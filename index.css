@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-body: "Open Sans", sans-serif;
+
+  --color-clinic-blue: #2b337e;
+  --color-clinic-lime: #d1da4d;
+  --color-clinic-purple: #c2a9eb;
+  --color-clinic-bg: #f2f2f2;
+
+  --animate-fade-in-up: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-float: float 8s ease-in-out infinite;
+  --animate-glow-cycle: glowCycle 12s ease-in-out infinite;
+
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+  @keyframes glowCycle {
+    0%, 100% { color: #2b337e; background-color: #2b337e; }
+    33% { color: #d1da4d; background-color: #d1da4d; }
+    66% { color: #c2a9eb; background-color: #c2a9eb; }
+  }
+}
+
+.edge-glow-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.edge-glow-border {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--color-clinic-blue), var(--color-clinic-lime), var(--color-clinic-purple), var(--color-clinic-blue));
+  background-size: 300% 100%;
+  animation: edgeGlow 8s linear infinite;
+  z-index: 0;
+}
+
+@keyframes edgeGlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-clinic-bg);
+  color: var(--color-clinic-blue);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-clinic-blue);
+  border-radius: 5px;
+}

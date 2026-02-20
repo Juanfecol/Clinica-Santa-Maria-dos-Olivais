@@ -1,0 +1,7 @@
+{
+  "name": "Clínica Dentária Santa Maria dos Olivais",
+  "description": "Website oficial da Clínica Santa Maria dos Olivais em Lisboa. Especialistas em Implantologia, Invisalign e Estética Dentária com mais de 10 anos de experiência.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

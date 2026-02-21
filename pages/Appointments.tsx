@@ -51,15 +51,22 @@ const Appointments: React.FC = () => {
           });
         }
         
-        // --- META PIXEL CONVERSION (Lead Event) ---
+        // --- META PIXEL CONVERSION (Standard Events) ---
         if ((window as any).trackMeta) {
+          // Evento estándar 'Lead' para captación de datos
           (window as any).trackMeta('Lead', { 
             content_name: dataObj.servico || 'Consulta Clínica',
+            content_category: 'Formulário',
             value: 25.0,
             currency: 'EUR'
           }, true);
           
-          (window as any).trackMeta('Envio_Formulario_Cita_Success');
+          // Evento estándar 'Schedule' para marcar la cita finalizada
+          (window as any).trackMeta('Schedule', {
+            content_name: dataObj.servico || 'Consulta Clínica',
+            value: 25.0,
+            currency: 'EUR'
+          }, true);
         }
 
         if ((window as any).trackEvent) { 

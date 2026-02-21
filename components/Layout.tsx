@@ -36,8 +36,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const trackWhatsAppClick = () => {
     if ((window as any).trackMeta) {
-      (window as any).trackMeta('Contact', { content_name: 'WhatsApp' }, true);
-      (window as any).trackMeta('WhatsApp_Lead_Click');
+      // Evento estándar 'Contact' para clics en WhatsApp
+      (window as any).trackMeta('Contact', { 
+        content_name: 'WhatsApp',
+        content_category: 'Messenger'
+      }, true);
     }
     trackGtagEvent('whatsapp_click', {
       'event_category': 'contact',

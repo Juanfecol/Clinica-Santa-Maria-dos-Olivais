@@ -1,20 +1,29 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import Team from './pages/Team';
-import Clinic from './pages/Clinic';
-import Contact from './pages/Contact';
-import Appointments from './pages/Appointments';
-import Campaigns from './pages/Campaigns';
-import Admin from './pages/Admin';
-import CookiesPolicy from './pages/CookiesPolicy';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsAndConditions from './pages/TermsAndConditions';
-import ThankYou from './pages/ThankYou';
 import ScrollToTop from './components/ScrollToTop';
 import { ContentProvider } from './context/ContentContext';
+
+// Lazy loading pages for performance
+const Home = lazy(() => import('./pages/Home'));
+const Team = lazy(() => import('./pages/Team'));
+const Clinic = lazy(() => import('./pages/Clinic'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Appointments = lazy(() => import('./pages/Appointments'));
+const Campaigns = lazy(() => import('./pages/Campaigns'));
+const Admin = lazy(() => import('./pages/Admin'));
+const CookiesPolicy = lazy(() => import('./pages/CookiesPolicy'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const ThankYou = lazy(() => import('./pages/ThankYou'));
+
+// Loading fallback
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-clinic-bg">
+    <div className="w-12 h-12 border-4 border-clinic-blue border-t-clinic-lime rounded-full animate-spin"></div>
+  </div>
+);
 
 const PixelRouteTracker: React.FC = () => {
   const location = useLocation();
@@ -27,8 +36,11 @@ const PixelRouteTracker: React.FC = () => {
 
     if (location.pathname.includes('marcacoes')) {
       if ((window as any).trackMeta) {
-        (window as any).trackMeta('InitiateCheckout', { content_name: 'Formulário de Marcação' }, true);
-        (window as any).trackMeta('Solicitud_Cita_Visit');
+        // Usamos eventos estándar recomendados por Meta para citas
+        (window as any).trackMeta('InitiateCheckout', { 
+          content_name: 'Formulário de Marcação',
+          content_category: 'Cita'
+        }, true);
       }
     }
   }, [location]);
@@ -80,17 +92,17 @@ const App: React.FC = () => {
         <ScrollToTop />
         <PixelRouteTracker />
         <Routes>
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/" element={<Layout><Home /></Layout>} />
-          <Route path="/equipa" element={<Layout><Team /></Layout>} />
-          <Route path="/clinica" element={<Layout><Clinic /></Layout>} />
-          <Route path="/contactos" element={<Layout><Contact /></Layout>} />
-          <Route path="/marcacoes" element={<Layout><Appointments /></Layout>} />
-          <Route path="/campanhas" element={<Layout><Campaigns /></Layout>} />
-          <Route path="/cookies" element={<Layout><CookiesPolicy /></Layout>} />
-          <Route path="/privacidade" element={<Layout><PrivacyPolicy /></Layout>} />
-          <Route path="/termos" element={<Layout><TermsAndConditions /></Layout>} />
-          <Route path="/obrigado" element={<Layout><ThankYou /></Layout>} />
+          <Route path="/admin" element={<Suspense fallback={<PageLoader />}><Admin /></Suspense>} />
+          <Route path="/" element={<Layout><Suspense fallback={<PageLoader />}><Home /></Suspense></Layout>} />
+          <Route path="/equipa" element={<Layout><Suspense fallback={<PageLoader />}><Team /></Suspense></Layout>} />
+          <Route path="/clinica" element={<Layout><Suspense fallback={<PageLoader />}><Clinic /></Suspense></Layout>} />
+          <Route path="/contactos" element={<Layout><Suspense fallback={<PageLoader />}><Contact /></Suspense></Layout>} />
+          <Route path="/marcacoes" element={<Layout><Suspense fallback={<PageLoader />}><Appointments /></Suspense></Layout>} />
+          <Route path="/campanhas" element={<Layout><Suspense fallback={<PageLoader />}><Campaigns /></Suspense></Layout>} />
+          <Route path="/cookies" element={<Layout><Suspense fallback={<PageLoader />}><CookiesPolicy /></Suspense></Layout>} />
+          <Route path="/privacidade" element={<Layout><Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense></Layout>} />
+          <Route path="/termos" element={<Layout><Suspense fallback={<PageLoader />}><TermsAndConditions /></Suspense></Layout>} />
+          <Route path="/obrigado" element={<Layout><Suspense fallback={<PageLoader />}><ThankYou /></Suspense></Layout>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </HashRouter>

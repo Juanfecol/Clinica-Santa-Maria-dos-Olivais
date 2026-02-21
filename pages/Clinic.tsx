@@ -21,7 +21,7 @@ const Clinic: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {gallery.map((src: string, index: number) => (
             <div key={index} className="h-64 rounded-xl overflow-hidden shadow-lg border border-white/20 hover:-translate-y-2 transition-transform duration-300">
-              <img src={src} alt={`Clinic Interior ${index + 1}`} className="w-full h-full object-cover" />
+              <img src={src} alt={`Clinic Interior ${index + 1}`} className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </div>
           ))}
         </div>
@@ -54,6 +54,8 @@ const Clinic: React.FC = () => {
              src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Slide%201.jpg" 
              alt="Compromisso e Valores Clínica Santa Maria dos Olivais" 
              className="rounded-[2.5rem] shadow-2xl w-full h-full min-h-[500px] object-cover object-center border-4 border-white transition-all duration-700 hover:scale-[1.01]" 
+             loading="lazy"
+             decoding="async"
            />
         </div>
       </section>

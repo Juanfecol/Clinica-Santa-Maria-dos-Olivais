@@ -292,7 +292,7 @@ const Home: React.FC = () => {
                     muted 
                     playsInline 
                     webkit-playsinline="true" 
-                    preload={isCenter ? "auto" : "metadata"}
+                    preload="none"
                     onEnded={isCenter ? handleNextStory : undefined} 
                   />
                 ) : (
@@ -301,6 +301,7 @@ const Home: React.FC = () => {
                     className="absolute inset-0 w-full h-full object-cover" 
                     alt={story.title} 
                     loading="lazy" 
+                    decoding="async"
                   />
                 )}
                 {isCenter && (
@@ -369,7 +370,6 @@ const Home: React.FC = () => {
                 muted 
                 playsInline 
                 preload="none"
-                loading="lazy"
                 className="w-full h-full object-cover"
                 aria-label="Vídeo informativo sobre cuidados dentários em Portugal"
               />
@@ -399,7 +399,6 @@ const Home: React.FC = () => {
                     muted 
                     playsInline 
                     preload="none" 
-                    loading="lazy"
                     className="w-full h-full object-cover" 
                   />
                   <button 
@@ -517,7 +516,7 @@ const Home: React.FC = () => {
 
       <section className="relative z-30 py-16 md:py-24 text-center">
         <div className="max-w-[1100px] mx-auto px-4 flex flex-col items-center">
-          <h2 className="text-2xl sm:text-4xl md:text-6xl font-bold text-clinic-blue mb-12 flex flex-wrap justify-center items-center gap-4"><span>Transforme o seu</span><div className="w-[80px] h-[55px] md:w-[150px] md:h-[100px] rounded-2xl overflow-hidden border-4 border-white shadow-xl flex items-center justify-center bg-white/10"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Capture-removebg-preview.png" className="w-[85%] h-[85%] object-contain animate-float" alt="Smile Logo" loading="lazy" /></div><span className="font-serif italic text-clinic-purple">sorriso</span><span>hoje!</span></h2>
+          <h2 className="text-2xl sm:text-4xl md:text-6xl font-bold text-clinic-blue mb-12 flex flex-wrap justify-center items-center gap-4"><span>Transforme o seu</span><div className="w-[80px] h-[55px] md:w-[150px] md:h-[100px] rounded-2xl overflow-hidden border-4 border-white shadow-xl flex items-center justify-center bg-white/10"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Capture-removebg-preview.png" className="w-[85%] h-[85%] object-contain animate-float" alt="Smile Logo" loading="lazy" decoding="async" /></div><span className="font-serif italic text-clinic-purple">sorriso</span><span>hoje!</span></h2>
           <Link to="/marcacoes" className="inline-block bg-clinic-blue text-white px-6 py-4 rounded-full text-base font-bold shadow-2xl hover:bg-clinic-purple transition-all transform hover:-translate-y-2 text-center w-full max-w-[320px] sm:w-auto sm:px-12 sm:py-5 sm:text-xl active:scale-95">Agende Sua Consulta <span className="animate-pulse ml-2 inline-block">♥</span></Link>
         </div>
       </section>

@@ -14,6 +14,15 @@
     <meta name="author" content="Clínica Santa Maria dos Olivais">
     <meta name="robots" content="index, follow">
 
+    <!-- Resource Hints for Performance -->
+    <link rel="preconnect" href="https://clinica-santa-maria-dos-olivais.b-cdn.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://connect.facebook.net">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://clinica-santa-maria-dos-olivais.b-cdn.net">
+    <link rel="dns-prefetch" href="https://formspree.io">
+
     <!-- Open Graph / Facebook / Meta -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://clinicadentariasantamariadosolivais.pt/">
@@ -83,12 +92,8 @@
       fbq('track', 'PageView');
 
       window.trackMeta = function(eventName, params = {}, isStandard = false) {
-        if (typeof fbq !== 'undefined') {
-          if (isStandard) {
-            fbq('track', eventName, params);
-          } else {
-            fbq('trackCustom', eventName, params);
-          }
+        if (typeof fbq !== 'undefined' && isStandard) {
+          fbq('track', eventName, params);
         }
       };
     </script>
@@ -105,9 +110,6 @@
       window.trackEvent = function(eventName, eventParams = {}) {
         if (typeof gtag !== 'undefined') {
           gtag('event', eventName, { ...eventParams, 'send_to': ['AW-434250599', 'AW-1135006626'] });
-        }
-        if (window.trackMeta) {
-          window.trackMeta(eventName, eventParams);
         }
       };
     </script>

@@ -106,6 +106,28 @@ const Home: React.FC = () => {
     }
   };
 
+  const [activeVideoProgress, setActiveVideoProgress] = useState(0);
+
+  useEffect(() => {
+    const activeVideo = videoRefs.current[centerIndex];
+    if (!activeVideo) {
+      setActiveVideoProgress(0);
+      return;
+    }
+
+    const handleTimeUpdate = () => {
+      if (activeVideo.duration) {
+        const progress = (activeVideo.currentTime / activeVideo.duration) * 100;
+        setActiveVideoProgress(progress);
+      }
+    };
+
+    activeVideo.addEventListener('timeupdate', handleTimeUpdate);
+    return () => {
+      activeVideo.removeEventListener('timeupdate', handleTimeUpdate);
+    };
+  }, [centerIndex, isStoriesVisible]);
+
   const handleNextStory = useCallback(() => {
     if (stories.length === 0) return;
     setCenterIndex((prev) => (prev + 1) % stories.length);
@@ -282,35 +304,48 @@ const Home: React.FC = () => {
                 }} 
                 onClick={() => setCenterIndex(index)} 
               >
-                {story.type === 'video' ? (
-                  <video 
-                    key={story.src} 
-                    ref={(el) => (videoRefs.current[index] = el)} 
-                    src={story.src} 
-                    poster={story.thumbnail} 
-                    className="absolute inset-0 w-full h-full object-cover" 
-                    muted 
-                    playsInline 
-                    webkit-playsinline="true" 
-                    preload="none"
-                    onEnded={isCenter ? handleNextStory : undefined} 
-                  />
-                ) : (
-                  <img 
-                    src={story.thumbnail || story.src} 
-                    className="absolute inset-0 w-full h-full object-cover" 
-                    alt={story.title} 
-                    loading="lazy" 
-                    decoding="async"
-                  />
-                )}
-                {isCenter && (
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 to-transparent z-10">
-                    <p className="text-white text-[10px] md:text-xs font-bold uppercase tracking-widest text-center drop-shadow-md">
-                      {story.title}
-                    </p>
-                  </div>
-                )}
+                <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+                  {story.type === 'video' ? (
+                    <video 
+                      key={story.src} 
+                      ref={(el) => (videoRefs.current[index] = el)} 
+                      src={story.src} 
+                      poster={story.thumbnail} 
+                      className="absolute inset-0 w-full h-full object-cover" 
+                      muted 
+                      playsInline 
+                      webkit-playsinline="true" 
+                      preload="none"
+                      onEnded={isCenter ? handleNextStory : undefined} 
+                    />
+                  ) : (
+                    <img 
+                      src={story.thumbnail || story.src} 
+                      className="absolute inset-0 w-full h-full object-cover" 
+                      alt={story.title} 
+                      loading="lazy" 
+                      decoding="async"
+                    />
+                  )}
+                  
+                  {isCenter && (
+                    <>
+                      {/* Progress Bar at the bottom */}
+                      <div className="absolute bottom-0 left-0 w-full h-1.5 bg-white/20 z-20">
+                        <div 
+                          className="h-full bg-gradient-to-r from-clinic-blue via-clinic-lime to-clinic-purple transition-all duration-150 ease-linear"
+                          style={{ width: `${activeVideoProgress}%` }}
+                        />
+                      </div>
+                      
+                      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-black/95 to-transparent z-10">
+                        <p className="text-white text-[10px] md:text-xs font-bold uppercase tracking-widest text-center drop-shadow-md">
+                          {story.title}
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             );
           })}

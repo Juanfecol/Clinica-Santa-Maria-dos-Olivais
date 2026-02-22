@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { useContent } from '../context/ContentContext';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useGoogleAds } from '../hooks/useGoogleAds';
 
 const Appointments: React.FC = () => {
   const { content } = useContent();
+  const { trackForm } = useGoogleAds();
   const appointmentsData = content.appointments || { heroImage: "", services: [] };
   const services = appointmentsData.services || [];
   
@@ -36,7 +38,9 @@ const Appointments: React.FC = () => {
       });
 
       if (response.ok) {
-        // --- GOOGLE ADS CONVERSION ---
+        trackForm(); // Google Ads Conversion (New Hook)
+        
+        // --- GOOGLE ADS CONVERSION (Legacy) ---
         if (typeof (window as any).gtag === 'function') {
           (window as any).gtag('event', 'conversion', { 
             'send_to': 'AW-434250599', 

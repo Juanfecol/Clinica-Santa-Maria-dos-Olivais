@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
+import { useGoogleAds } from '../hooks/useGoogleAds';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { trackWhatsApp, trackPhone } = useGoogleAds();
   
   const { content } = useContent();
   const navigation = content.navigation || [];
@@ -35,6 +37,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   const trackWhatsAppClick = () => {
+    trackWhatsApp(); // Google Ads Conversion
     if ((window as any).trackMeta) {
       // Evento estándar 'Contact' para clics en WhatsApp
       (window as any).trackMeta('Contact', { 
@@ -49,6 +52,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   const trackPhoneClick = (number: string) => {
+    trackPhone(); // Google Ads Conversion
     if ((window as any).trackMeta) {
       (window as any).trackMeta('Contact', { content_name: 'Phone Call' }, true);
     }

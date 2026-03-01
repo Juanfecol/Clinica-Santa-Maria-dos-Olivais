@@ -90,7 +90,9 @@ const Appointments: React.FC = () => {
         setSuccessMessage('Mensagem enviada com sucesso! Entraremos em contacto em breve.');
         form.reset();
       } else {
-        alert("Ocorreu um erro ao enviar o formulário.");
+        const errorData = await response.json();
+        const errorMessage = errorData.error?.message || errorData.error || "Ocorreu um erro ao enviar o formulário.";
+        alert(`Erro: ${errorMessage}`);
       }
     } catch (error) {
       alert("Erro de ligação. Verifique a sua ligação.");

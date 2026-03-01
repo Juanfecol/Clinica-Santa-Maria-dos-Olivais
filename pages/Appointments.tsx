@@ -18,6 +18,7 @@ const Appointments: React.FC = () => {
     : "";
 
   const [isSending, setIsSending] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,20 +26,28 @@ const Appointments: React.FC = () => {
     if (!form.checkValidity()) { form.reportValidity(); return; }
     if (isSending) return;
     setIsSending(true);
+    setSuccessMessage('');
 
     const formData = new FormData(form);
     const dataObj = Object.fromEntries(formData.entries());
-    const payload = { ...dataObj, _subject: `Nova Marcação: ${dataObj.nome}`, _replyto: dataObj.email, destination_email_hint: "clinicasmod@gmail.com" };
+    
+    // Map form fields to API expected names
+    const payload = {
+      name: dataObj.nome,
+      email: dataObj.email,
+      phone: dataObj.telemovel,
+      message: `Serviço de interesse: ${dataObj.servico || 'Não especificado'}`
+    };
 
     try {
-      const response = await fetch(`https://formspree.io/f/xwvlagzr`, { 
+      const response = await fetch('/api/send', { 
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       if (response.ok) {
-        trackForm(); // Google Ads Conversion (New Hook)
+        trackForm(); // Google Ads Conversion
         
         // --- GOOGLE ADS CONVERSION (Legacy) ---
         if (typeof (window as any).gtag === 'function') {
@@ -55,9 +64,8 @@ const Appointments: React.FC = () => {
           });
         }
         
-        // --- META PIXEL CONVERSION (Standard Events) ---
+        // --- META PIXEL CONVERSION ---
         if ((window as any).trackMeta) {
-          // Evento estándar 'Lead' para captación de datos
           (window as any).trackMeta('Lead', { 
             content_name: dataObj.servico || 'Consulta Clínica',
             content_category: 'Formulário',
@@ -65,7 +73,6 @@ const Appointments: React.FC = () => {
             currency: 'EUR'
           }, true);
           
-          // Evento estándar 'Schedule' para marcar la cita finalizada
           (window as any).trackMeta('Schedule', {
             content_name: dataObj.servico || 'Consulta Clínica',
             value: 25.0,
@@ -80,7 +87,8 @@ const Appointments: React.FC = () => {
           }); 
         }
         
-        navigate('/obrigado', { state: dataObj });
+        setSuccessMessage('Mensagem enviada com sucesso! Entraremos em contacto em breve.');
+        form.reset();
       } else {
         alert("Ocorreu um erro ao enviar o formulário.");
       }
@@ -107,6 +115,11 @@ const Appointments: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
+            {successMessage && (
+              <div className="bg-clinic-lime/10 border border-clinic-lime text-clinic-blue p-4 rounded-2xl text-center font-medium animate-fade-in">
+                {successMessage}
+              </div>
+            )}
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-clinic-purple uppercase tracking-[0.2em] ml-2">Nome Completo</label>
               <input name="nome" type="text" placeholder="Ex: João Silva" className="w-full px-6 py-4 rounded-2xl border border-gray-100 focus:border-clinic-blue outline-none transition-all shadow-sm text-lg" required />
@@ -135,7 +148,7 @@ const Appointments: React.FC = () => {
             </div>
 
             <button type="submit" disabled={isSending} className={`w-full bg-clinic-blue text-white font-bold text-xl py-5 rounded-2xl transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 ${isSending ? 'opacity-70' : 'hover:bg-clinic-purple'}`}>
-              {isSending ? <><i className="fas fa-spinner animate-spin"></i> A Enviar...</> : <>Agendar Agora <i className="fas fa-arrow-right text-sm"></i></>}
+              {isSending ? <><i className="fas fa-spinner animate-spin"></i> A enviar...</> : <>Agendar Agora <i className="fas fa-arrow-right text-sm"></i></>}
             </button>
           </form>
         </div>

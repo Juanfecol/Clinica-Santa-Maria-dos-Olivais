@@ -5,15 +5,15 @@ const IntroOverlay: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
-    // Keep the logo visible for 2.5 seconds, then start exit animation
+    // Keep the logo visible for 1.5 seconds, then start exit animation
     const timer1 = setTimeout(() => {
       setExiting(true);
-    }, 2500);
+    }, 1500);
 
     // Allow time for the slide animation (2.0s) to finish before unmounting
     const timer2 = setTimeout(() => {
       onComplete();
-    }, 4600); // 2500ms + 2100ms buffer
+    }, 3600); // 1500ms + 2100ms buffer
 
     return () => {
       clearTimeout(timer1);
@@ -45,6 +45,7 @@ const IntroOverlay: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
             src="https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/05/Capture-removebg-preview.png" 
             alt="Logo Clínica Santa Maria dos Olivais" 
             className="w-32 h-32 md:w-48 md:h-48 object-contain mb-8 drop-shadow-lg"
+            fetchPriority="high"
         />
         <h1 className="text-4xl md:text-5xl font-bold text-clinic-blue mb-6 font-serif leading-tight drop-shadow-md">
           Clínica Santa Maria <br className="md:hidden" />dos Olivais

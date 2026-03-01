@@ -73,11 +73,22 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     trackGtagEvent('location_click', { 'event_category': 'contact', 'event_label': 'Maps' });
   };
 
+  const [bgLoaded, setBgLoaded] = useState(false);
+
+  useEffect(() => {
+    setBgLoaded(true);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen font-sans text-clinic-blue bg-clinic-bg overflow-x-hidden">
       <header className="fixed top-2 md:top-5 left-0 right-0 mx-auto w-[92%] md:w-[90%] max-w-[1400px] h-[65px] md:h-[90px] bg-white/20 backdrop-blur-md border border-white/30 rounded-[20px] md:rounded-[30px] flex justify-between items-center px-4 md:px-[40px] z-[100] shadow-lg transition-all hover:bg-white/30">
         <Link to="/" className="z-[110] flex-shrink-0">
-          <img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Capture-removebg-preview.png" alt="Clínica Santa Maria dos Olivais" className="h-[40px] sm:h-[48px] md:h-[68px] w-auto object-contain transition-transform hover:scale-105" />
+          <img 
+            src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Capture-removebg-preview.png" 
+            alt="Clínica Santa Maria dos Olivais" 
+            className="h-[40px] sm:h-[48px] md:h-[68px] w-auto object-contain transition-transform hover:scale-105" 
+            fetchPriority="high"
+          />
         </Link>
         <button 
           className="flex flex-col justify-between w-[24px] h-[16px] md:w-[30px] md:h-[22px] cursor-pointer z-[110] flex-shrink-0 transition-all" 
@@ -109,7 +120,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </div>
 
       <main className="flex-grow pt-[90px] md:pt-[130px] relative">
-        <div className="fixed inset-0 pointer-events-none opacity-[0.02] z-[-1]" style={{ backgroundImage: `url('https://clinicadentariasantamariadosolivais.pt/wp-content/uploads/2025/05/Sem-titulo-7.png')`, backgroundSize: '250px', backgroundRepeat: 'repeat' }}></div>
+        {bgLoaded && (
+          <div className="fixed inset-0 pointer-events-none opacity-[0.02] z-[-1]" style={{ backgroundImage: `url('https://clinicadentariasantamariadosolivais.pt/wp-content/uploads/2025/05/Sem-titulo-7.png')`, backgroundSize: '250px', backgroundRepeat: 'repeat' }}></div>
+        )}
         {children}
       </main>
 

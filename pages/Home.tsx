@@ -107,6 +107,7 @@ const Home: React.FC = () => {
   };
 
   const [activeVideoProgress, setActiveVideoProgress] = useState(0);
+  const [loadingStates, setLoadingStates] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const activeVideo = videoRefs.current[centerIndex];
@@ -115,6 +116,9 @@ const Home: React.FC = () => {
       return;
     }
 
+    // Reset progress when changing story
+    setActiveVideoProgress(0);
+
     const handleTimeUpdate = () => {
       if (activeVideo.duration) {
         const progress = (activeVideo.currentTime / activeVideo.duration) * 100;
@@ -122,9 +126,25 @@ const Home: React.FC = () => {
       }
     };
 
+    const handleWaiting = () => setLoadingStates(prev => ({ ...prev, [centerIndex]: true }));
+    const handlePlaying = () => setLoadingStates(prev => ({ ...prev, [centerIndex]: false }));
+    const handleCanPlay = () => setLoadingStates(prev => ({ ...prev, [centerIndex]: false }));
+
     activeVideo.addEventListener('timeupdate', handleTimeUpdate);
+    activeVideo.addEventListener('waiting', handleWaiting);
+    activeVideo.addEventListener('playing', handlePlaying);
+    activeVideo.addEventListener('canplay', handleCanPlay);
+
+    // Check if already playing
+    if (!activeVideo.paused) {
+      setLoadingStates(prev => ({ ...prev, [centerIndex]: false }));
+    }
+
     return () => {
       activeVideo.removeEventListener('timeupdate', handleTimeUpdate);
+      activeVideo.removeEventListener('waiting', handleWaiting);
+      activeVideo.removeEventListener('playing', handlePlaying);
+      activeVideo.removeEventListener('canplay', handleCanPlay);
     };
   }, [centerIndex, isStoriesVisible]);
 
@@ -153,9 +173,6 @@ const Home: React.FC = () => {
         entries.forEach(entry => {
           if (entry.target === storiesSectionRef.current) {
             setIsStoriesVisible(entry.isIntersecting);
-            if (!entry.isIntersecting) {
-              videoRefs.current.forEach(v => { if (v) v.muted = true; });
-            }
           }
           
           if (entry.target === expVideoRef.current) {
@@ -179,7 +196,7 @@ const Home: React.FC = () => {
           }
         });
       },
-      { threshold: 0.6 }
+      { threshold: 0.1, rootMargin: '100px' }
     );
     if (storiesSectionRef.current) observer.observe(storiesSectionRef.current);
     if (expVideoRef.current) observer.observe(expVideoRef.current);
@@ -194,27 +211,45 @@ const Home: React.FC = () => {
         return;
       }
 
+      // Pause and mute non-active videos
+      videoRefs.current.forEach((v, i) => {
+        if (v && i !== centerIndex) {
+          v.pause();
+          v.muted = true;
+        }
+      });
+
+      // Handle active video
+      const activeVideo = videoRefs.current[centerIndex];
+      if (activeVideo) {
+        activeVideo.muted = !hasInteracted;
+        
+        if (activeVideo.paused) {
+          try {
+            await activeVideo.play();
+          } catch (e) {
+            activeVideo.muted = true;
+            activeVideo.play().catch(() => {});
+          }
+        }
+      }
+
       if (expVideoRef.current) { expVideoRef.current.muted = true; setIsExpMuted(true); }
       if (campVideoRef.current) { campVideoRef.current.muted = true; setIsCampMuted(true); }
-
-      for (let i = 0; i < videoRefs.current.length; i++) {
-        const v = videoRefs.current[i];
-        if (!v) continue;
-        const isCenter = i === centerIndex;
-
-        if (isCenter) {
-          v.currentTime = 0;
-          v.muted = !hasInteracted;
-          v.loop = false;
-        } else {
-          v.muted = true;
-          v.loop = true;
-        }
-
-        try { await v.play(); } catch (e) { v.muted = true; v.play().catch(() => {}); }
-      }
     };
+
     syncPlayback();
+    
+    // Retry mechanism for autoplay
+    const interval = setInterval(() => {
+      const activeVideo = videoRefs.current[centerIndex];
+      if (activeVideo && activeVideo.paused && isStoriesVisible) {
+        activeVideo.muted = true;
+        activeVideo.play().catch(() => {});
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, [centerIndex, isStoriesVisible, hasInteracted]);
 
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
@@ -302,10 +337,20 @@ const Home: React.FC = () => {
                   ...getStoryStyle(index),
                   WebkitMaskImage: '-webkit-radial-gradient(white, black)',
                 }} 
-                onClick={() => setCenterIndex(index)} 
+                onClick={() => {
+                  if (isCenter) {
+                    const activeVideo = videoRefs.current[index];
+                    if (activeVideo) {
+                      if (activeVideo.paused) activeVideo.play().catch(() => {});
+                      else activeVideo.pause();
+                    }
+                  } else {
+                    setCenterIndex(index);
+                  }
+                }} 
               >
                 <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
-                  {story.type === 'video' ? (
+                  {story.type === 'video' && story.src ? (
                     <video 
                       key={story.src} 
                       ref={(el) => (videoRefs.current[index] = el)} 
@@ -315,17 +360,42 @@ const Home: React.FC = () => {
                       muted 
                       playsInline 
                       webkit-playsinline="true" 
-                      preload="none"
+                      preload={Math.abs(index - centerIndex) <= 1 ? "auto" : "none"}
+                      crossOrigin="anonymous"
+                      autoPlay={isCenter}
+                      onLoadStart={() => setLoadingStates(prev => ({ ...prev, [index]: true }))}
+                      onCanPlay={() => setLoadingStates(prev => ({ ...prev, [index]: false }))}
                       onEnded={isCenter ? handleNextStory : undefined} 
                     />
+                  ) : story.type === 'video' ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                      <i className="fas fa-video-slash text-gray-400"></i>
+                    </div>
                   ) : (
                     <img 
                       src={story.thumbnail || story.src} 
                       className="absolute inset-0 w-full h-full object-cover" 
                       alt={story.title} 
-                      loading="lazy" 
+                      loading={index < 3 ? "eager" : "lazy"} 
                       decoding="async"
+                      {...(index === 0 ? { fetchPriority: "high" } : {})}
                     />
+                  )}
+
+                  {/* Loading Spinner */}
+                  {story.type === 'video' && loadingStates[index] && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px] z-30 transition-opacity duration-300">
+                      <div className="w-10 h-10 border-3 border-white/20 border-t-white rounded-full animate-spin shadow-lg"></div>
+                    </div>
+                  )}
+
+                  {/* Unmute Hint */}
+                  {isCenter && !hasInteracted && !loadingStates[index] && (
+                    <div className="absolute top-4 right-4 z-30 animate-bounce">
+                      <div className="bg-black/40 backdrop-blur-md p-2 rounded-full border border-white/20">
+                        <i className="fas fa-volume-mute text-white text-xs"></i>
+                      </div>
+                    </div>
                   )}
                   
                   {isCenter && (
@@ -405,6 +475,8 @@ const Home: React.FC = () => {
                 muted 
                 playsInline 
                 preload="none"
+                crossOrigin="anonymous"
+                autoPlay
                 className="w-full h-full object-cover"
                 aria-label="Vídeo informativo sobre cuidados dentários em Portugal"
               />
@@ -434,6 +506,8 @@ const Home: React.FC = () => {
                     muted 
                     playsInline 
                     preload="none" 
+                    crossOrigin="anonymous"
+                    autoPlay
                     className="w-full h-full object-cover" 
                   />
                   <button 

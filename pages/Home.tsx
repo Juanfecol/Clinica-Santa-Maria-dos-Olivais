@@ -107,7 +107,6 @@ const Home: React.FC = () => {
   };
 
   const [activeVideoProgress, setActiveVideoProgress] = useState(0);
-  const [loadingStates, setLoadingStates] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const activeVideo = videoRefs.current[centerIndex];
@@ -116,9 +115,6 @@ const Home: React.FC = () => {
       return;
     }
 
-    // Reset progress when changing story
-    setActiveVideoProgress(0);
-
     const handleTimeUpdate = () => {
       if (activeVideo.duration) {
         const progress = (activeVideo.currentTime / activeVideo.duration) * 100;
@@ -126,25 +122,9 @@ const Home: React.FC = () => {
       }
     };
 
-    const handleWaiting = () => setLoadingStates(prev => ({ ...prev, [centerIndex]: true }));
-    const handlePlaying = () => setLoadingStates(prev => ({ ...prev, [centerIndex]: false }));
-    const handleCanPlay = () => setLoadingStates(prev => ({ ...prev, [centerIndex]: false }));
-
     activeVideo.addEventListener('timeupdate', handleTimeUpdate);
-    activeVideo.addEventListener('waiting', handleWaiting);
-    activeVideo.addEventListener('playing', handlePlaying);
-    activeVideo.addEventListener('canplay', handleCanPlay);
-
-    // Check if already playing
-    if (!activeVideo.paused) {
-      setLoadingStates(prev => ({ ...prev, [centerIndex]: false }));
-    }
-
     return () => {
       activeVideo.removeEventListener('timeupdate', handleTimeUpdate);
-      activeVideo.removeEventListener('waiting', handleWaiting);
-      activeVideo.removeEventListener('playing', handlePlaying);
-      activeVideo.removeEventListener('canplay', handleCanPlay);
     };
   }, [centerIndex, isStoriesVisible]);
 
@@ -196,7 +176,7 @@ const Home: React.FC = () => {
           }
         });
       },
-      { threshold: 0.1, rootMargin: '100px' }
+      { threshold: 0.05, rootMargin: '200px' }
     );
     if (storiesSectionRef.current) observer.observe(storiesSectionRef.current);
     if (expVideoRef.current) observer.observe(expVideoRef.current);
@@ -211,28 +191,21 @@ const Home: React.FC = () => {
         return;
       }
 
-      // Pause and mute non-active videos
+      // Play all videos when section is visible, but only center one can have audio
       videoRefs.current.forEach((v, i) => {
-        if (v && i !== centerIndex) {
-          v.pause();
-          v.muted = true;
-        }
-      });
-
-      // Handle active video
-      const activeVideo = videoRefs.current[centerIndex];
-      if (activeVideo) {
-        activeVideo.muted = !hasInteracted;
-        
-        if (activeVideo.paused) {
-          try {
-            await activeVideo.play();
-          } catch (e) {
-            activeVideo.muted = true;
-            activeVideo.play().catch(() => {});
+        if (v) {
+          if (i !== centerIndex) {
+            v.muted = true;
+            v.play().catch(() => {});
+          } else {
+            v.muted = !hasInteracted;
+            v.play().catch(() => {
+              v.muted = true;
+              v.play().catch(() => {});
+            });
           }
         }
-      }
+      });
 
       if (expVideoRef.current) { expVideoRef.current.muted = true; setIsExpMuted(true); }
       if (campVideoRef.current) { campVideoRef.current.muted = true; setIsCampMuted(true); }
@@ -332,39 +305,26 @@ const Home: React.FC = () => {
             return (
               <div 
                 key={story.id} 
-                className={`absolute w-[125px] h-[210px] md:w-[200px] md:h-[330px] rounded-[2.2rem] md:rounded-[3.2rem] border-[4px] md:border-[8px] border-white overflow-hidden bg-white cursor-pointer transition-all duration-500 isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)]' : 'shadow-xl'}`}
+                className={`absolute w-[125px] h-[210px] md:w-[200px] md:h-[330px] rounded-[2.2rem] md:rounded-[3.2rem] border-[4px] md:border-[8px] border-white overflow-hidden bg-black cursor-pointer transition-all duration-500 isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)]' : 'shadow-xl'}`}
                 style={{
                   ...getStoryStyle(index),
-                  WebkitMaskImage: '-webkit-radial-gradient(white, black)',
                 }} 
-                onClick={() => {
-                  if (isCenter) {
-                    const activeVideo = videoRefs.current[index];
-                    if (activeVideo) {
-                      if (activeVideo.paused) activeVideo.play().catch(() => {});
-                      else activeVideo.pause();
-                    }
-                  } else {
-                    setCenterIndex(index);
-                  }
-                }} 
+                onClick={() => setCenterIndex(index)} 
               >
-                <div className="absolute inset-0 overflow-hidden rounded-[inherit]">
+                <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-black">
                   {story.type === 'video' && story.src ? (
                     <video 
                       key={story.src} 
                       ref={(el) => (videoRefs.current[index] = el)} 
                       src={story.src} 
-                      poster={story.thumbnail} 
+                      poster={story.thumbnail || `${story.src}#t=0.1`} 
                       className="absolute inset-0 w-full h-full object-cover" 
                       muted 
                       playsInline 
                       webkit-playsinline="true" 
-                      preload={Math.abs(index - centerIndex) <= 1 ? "auto" : "none"}
-                      crossOrigin="anonymous"
+                      referrerPolicy="no-referrer"
+                      preload="auto"
                       autoPlay={isCenter}
-                      onLoadStart={() => setLoadingStates(prev => ({ ...prev, [index]: true }))}
-                      onCanPlay={() => setLoadingStates(prev => ({ ...prev, [index]: false }))}
                       onEnded={isCenter ? handleNextStory : undefined} 
                     />
                   ) : story.type === 'video' ? (
@@ -376,26 +336,11 @@ const Home: React.FC = () => {
                       src={story.thumbnail || story.src} 
                       className="absolute inset-0 w-full h-full object-cover" 
                       alt={story.title} 
+                      referrerPolicy="no-referrer"
                       loading={index < 3 ? "eager" : "lazy"} 
                       decoding="async"
                       {...(index === 0 ? { fetchPriority: "high" } : {})}
                     />
-                  )}
-
-                  {/* Loading Spinner */}
-                  {story.type === 'video' && loadingStates[index] && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px] z-30 transition-opacity duration-300">
-                      <div className="w-10 h-10 border-3 border-white/20 border-t-white rounded-full animate-spin shadow-lg"></div>
-                    </div>
-                  )}
-
-                  {/* Unmute Hint */}
-                  {isCenter && !hasInteracted && !loadingStates[index] && (
-                    <div className="absolute top-4 right-4 z-30 animate-bounce">
-                      <div className="bg-black/40 backdrop-blur-md p-2 rounded-full border border-white/20">
-                        <i className="fas fa-volume-mute text-white text-xs"></i>
-                      </div>
-                    </div>
                   )}
                   
                   {isCenter && (
@@ -474,9 +419,8 @@ const Home: React.FC = () => {
                 loop 
                 muted 
                 playsInline 
-                preload="none"
-                crossOrigin="anonymous"
-                autoPlay
+                preload="metadata"
+                referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
                 aria-label="Vídeo informativo sobre cuidados dentários em Portugal"
               />
@@ -505,9 +449,9 @@ const Home: React.FC = () => {
                     loop 
                     muted 
                     playsInline 
-                    preload="none" 
-                    crossOrigin="anonymous"
+                    preload="metadata" 
                     autoPlay
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover" 
                   />
                   <button 

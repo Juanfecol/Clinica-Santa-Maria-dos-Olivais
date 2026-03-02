@@ -188,7 +188,12 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       const saved = localStorage.getItem('site_content_v3');
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Migração/Segurança: Garantir que as histórias existem no conteúdo guardado
+        if (!parsed.stories || !Array.isArray(parsed.stories) || parsed.stories.length === 0) {
+          parsed.stories = defaultData.stories;
+        }
+        return parsed;
       }
     } catch (e) {
       console.error("Content load failed", e);

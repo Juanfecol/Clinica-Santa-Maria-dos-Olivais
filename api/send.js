@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
-// Clave configurada directamente para funcionamiento inmediato
-const resend = new Resend('re_K4soxQjj_NqnjBWg1a7dsWG1yfeSN3Sr9');
+// Clave configurada a través de variables de entorno para mayor seguridad
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });

@@ -8,7 +8,7 @@ async function startServer() {
 
   app.use(express.json());
 
-  const resend = new Resend('re_K4soxQjj_NqnjBWg1a7dsWG1yfeSN3Sr9');
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   // API route for Resend
   app.post("/api/send", async (req, res) => {

@@ -6,6 +6,7 @@ const defaultData = {
   global: {
     email: "clinicasmod@gmail.com",
     phone: "211 350 066",
+    customerService: "923 233 393",
     mobile: "+351 919 861 310",
     address: "Estrada de Moscavide N 32C, 1800-279, Lisboa",
     mapsLink: "https://www.google.com/maps/search/?api=1&query=Estrada+de+Moscavide+N+32C,+1800-279,+Lisboa",

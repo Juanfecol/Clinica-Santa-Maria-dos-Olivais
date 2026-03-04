@@ -26,9 +26,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return () => { document.body.style.overflow = 'unset'; };
   }, [isMenuOpen]);
 
-  const contactEmail = "clinicasmod@gmail.com";
-  const contactPhone = "211 350 066";
+  const contactEmail = global.email || "clinicasmod@gmail.com";
+  const contactPhone = global.phone || "211 350 066";
+  const customerService = global.customerService || "923 233 393";
   const cleanPhone = contactPhone.replace(/\s+/g, '');
+  const cleanCustomerService = customerService.replace(/\s+/g, '');
 
   const trackGtagEvent = (name: string, params: any) => {
     if ((window as any).trackEvent) {
@@ -160,7 +162,14 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <h4 className="text-lg md:text-xl font-medium text-clinic-purple mb-2 uppercase tracking-wider">Contactos</h4>
                 <div className="space-y-3">
                   <a href={`mailto:${contactEmail}`} onClick={() => trackEmailClick(contactEmail)} className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold">{contactEmail}</a>
-                  <a href={`tel:${cleanPhone}`} onClick={() => trackPhoneClick(contactPhone)} className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold">{contactPhone}</a>
+                  <div className="text-white">
+                    <p className="text-xs text-clinic-purple uppercase font-bold tracking-widest mb-1">Apoio ao Cliente 24h</p>
+                    <a href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className="text-base md:text-lg hover:text-clinic-lime transition-colors block font-bold">{customerService} <span className="text-[10px] font-light block opacity-70">(marcação de consultas - urgências e dúvidas)</span></a>
+                  </div>
+                  <div className="text-white">
+                    <p className="text-xs text-clinic-purple uppercase font-bold tracking-widest mb-1">Receção</p>
+                    <a href={`tel:${cleanPhone}`} onClick={() => trackPhoneClick(contactPhone)} className="text-base md:text-lg hover:text-clinic-lime transition-colors block font-bold">{contactPhone}</a>
+                  </div>
                   <a href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold">WhatsApp: {global.mobile}</a>
                 </div>
               </div>

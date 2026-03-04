@@ -305,9 +305,10 @@ const Home: React.FC = () => {
             return (
               <div 
                 key={story.id} 
-                className={`absolute w-[125px] h-[210px] md:w-[200px] md:h-[330px] rounded-[2.2rem] md:rounded-[3.2rem] border-[4px] md:border-[8px] border-white overflow-hidden bg-black cursor-pointer transition-all duration-500 isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)]' : 'shadow-xl'}`}
+                className={`absolute w-[125px] h-[210px] md:w-[200px] md:h-[330px] rounded-[2.2rem] md:rounded-[3.2rem] border-[4px] md:border-[8px] border-white overflow-hidden cursor-pointer transition-all duration-500 isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)]' : 'shadow-xl'}`}
                 style={{
                   ...getStoryStyle(index),
+                  WebkitMaskImage: '-webkit-radial-gradient(white, black)',
                 }} 
                 onClick={() => setCenterIndex(index)} 
               >
@@ -318,7 +319,8 @@ const Home: React.FC = () => {
                       ref={(el) => (videoRefs.current[index] = el)} 
                       src={story.src} 
                       poster={story.thumbnail || `${story.src}#t=0.1`} 
-                      className="absolute inset-0 w-full h-full object-cover" 
+                      className="absolute inset-0 w-full h-full object-cover rounded-[inherit] scale-[1.02]" 
+                      style={{ transform: 'translateZ(0)' }}
                       muted 
                       playsInline 
                       webkit-playsinline="true" 
@@ -334,7 +336,8 @@ const Home: React.FC = () => {
                   ) : (
                     <img 
                       src={story.thumbnail || story.src} 
-                      className="absolute inset-0 w-full h-full object-cover" 
+                      className="absolute inset-0 w-full h-full object-cover rounded-[inherit] scale-[1.02]" 
+                      style={{ transform: 'translateZ(0)' }}
                       alt={story.title} 
                       referrerPolicy="no-referrer"
                       loading={index < 3 ? "eager" : "lazy"} 

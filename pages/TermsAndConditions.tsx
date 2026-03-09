@@ -31,7 +31,7 @@ const TermsAndConditions: React.FC = () => {
             Propriedade Intelectual
           </h2>
           <p>
-            Todos os conteúdos, imagens e vídeos da campanha "Sorriso Sem Escalas" são propriedade intelectual da Clínica Santa Maria dos Olivais. É proibida a sua cópia ou utilização sem consentimento prévio e por escrito.
+            Todos os conteúdos, imagens e vídeos da campanha "Excelência e Proximidade" são propriedade intelectual da Clínica Santa Maria dos Olivais. É proibida a sua cópia ou utilização sem consentimento prévio e por escrito.
           </p>
         </section>
 

@@ -57,11 +57,11 @@ const IntroOverlay: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
         {/* Updated Title and Approved Descriptive Text */}
         <div className="max-w-3xl mx-auto space-y-4">
           <h2 className="text-3xl md:text-6xl font-extrabold font-serif italic tracking-wide py-2 px-4 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-clinic-blue via-[#8A2BE2] to-[#FF1493] drop-shadow-sm filter">
-            Sorriso Sem Escalas
+            Excelência e Proximidade
           </h2>
           <div className="text-lg md:text-2xl font-medium text-clinic-blue font-serif italic leading-relaxed px-6 space-y-3">
-            <p>Não arrisque a sua saúde em viagens longas. Oferecemos preços justos com a garantia da medicina portuguesa.</p>
-            <p>A grande vantagem? Se precisar de nós no dia seguinte, estamos à distância de um telefonema, não de um voo. Sem barreiras de língua e com a segurança de um acompanhamento contínuo em Lisboa.</p>
+            <p>Uma Década a Criar Sorrisos em Lisboa</p>
+            <p>Com 10 anos de experiência, a nossa clínica em Olivais é referência em Implantologia e Estética Dentária.</p>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
+import IntroOverlay from '../components/IntroOverlay';
 
 const Home: React.FC = () => {
   const { content } = useContent();
@@ -9,6 +10,7 @@ const Home: React.FC = () => {
   const heroSubtitle = content?.home?.heroSubtitle || "";
   const stories = content?.stories || [];
 
+  const [showIntro, setShowIntro] = useState(true);
   const [centerIndex, setCenterIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -284,6 +286,8 @@ const Home: React.FC = () => {
 
   return (
     <div className="relative animate-fade-in-up overflow-x-hidden bg-clinic-bg">
+      {showIntro && <IntroOverlay onComplete={() => setShowIntro(false)} />}
+      
       {/* Hero Section */}
       <section className="relative z-30 text-center px-4 mb-4 md:mb-8" aria-labelledby="main-heading">
         <h1 id="main-heading" className="text-3xl sm:text-5xl md:text-7xl font-semibold text-clinic-blue mb-6 leading-tight">
@@ -305,21 +309,21 @@ const Home: React.FC = () => {
             return (
               <div 
                 key={story.id} 
-                className={`absolute w-[125px] h-[210px] md:w-[200px] md:h-[330px] rounded-[2.2rem] md:rounded-[3.2rem] border-[4px] md:border-[8px] border-white overflow-hidden cursor-pointer transition-all duration-500 isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)]' : 'shadow-xl'}`}
+                className={`absolute w-[125px] aspect-[9/16] md:w-[200px] rounded-[2.5rem] md:rounded-[3.5rem] border-[4px] border-white overflow-hidden cursor-pointer transition-all duration-500 isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)]' : 'shadow-xl'}`}
                 style={{
                   ...getStoryStyle(index),
                   WebkitMaskImage: '-webkit-radial-gradient(white, black)',
                 }} 
                 onClick={() => setCenterIndex(index)} 
               >
-                <div className="absolute inset-0 overflow-hidden rounded-[inherit] bg-black">
+                <div className="absolute inset-0 bg-black">
                   {story.type === 'video' && story.src ? (
                     <video 
                       key={story.src} 
                       ref={(el) => (videoRefs.current[index] = el)} 
                       src={story.src} 
                       poster={story.thumbnail || `${story.src}#t=0.1`} 
-                      className="absolute inset-0 w-full h-full object-cover rounded-[inherit] scale-[1.02]" 
+                      className="absolute inset-0 w-full h-full object-cover scale-[1.05]" 
                       style={{ transform: 'translateZ(0)' }}
                       muted 
                       playsInline 
@@ -336,7 +340,7 @@ const Home: React.FC = () => {
                   ) : (
                     <img 
                       src={story.thumbnail || story.src} 
-                      className="absolute inset-0 w-full h-full object-cover rounded-[inherit] scale-[1.02]" 
+                      className="absolute inset-0 w-full h-full object-cover scale-[1.05]" 
                       style={{ transform: 'translateZ(0)' }}
                       alt={story.title} 
                       referrerPolicy="no-referrer"
@@ -375,56 +379,57 @@ const Home: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="order-2 lg:order-1 lg:pl-16 xl:pl-24">
             <span className="inline-block bg-clinic-purple text-white px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 shadow-sm">Campanha Exclusiva</span>
-            <h2 id="campaign-heading" className="text-3xl md:text-5xl font-bold text-clinic-blue mb-6 leading-tight">Sorriso Sem Escalas:<br /><span className="text-clinic-purple font-serif italic">Excelência em Portugal</span></h2>
+            <h2 id="campaign-heading" className="text-3xl md:text-5xl font-bold text-clinic-blue mb-6 leading-tight">Clínica Santa Maria dos Olivais:<br /><span className="text-clinic-purple font-serif italic">Excelência e Proximidade</span></h2>
             
-            <div className="text-base text-gray-700 mb-8 leading-relaxed space-y-3 font-light">
-              <p>Não arrisque a sua saúde em viagens longas. Oferecemos preços justos com a garantia da medicina portuguesa.</p>
-              <p>A grande vantagem? Se precisar de nós no dia seguinte, estamos à distância de um telefonema, não de um voo. Sem barreiras de língua e com a segurança de um acompanhamento médico contínuo em Lisboa.</p>
+            <div className="text-base text-gray-700 mb-8 leading-relaxed space-y-6 font-light">
+              <div>
+                <h3 className="text-xl font-bold text-clinic-blue mb-2">Uma Década a Criar Sorrisos em Lisboa</h3>
+                <p>Com 10 anos de experiência, a nossa clínica em Olivais é referência em Implantologia e Estética Dentária. Aliamos o rigor técnico à inovação para oferecer tratamentos personalizados, desde Facetas Estéticas a reabilitações complexas, focando sempre na sua saúde e harmonia facial.</p>
+              </div>
             </div>
             
             <div className="grid grid-cols-1 gap-3 mb-6">
-              <div className="bg-white p-4 rounded-xl shadow-md border-l-4 border-clinic-lime transition-transform hover:scale-[1.01]">
+              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-4 rounded-xl shadow-md border-l-4 border-clinic-lime transition-all hover:scale-[1.02] hover:shadow-lg block group">
                 <div className="flex justify-between items-start mb-1">
-                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Implante Unitário + Coroa</p>
+                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-lime transition-colors">Implante Unitário + Coroa</p>
                   <p className="text-xl font-bold text-clinic-blue whitespace-nowrap">Desde 745 €*</p>
                 </div>
                 <p className="text-[10px] text-clinic-purple font-medium italic leading-tight">(Inclui fase cirúrgica e coroa metalo-cerâmica)</p>
-              </div>
+              </Link>
 
-              <div className="bg-white p-4 rounded-xl shadow-md border-l-4 border-clinic-purple transition-transform hover:scale-[1.01]">
+              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-4 rounded-xl shadow-md border-l-4 border-clinic-purple transition-all hover:scale-[1.02] hover:shadow-lg block group">
                 <div className="flex justify-between items-start mb-1">
-                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Protocolo Superior (Dentes Fixos)</p>
+                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-purple transition-colors">Protocolo Superior (Dentes Fixos)</p>
                   <p className="text-xl font-bold text-clinic-blue whitespace-nowrap">Desde 4.800 €*</p>
                 </div>
                 <p className="text-[10px] text-clinic-purple font-medium italic leading-tight">(Reabilitação total de arcada)</p>
-              </div>
+              </Link>
 
-              <div className="bg-white p-4 rounded-xl shadow-md border-l-4 border-clinic-blue transition-transform hover:scale-[1.01]">
+              <Link to="/marcacoes" state={{ service: "Estética Dentária" }} className="bg-white p-4 rounded-xl shadow-md border-l-4 border-clinic-blue transition-all hover:scale-[1.02] hover:shadow-lg block group">
                 <div className="flex justify-between items-start mb-1">
-                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Facetas Estéticas (Pack 4 dentes)</p>
+                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-blue transition-colors">Facetas Estéticas (Pack 4 dentes)</p>
                   <p className="text-xl font-bold text-clinic-blue whitespace-nowrap">Desde 1.800 €*</p>
                 </div>
                 <p className="text-[10px] text-clinic-purple font-medium italic leading-tight">(Zona estética frontal)</p>
-              </div>
+              </Link>
             </div>
             
-            <p className="text-[10px] text-gray-400 mb-8 italic leading-tight">
+            <p className="text-[10px] text-gray-400 mb-4 italic leading-tight">
               *Nota Legal: Valores de referência para casos standard, sujeitos a avaliação médica presencial. Não inclui enxertos ósseos se necessários.
             </p>
-            <Link to="/marcacoes" onClick={() => trackGtagEvent('click_agendar_consulta', { 'event_category': 'engagement' })} className="inline-block bg-clinic-blue text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-clinic-purple transition-all transform hover:scale-105">Marque a Sua Consulta</Link>
           </div>
           
-          <div className="order-1 lg:order-2 flex justify-center items-center">
+          <div className="order-1 lg:order-2 flex flex-col justify-center items-center gap-8">
             <div className="relative w-full max-w-[240px] md:max-w-[320px] aspect-[9/16] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden shadow-[0_35px_70px_-15px_rgba(0,0,0,0.6)] border-[4px] border-white bg-black">
               <video 
                 ref={campVideoRef}
-                src="https://clinica-santa-maria-dos-olivais.b-cdn.net/GUION%2004%20-%20TURQUIA.mp4" 
+                src="https://clinica-santa-maria-dos-olivais.b-cdn.net/0309.mp4" 
                 loop 
                 muted 
                 playsInline 
                 preload="metadata"
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover scale-[1.05]"
                 aria-label="Vídeo informativo sobre cuidados dentários em Portugal"
               />
               <button 
@@ -435,6 +440,7 @@ const Home: React.FC = () => {
                 <i className={`fas ${isCampMuted ? 'fa-volume-xmark' : 'fa-volume-high'} text-sm`}></i>
               </button>
             </div>
+            <Link to="/marcacoes" onClick={() => trackGtagEvent('click_agendar_consulta', { 'event_category': 'engagement' })} className="inline-block bg-clinic-blue text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-clinic-purple transition-all transform hover:scale-105 text-center">Marque a Sua Consulta</Link>
           </div>
         </div>
       </section>
@@ -445,7 +451,7 @@ const Home: React.FC = () => {
           <div className="flex flex-col items-center lg:items-end order-2 lg:order-1 gap-4">
              <div className="relative w-full max-w-[245px] md:max-w-[340px] aspect-[9/16] rounded-[2.8rem] md:rounded-[4.5rem] flex items-center justify-center overflow-visible">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[90%] rounded-full blur-[90px] md:blur-[250px] animate-glow-cycle opacity-[0.48] -z-10" style={{ background: 'radial-gradient(circle, currentColor 0%, currentColor 12%, #f2f2f2 38%)' }}></div>
-                <div className="relative z-20 w-full h-full rounded-[2.6rem] md:rounded-[4.2rem] overflow-hidden border-[6px] md:border-[12px] border-white shadow-[0_55px_120px_-15px_rgba(0,0,0,0.8)] bg-black">
+                <div className="relative z-20 w-full h-full rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden border-[4px] border-white shadow-[0_35px_70px_-15px_rgba(0,0,0,0.6)] bg-black">
                   <video 
                     ref={expVideoRef} 
                     src="https://clinica-santa-maria-dos-olivais.b-cdn.net/clinicadentaria-santamariadosolivais.mp4" 
@@ -455,7 +461,7 @@ const Home: React.FC = () => {
                     preload="metadata" 
                     autoPlay
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover" 
+                    className="w-full h-full object-cover scale-[1.05]" 
                   />
                   <button 
                     onClick={toggleExpMute} 

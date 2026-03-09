@@ -19,11 +19,7 @@ const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
 const ThankYou = lazy(() => import('./pages/ThankYou'));
 
 // Loading fallback
-const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-clinic-bg">
-    <div className="w-12 h-12 border-4 border-clinic-blue border-t-clinic-lime rounded-full animate-spin"></div>
-  </div>
-);
+const PageLoader = () => null;
 
 const PixelRouteTracker: React.FC = () => {
   const location = useLocation();
@@ -86,6 +82,13 @@ const PixelRouteTracker: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  useEffect(() => {
+    // Forçar redirecionamento para o home ao carregar a aplicação
+    if (window.location.hash !== '#/' && window.location.hash !== '') {
+      window.location.hash = '#/';
+    }
+  }, []);
+
   return (
     <ContentProvider>
       <HashRouter>

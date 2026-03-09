@@ -44,13 +44,6 @@ const defaultData = {
       thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-100-scaled.jpg'
     },
     {
-      id: 11,
-      type: 'video',
-      title: 'Mais Perto',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/GUION%2005%20-%20MAIS%20PERTO.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg'
-    },
-    {
       id: 13,
       type: 'video',
       title: 'Limpeza GBT',
@@ -175,6 +168,7 @@ const defaultData = {
       "Consulta de Rotina",
       "Odontopediatria",
       "Branqueamento",
+      "Estética Dentária",
       "Urgências",
       "Avaliação",
       "Outros"

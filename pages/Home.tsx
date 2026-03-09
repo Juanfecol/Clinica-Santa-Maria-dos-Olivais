@@ -2,15 +2,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
-import IntroOverlay from '../components/IntroOverlay';
-
 const Home: React.FC = () => {
   const { content } = useContent();
   const heroTitle = content?.home?.heroTitle || "Clínica Santa Maria dos Olivais";
   const heroSubtitle = content?.home?.heroSubtitle || "";
   const stories = content?.stories || [];
 
-  const [showIntro, setShowIntro] = useState(true);
   const [centerIndex, setCenterIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -286,7 +283,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="relative animate-fade-in-up overflow-x-hidden bg-clinic-bg">
-      {showIntro && <IntroOverlay onComplete={() => setShowIntro(false)} />}
+      
       
       {/* Hero Section */}
       <section className="relative z-30 text-center px-4 mb-4 md:mb-8" aria-labelledby="main-heading">

@@ -72,3 +72,10 @@ body {
   background: var(--color-clinic-blue);
   border-radius: 5px;
 }
+
+/* User requested professional container */
+.contenedor {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}

@@ -26,7 +26,7 @@ const defaultData = {
   ],
   home: {
     heroTitle: "Clínica Santa Maria dos Olivais",
-    heroSubtitle: "Não tratamos apenas dentes — cultivamos confiança, autoestima e bem-estar. Oferecemos conforto e a liberdade de sorrir sem reservas. Porque cada sorriso conta uma história — e a sua merece ser contada com brilho.",
+    heroSubtitle: "Especialistas em Implantologia, Ortodontia (Invisalign) e Estética Dentária em Olivais, Lisboa. 10 anos de excelência médica.",
   },
   stories: [
     {

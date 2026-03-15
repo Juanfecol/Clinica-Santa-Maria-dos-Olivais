@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-d
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
 import { ContentProvider } from './context/ContentContext';
+import { CookieConsent } from './components/CookieConsent';
 
 // Lazy loading pages for performance
 const Home = lazy(() => import('./pages/Home'));
@@ -17,9 +18,10 @@ const CookiesPolicy = lazy(() => import('./pages/CookiesPolicy'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
 const ThankYou = lazy(() => import('./pages/ThankYou'));
+import { ServiceDetail } from './pages/ServiceDetail';
 
 // Loading fallback
-const PageLoader = () => null;
+const PageLoader = () => <div className="flex justify-center items-center h-screen text-clinic-blue font-bold">Carregando...</div>;
 
 const PixelRouteTracker: React.FC = () => {
   const location = useLocation();
@@ -82,32 +84,29 @@ const PixelRouteTracker: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  useEffect(() => {
-    // Forçar redirecionamento para o home ao carregar a aplicação
-    if (window.location.hash !== '#/' && window.location.hash !== '') {
-      window.location.hash = '#/';
-    }
-  }, []);
-
   return (
     <ContentProvider>
       <HashRouter>
-        <ScrollToTop />
-        <PixelRouteTracker />
-        <Routes>
-          <Route path="/admin" element={<Suspense fallback={<PageLoader />}><Admin /></Suspense>} />
-          <Route path="/" element={<Layout><Suspense fallback={<PageLoader />}><Home /></Suspense></Layout>} />
-          <Route path="/equipa" element={<Layout><Suspense fallback={<PageLoader />}><Team /></Suspense></Layout>} />
-          <Route path="/clinica" element={<Layout><Suspense fallback={<PageLoader />}><Clinic /></Suspense></Layout>} />
-          <Route path="/contactos" element={<Layout><Suspense fallback={<PageLoader />}><Contact /></Suspense></Layout>} />
-          <Route path="/marcacoes" element={<Layout><Suspense fallback={<PageLoader />}><Appointments /></Suspense></Layout>} />
-          <Route path="/campanhas" element={<Layout><Suspense fallback={<PageLoader />}><Campaigns /></Suspense></Layout>} />
-          <Route path="/cookies" element={<Layout><Suspense fallback={<PageLoader />}><CookiesPolicy /></Suspense></Layout>} />
-          <Route path="/privacidade" element={<Layout><Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense></Layout>} />
-          <Route path="/termos" element={<Layout><Suspense fallback={<PageLoader />}><TermsAndConditions /></Suspense></Layout>} />
-          <Route path="/obrigado" element={<Layout><Suspense fallback={<PageLoader />}><ThankYou /></Suspense></Layout>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <CookieConsent />
+        <Layout>
+          <ScrollToTop />
+          <PixelRouteTracker />
+          <Routes>
+            <Route path="/admin" element={<Suspense fallback={<PageLoader />}><Admin /></Suspense>} />
+            <Route path="/" element={<Suspense fallback={<PageLoader />}><Home /></Suspense>} />
+            <Route path="/equipa" element={<Suspense fallback={<PageLoader />}><Team /></Suspense>} />
+            <Route path="/clinica" element={<Suspense fallback={<PageLoader />}><Clinic /></Suspense>} />
+            <Route path="/contactos" element={<Suspense fallback={<PageLoader />}><Contact /></Suspense>} />
+            <Route path="/marcacoes" element={<Suspense fallback={<PageLoader />}><Appointments /></Suspense>} />
+            <Route path="/campanhas" element={<Suspense fallback={<PageLoader />}><Campaigns /></Suspense>} />
+            <Route path="/cookies" element={<Suspense fallback={<PageLoader />}><CookiesPolicy /></Suspense>} />
+            <Route path="/privacidade" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
+            <Route path="/termos" element={<Suspense fallback={<PageLoader />}><TermsAndConditions /></Suspense>} />
+            <Route path="/obrigado" element={<Suspense fallback={<PageLoader />}><ThankYou /></Suspense>} />
+            <Route path="/servicos/:slug" element={<ServiceDetail />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Layout>
       </HashRouter>
     </ContentProvider>
   );

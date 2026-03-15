@@ -10,7 +10,7 @@ const Clinic: React.FC = () => {
     <div className="animate-fade-in-up">
       {/* Intro */}
       <section className="text-center px-4 py-12 max-w-4xl mx-auto">
-        <h1 className="text-4xl font-serif italic text-clinic-blue border-2 border-clinic-lime inline-block px-8 py-3 rounded-full mb-8">Sobre a Nossa Clínica</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif italic text-clinic-blue border-2 border-clinic-lime inline-block px-8 py-3 rounded-full mb-8">Sobre a Nossa Clínica</h1>
         <p className="text-lg text-gray-700 leading-relaxed">
           A Clínica Santa Maria dos Olivais é um space dedicado à excelência em cuidados dentários, onde a saúde e a estética do seu sorriso são a nossa prioridade. Equipada com tecnologia de ponta e um ambiente acolhedor, a nossa clínica oferece uma ampla gama de tratamentos, desde odontologia geral até procedimentos especializados.
         </p>
@@ -30,7 +30,7 @@ const Clinic: React.FC = () => {
       {/* Values */}
       <section className="max-w-[1400px] mx-auto px-4 py-20 flex flex-col md:flex-row gap-10">
         <div className="flex-1">
-          <h2 className="text-3xl font-serif italic text-clinic-blue border-2 border-clinic-lime inline-block px-6 py-2 rounded-full mb-6">Nossos Valores e Compromisso</h2>
+          <h2 className="text-2xl md:text-3xl font-serif italic text-clinic-blue border-2 border-clinic-lime inline-block px-6 py-2 rounded-full mb-6">Nossos Valores e Compromisso</h2>
           <p className="text-gray-700 mb-8">
             Na Clínica Santa Maria dos Olivais, acreditamos que a saúde oral é essencial para o bem-estar geral. Nosso compromisso é oferecer tratamentos de alta qualidade em um ambiente acolhedor e profissional.
           </p>

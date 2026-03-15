@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 
@@ -8,6 +8,14 @@ const ThankYou: React.FC = () => {
   const { content } = useContent();
   const global = content.global || {};
   
+  useEffect(() => {
+    if ((window as any).trackEvent) {
+      (window as any).trackEvent('view_thank_you', {
+        service: state?.servico
+      });
+    }
+  }, [state]);
+
   // FIX: Datos de respaldo por si se accede directamente (para evitar pantalla en blanco)
   const displayData = state || {
     nome: "Estimado Paciente",

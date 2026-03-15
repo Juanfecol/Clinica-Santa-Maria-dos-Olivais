@@ -118,7 +118,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </button>
       </header>
 
-      <div className={`fixed inset-0 bg-white/95 backdrop-blur-2xl z-[90] flex flex-col justify-center items-center transition-all duration-500 ease-in-out ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
+      <div className={`fixed inset-0 bg-white/95 backdrop-blur-2xl z-[90] flex flex-col items-center overflow-y-auto pt-[100px] pb-[50px] transition-all duration-500 ease-in-out ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
         <nav className="w-full">
           <ul className="text-center space-y-5 md:space-y-8 px-6">
             {navigation.map((item: any, index: number) => (
@@ -132,6 +132,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 </Link>
               </li>
             ))}
+            <li className="pt-4 border-t border-clinic-blue/20">
+              <span className="text-xs font-bold text-clinic-purple uppercase tracking-widest block mb-2">Serviços</span>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <Link to="/servicos/implantologia" className="text-clinic-blue hover:text-clinic-purple" onClick={() => setIsMenuOpen(false)}>Implantologia</Link>
+                <Link to="/servicos/ortodontia" className="text-clinic-blue hover:text-clinic-purple" onClick={() => setIsMenuOpen(false)}>Ortodontia</Link>
+                <Link to="/servicos/facetas" className="text-clinic-blue hover:text-clinic-purple" onClick={() => setIsMenuOpen(false)}>Facetas</Link>
+                <Link to="/servicos/clinica-geral" className="text-clinic-blue hover:text-clinic-purple" onClick={() => setIsMenuOpen(false)}>Clínica Geral</Link>
+              </div>
+            </li>
           </ul>
         </nav>
       </div>
@@ -196,12 +205,14 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Link to="/cookies" className="hover:text-clinic-purple transition-colors uppercase">Política de Cookies</Link>
             <Link to="/privacidade" className="hover:text-clinic-purple transition-colors uppercase">Política de Privacidade</Link>
           </div>
-          <div className="mt-8 text-center text-[10px] text-white/40 uppercase tracking-[0.2em]">© {new Date().getFullYear()} Clínica Santa Maria dos Olivais</div>
+          <div className="mt-8 text-center text-[10px] text-white/40 uppercase tracking-[0.2em]">
+            Sisos & Sorrisos Lda | Estrada de Moscavide n 32 c, 1800-279 Lisboa | © {new Date().getFullYear()} Clínica Santa Maria dos Olivais
+          </div>
         </div>
       </footer>
       
       {/* ManyChat Messenger Button */}
-      <div className="fixed bottom-[180px] right-6 z-[100] flex items-center gap-3 group">
+      <div className={`fixed bottom-[180px] right-6 z-[100] flex items-center gap-3 group ${isMenuOpen ? 'hidden' : ''}`}>
         <div className="hidden md:block bg-white text-clinic-blue py-3 px-5 rounded-full shadow-xl font-medium text-sm opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10">
           Falar agora
         </div>
@@ -214,10 +225,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </button>
       </div>
 
-      <a href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className="fixed bottom-[100px] right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-105 active:scale-95" aria-label="Ligar para agendamento 24h">
-        <div className="bg-white/90 backdrop-blur-md border border-clinic-purple/20 py-2 px-4 rounded-2xl shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none translate-x-4 group-hover:translate-x-0 hidden md:block">
-          <p className="text-[11px] font-bold text-clinic-blue leading-tight">Agende a sua consulta 24h por dia.<br/>Saiba preços e serviços pelo <span className="text-clinic-purple">923 233 393</span>. Ligue já.</p>
-        </div>
+      <a href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className={`fixed bottom-[100px] right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-105 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
         <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl">
           <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple opacity-20 animate-pulse"></span>
           <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple shadow-[0_10px_30px_rgba(107,70,193,0.4)]"></span>
@@ -225,7 +233,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </a>
 
-      <a href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className="fixed bottom-6 right-6 z-[100] w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90" aria-label="Contact us on WhatsApp">
+      <a href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className={`fixed bottom-6 right-6 z-[100] w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping"></span>
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"></span>
         <i className="fab fa-whatsapp text-3xl md:text-4xl text-white relative z-10"></i>

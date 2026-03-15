@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
+
 const Home: React.FC = () => {
   const { content } = useContent();
   const heroTitle = content?.home?.heroTitle || "Clínica Santa Maria dos Olivais";
@@ -23,6 +24,7 @@ const Home: React.FC = () => {
   const servicesList = [
     {
       id: "01",
+      slug: "implantologia",
       category: "IMPLANTOLOGIA",
       title: "Reabilitação Oral e Implantes",
       description: "Recupere o seu sorriso fixo. Implantes de titânio e coroas de cerâmica com a Dra. Ana Mata. Solução completa em Lisboa, sem necessidade de viagens de risco.",
@@ -35,6 +37,7 @@ const Home: React.FC = () => {
     },
     {
       id: "02",
+      slug: "ortodontia",
       category: "ORTODONTIA, ALINHADORES INVISÍVEIS",
       title: "Ortodontia e Alinhamento Dentário",
       description: "Alinhamento dentário para crianças e adultos. Aparelhos fixos convencionais e as soluções mais modernas de alinhadores invisíveis com a Dra. Mariana Aberto.",
@@ -48,54 +51,31 @@ const Home: React.FC = () => {
     },
     {
       id: "03",
-      category: "LIMPEZA E DESTARTARIZAÇÃO",
-      title: "Higiene Oral e Prevenção",
-      description: "A base de um sorriso saudável é a prevenção. Consultas de higiene com ultrassons para remover tártaro e manchas, prevenindo doenças gengivais e mau hálito.",
-      highlight: "Inclui: Destartarização completa e polimento profissional.",
+      slug: "facetas",
+      category: "ESTÉTICA E FACETAS",
+      title: "Estética e Facetas",
+      description: "Melhoria da estética e harmonia do sorriso através da dentisteria avançada.",
+      highlight: "Transforme o seu sorriso com facetas estéticas de alta qualidade.",
       transparency: [
-        "Preço Fechado: 40€"
+        "Facetas 4 Dentes: 1.800€",
+        "Facetas 1 Arcada: 4.550€",
+        "Branqueamento: 200€"
       ],
-      buttonText: "Agendar Higiene Oral"
+      buttonText: "Agendar Avaliação Estética"
     },
     {
       id: "04",
-      category: "CONSULTA DE ROTINA",
-      title: "Consulta de Avaliação e Diagnóstico",
-      description: "Diferente das consultas grátis comerciais, realizamos um ato médico rigoroso para avaliar a sua saúde real e diagnosticar necessidades honestas, sem orçamentos desnecessários.",
+      slug: "clinica-geral",
+      category: "CLÍNICA GERAL E DESVITALIZAÇÃO",
+      title: "Clínica Geral e Desvitalização",
+      description: "Cuidados dentários gerais e tratamentos de desvitalização.",
       highlight: "Diagnóstico médico rigoroso com tecnologia digital.",
       transparency: [
-        "Valor da Consulta: 20€",
-        "Inclui:",
-        "- Diagnóstico Completo",
-        "- Plano de tratamento personalizado",
-        "- Aconselhamento profissional"
+        "Desvitalização Molar: 240€",
+        "Desvitalização Incisivo/Canino: 180€",
+        "Extração de Siso: 75€ a 200€"
       ],
-      buttonText: "Marcar Consulta 20€"
-    },
-    {
-      id: "05",
-      category: "ODONTOPEDIATRIA",
-      title: "Medicina Dentária Pediátrica",
-      description: "Cuidamos dos sorrisos dos mais pequenos num ambiente tranquilo. A Dra. Orizanda Claret é especialista em tornar a visita ao dentista numa experiência positiva e sem medos.",
-      highlight: "Foco na prevenção e acompanhamento do crescimento.",
-      transparency: [
-        "Aplicação de Selantes",
-        "Restauração de Dentes de Leite (45€)",
-        "Extração de Dentes de Leite (35€)"
-      ],
-      buttonText: "Agendar para o meu Filho"
-    },
-    {
-      id: "06",
-      category: "BRANQUEAMENTO",
-      title: "Estética e Branqueamento Dentário",
-      description: "Ilumine o seu sorriso de forma segura. Opções adaptadas à sua sensibilidade, sempre sob supervisão médica para garantir resultados naturais sem danificar o esmalte.",
-      highlight: "Resultados visíveis sob monitorização clínica.",
-      transparency: [
-        "Kit Ambulatório (Casa): Moldes + Gel (150€)",
-        "Em Consultório: Sessão intensiva (200€)"
-      ],
-      buttonText: "Quero um Sorriso Mais Branco"
+      buttonText: "Marcar Consulta"
     }
   ];
 
@@ -284,14 +264,13 @@ const Home: React.FC = () => {
   return (
     <div className="relative animate-fade-in-up overflow-x-hidden bg-clinic-bg">
       
-      
       {/* Hero Section */}
       <section className="relative z-30 text-center px-4 mb-4 md:mb-8" aria-labelledby="main-heading">
-        <h1 id="main-heading" className="text-3xl sm:text-5xl md:text-7xl font-semibold text-clinic-blue mb-6 leading-tight">
-          <span className="font-body text-clinic-purple text-xl md:text-4xl font-medium mr-2">Clínica Dentária</span>
+        <h1 id="main-heading" className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-clinic-blue mb-6 leading-tight">
+          <span className="font-body text-clinic-purple text-lg md:text-3xl lg:text-4xl font-medium mr-2">Clínica Dentária</span>
           {heroTitle.replace('Clínica', '')}
         </h1>
-        <p className="text-base md:text-xl text-gray-800 max-w-3xl mx-auto font-light px-4">{heroSubtitle}</p>
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-800 max-w-3xl mx-auto font-light px-4">{heroSubtitle}</p>
       </section>
 
       {/* Stories Section */}
@@ -357,8 +336,8 @@ const Home: React.FC = () => {
                         />
                       </div>
                       
-                      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-black/95 to-transparent z-10">
-                        <p className="text-white text-[10px] md:text-xs font-bold uppercase tracking-widest text-center drop-shadow-md">
+                      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-black/95 to-transparent z-10 flex justify-center items-center">
+                        <p className="text-white text-[9px] md:text-xs font-bold uppercase tracking-widest text-center drop-shadow-md">
                           {story.title}
                         </p>
                       </div>
@@ -376,7 +355,7 @@ const Home: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="order-2 lg:order-1 lg:pl-16 xl:pl-24">
             <span className="inline-block bg-clinic-purple text-white px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 shadow-sm">Campanha Exclusiva</span>
-            <h2 id="campaign-heading" className="text-3xl md:text-5xl font-bold text-clinic-blue mb-6 leading-tight">Clínica Santa Maria dos Olivais:<br /><span className="text-clinic-purple font-serif italic">Excelência e Proximidade</span></h2>
+            <h2 id="campaign-heading" className="text-2xl sm:text-4xl md:text-5xl font-bold text-clinic-blue mb-6 leading-tight">Clínica Santa Maria dos Olivais:<br /><span className="text-clinic-purple font-serif italic">Excelência e Proximidade</span></h2>
             
             <div className="text-base text-gray-700 mb-8 leading-relaxed space-y-6 font-light">
               <div>
@@ -472,7 +451,7 @@ const Home: React.FC = () => {
              <Link to="/campanhas" className="bg-clinic-purple text-white px-8 py-3 rounded-full text-lg font-bold shadow-xl hover:bg-clinic-blue transition-all transform hover:scale-105">Ver Mais <i className="fas fa-arrow-right ml-2 text-sm"></i></Link>
           </div>
           <div className="relative z-30 text-center lg:text-left order-1 lg:order-2">
-            <h2 id="experience-heading" className="text-4xl sm:text-5xl md:text-7xl font-bold text-clinic-blue leading-[1.1]"><div className="flex flex-wrap justify-center lg:justify-start items-center gap-2"><span>Com</span><span className="font-serif italic text-clinic-lime text-6xl md:text-[10rem]">10</span><span>anos de</span></div><div className="font-serif italic text-clinic-purple">Experiência</div></h2>
+            <h2 id="experience-heading" className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-clinic-blue leading-[1.1]"><div className="flex flex-wrap justify-center lg:justify-start items-center gap-2"><span>Com</span><span className="font-serif italic text-clinic-lime text-4xl md:text-6xl lg:text-[10rem]">10</span><span>anos de</span></div><div className="font-serif italic text-clinic-purple">Experiência</div></h2>
             <div className="mt-8 md:mt-12 space-y-4"><p className="text-xl sm:text-2xl md:text-4xl font-bold text-clinic-blue tracking-tight">Implantes | Estética Dentária | Ortodontia</p><p className="text-lg sm:text-xl md:text-2xl font-serif italic text-clinic-purple">Tratamentos personalizados para toda a família👇</p></div>
           </div>
         </div>
@@ -480,7 +459,7 @@ const Home: React.FC = () => {
 
       {/* Serviços */}
       <section className="relative z-30 max-w-[1100px] mx-auto px-4 py-16 md:py-24" aria-labelledby="services-heading">
-        <h2 id="services-heading" className="text-3xl md:text-6xl font-serif italic text-center mb-16 border-b-4 border-clinic-lime inline-block pb-4 mx-auto block w-fit">Nossos Serviços Dentários</h2>
+        <h2 id="services-heading" className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif italic text-center mb-16 border-b-4 border-clinic-lime inline-block pb-4 mx-auto block w-fit">Nossos Serviços Dentários</h2>
         <div className="grid gap-6">
           {servicesList.map((service, index) => (
             <details key={index} className="group bg-white rounded-3xl border border-clinic-blue/5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.20)] overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.40)] open:border-clinic-lime"
@@ -495,7 +474,7 @@ const Home: React.FC = () => {
                   <span className="text-3xl md:text-5xl font-serif italic text-clinic-lime/20 font-bold group-open:text-clinic-lime" aria-hidden="true">{service.id}</span>
                   <div className="flex flex-col">
                     <span className="text-[10px] md:text-xs font-bold text-clinic-purple tracking-widest uppercase mb-1">{service.category}</span>
-                    <h3 className="text-lg md:text-3xl font-semibold text-clinic-blue group-open:text-clinic-purple transition-colors uppercase leading-tight">{service.title}</h3>
+                    <h3 className="text-base sm:text-lg md:text-3xl font-semibold text-clinic-blue group-open:text-clinic-purple transition-colors uppercase leading-tight">{service.title}</h3>
                   </div>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-clinic-bg flex items-center justify-center text-clinic-blue transition-all group-open:rotate-180 group-open:bg-clinic-blue group-open:text-white"><i className="fas fa-chevron-down"></i></div>
@@ -510,13 +489,16 @@ const Home: React.FC = () => {
                     <p className="font-bold text-clinic-blue mb-4 italic">{service.highlight}</p>
                     <div className="space-y-2">
                        <p className="text-xs font-bold uppercase tracking-wider text-clinic-purple mb-2">Transparência:</p>
-                       {service.transparency.map((line, idx) => (
+                       {service.transparency.map((line: string, idx: number) => (
                          <p key={idx} className={`text-base md:text-lg font-semibold text-clinic-blue ${line.startsWith('-') ? 'ml-4 font-normal text-gray-700' : ''}`}>{line}</p>
                        ))}
                     </div>
                   </div>
 
-                  <div className="pt-4">
+                  <div className="pt-4 flex gap-4">
+                    <Link to={`/servicos/${service.slug}`} className="inline-block bg-clinic-purple text-white font-black px-10 py-4 rounded-full shadow-lg hover:bg-clinic-blue transition-all uppercase text-sm md:text-base transform hover:scale-105 active:scale-95">
+                      Ver Detalhes
+                    </Link>
                     <Link to="/marcacoes" state={{ service: service.category }} onClick={() => trackGtagEvent('click_service_cta', { 'event_category': 'engagement', 'event_label': service.buttonText })} className="inline-block bg-clinic-lime text-clinic-blue font-black px-10 py-4 rounded-full shadow-lg hover:bg-clinic-blue hover:text-white transition-all uppercase text-sm md:text-base transform hover:scale-105 active:scale-95">
                       {service.buttonText}
                     </Link>

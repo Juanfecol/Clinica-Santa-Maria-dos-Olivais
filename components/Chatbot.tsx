@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const API_KEY = 'AIzaSyBiWsEcO-sfalWzYMWfyqrFUyLRgGK9w7A';
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const SYSTEM = `És o assistente virtual da Clínica Santa Maria dos Olivais (Lisboa).
 Respondes SEMPRE em português europeu (nunca brasileiro), de forma simpática, clara e profissional.
@@ -210,6 +210,7 @@ interface ChatbotProps {
 interface Msg {
   role: 'user' | 'assistant';
   text: string;
+  showCalendar?: boolean;
 }
 
 const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
@@ -229,13 +230,21 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
     try {
       const contents = msgs.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.text }] }));
       contents.push({ role: 'user', parts: [{ text: userMsg }] });
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ system_instruction: { parts: [{ text: SYSTEM }] }, contents, generationConfig: { maxOutputTokens: 400, temperature: 0.7 } })
+        body: JSON.stringify({ system_instruction: { parts: [{ text: SYSTEM }] }, contents, generationConfig: { maxOutputTokens: 1000, temperature: 0.7 } })
       });
       const d = await r.json();
       const reply = d.candidates?.[0]?.content?.parts?.[0]?.text || 'Desculpe, não consegui responder. Ligue 923 233 393.';
-      setMsgs(p => [...p, { role: 'assistant', text: reply }]);
+      if (reply.includes('SHOW_CALENDAR')) {
+        setMsgs(p => [...p, { 
+          role: 'assistant', 
+          text: '📅 Escolha o dia e hora da sua consulta:',
+          showCalendar: true
+        }]);
+      } else {
+        setMsgs(p => [...p, { role: 'assistant', text: reply }]);
+      }
     } catch { setMsgs(p => [...p, { role: 'assistant', text: 'Erro de ligação. Contacte-nos: 923 233 393.' }]); }
     setLoading(false);
   };
@@ -269,7 +278,18 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
             <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 18 }}>✕</button>
           </div>
           <div style={S.msgs}>
-            {msgs.map((m, i) => <div key={i} style={m.role === 'user' ? S.uBubble : S.aBubble}>{m.text}</div>)}
+            {msgs.map((m, i) => (
+              <div key={i} style={m.role === 'user' ? S.uBubble : S.aBubble}>
+                {m.text}
+                {m.showCalendar && (
+                  <iframe
+                    src="https://tidycal.com/cofelipecifuentes/consulta"
+                    style={{ width:'100%', height:400, border:'none', borderRadius:12, marginTop:8 }}
+                    title="Marcar Consulta"
+                  />
+                )}
+              </div>
+            ))}
             {loading && <div style={S.dots}>{[0,150,300].map(d => <span key={d} style={{ width:8, height:8, background:'#94a3b8', borderRadius:'50%', display:'inline-block', animation:`bounce 1s ${d}ms infinite` }} />)}</div>}
             <div ref={endRef} />
           </div>

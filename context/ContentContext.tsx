@@ -105,44 +105,56 @@ const defaultData = {
       {
         name: "Dra. Ana Mata",
         title: "Direção Clínica e Implantologia",
-        img: "https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-100-scaled.jpg",
-        bio: "Diretora Clínica e especialista em reabilitação oral avançada com implantes."
+        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-114.jpeg",
+        bio: "Diretora Clínica e especialista em reabilitação oral avançada com implantes.",
+        imgPosition: "object-top"
       },
       {
         name: "Dra. Mariana Aberto",
         title: "Ortodontia",
-        img: "https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-136-scaled.jpg",
-        bio: "Especialista em Ortodontia Clínica e Alinhadores Invisíveis."
+        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-132.jpeg",
+        bio: "Especialista em Ortodontia Clínica e Alinhadores Invisíveis.",
+        imgPosition: "object-top"
       },
       {
         name: "Dra. Alexandra Lucas",
         title: "Periodontologia",
-        img: "https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-882A385B-218D-47B8-AA16-EB091B83A480.jpeg",
+        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-67.jpeg",
         bio: "Especialista em saúde gengival e tecidos de suporte dentário.",
-        imgPosition: "object-[75%_25%]"
+        imgPosition: "object-top"
       },
       {
         name: "Dra. Orizanda Claret",
         title: "Odontopediatria",
-        img: "https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-48-scaled.jpg",
-        bio: "Especialista no atendimento e saúde oral dos mais pequenos."
+        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-51.jpeg",
+        bio: "Especialista no atendimento e saúde oral dos más pequenos.",
+        imgPosition: "object-top"
       },
       {
         name: "Dr. Tomás Machado",
         title: "Dentisteria e Endodontia",
-        img: "https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-7A390FD7-42CA-4F33-A5B7-800ABBBCDF8B.jpeg",
-        bio: "Focado na preservação dentária e tratamentos de canal."
+        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-227.jpeg",
+        bio: "Focado na preservação dentária e tratamentos de canal.",
+        imgPosition: "object-top"
       }
     ],
     assistants: [
       {
         name: "Inês Gama",
         title: "Assistente de Medicina Dentária",
-        img: "https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-126-scaled.jpg",
+        img: "",
         bio: "Apoio clínico especializado em todas as áreas da medicina dentária."
       }
     ],
-    reception: []
+    reception: [
+      {
+        name: "Carla Claro",
+        title: "Receção e Apoio ao Cliente",
+        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-94.jpeg",
+        bio: "Responsável pelo acolhimento e gestão personalizada del percurso de cada paciente.",
+        imgPosition: "object-top"
+      }
+    ]
   },
   clinic: {
     gallery: [

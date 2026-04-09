@@ -17,9 +17,27 @@ const MemberCard: React.FC<{ member: Member }> = ({ member }) => (
     
     {/* Content Box */}
     <div className="relative bg-white rounded-[21px] p-8 flex flex-col items-center text-center shadow-inner h-full z-10">
-      {/* Photo removed but layout remains centered and professional */}
-      <div className="mb-4">
-        <div className="w-16 h-1 bg-gradient-to-r from-clinic-blue via-clinic-lime to-clinic-purple rounded-full mx-auto opacity-40 group-hover:opacity-100 transition-opacity"></div>
+      {/* Photo with professional frame */}
+      <div className="mb-6 relative">
+        {member.img ? (
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-clinic-lime/30 shadow-lg group-hover:border-clinic-purple/50 transition-all duration-500">
+            <img 
+              src={member.img} 
+              alt={member.name} 
+              className={`w-full h-full object-cover ${member.imgPosition || 'object-center'}`}
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        ) : (
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-50 border-4 border-clinic-lime/20 flex items-center justify-center shadow-inner group-hover:border-clinic-purple/30 transition-all duration-500">
+            <div className="w-16 h-16 text-clinic-blue/20">
+              <svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+            </div>
+          </div>
+        )}
+        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-clinic-blue via-clinic-lime to-clinic-purple rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
       </div>
       
       <h3 className="text-2xl font-bold text-clinic-blue mb-1 group-hover:text-clinic-purple transition-colors">{member.name}</h3>
@@ -30,8 +48,6 @@ const MemberCard: React.FC<{ member: Member }> = ({ member }) => (
       <p className="text-sm text-gray-700 leading-relaxed italic">
         "{member.bio}"
       </p>
-      
-      {/* Ready for future image insertion if needed */}
     </div>
   </div>
 );

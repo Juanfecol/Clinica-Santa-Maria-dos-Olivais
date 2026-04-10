@@ -29,76 +29,25 @@ const defaultData = {
     heroSubtitle: "Especialistas em Implantologia, Ortodontia (Invisalign) e Estética Dentária em Olivais, Lisboa. 10 anos de excelência médica.",
   },
   stories: [
-    {
-      id: 1,
-      type: 'video',
-      title: 'Generalista',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/GENERALISTA.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-D089534F-903E-476C-BB13-26CAB404F1F3.jpeg'
-    },
-    {
-      id: 12,
-      type: 'video',
-      title: 'Implante Dentário',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMPLANTE.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-100-scaled.jpg'
-    },
-    {
-      id: 13,
-      type: 'video',
-      title: 'Limpeza GBT',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/LIMPEZA%20GBT.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg'
-    },
-    {
-      id: 9,
-      type: 'video',
-      title: 'Qualidade',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/WhatsApp-Video-2025-09-18-at-15.06.59.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg'
-    },
-    {
-      id: 14,
-      type: 'video',
-      title: 'Facetas Premium',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/FACETAS.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/05/20250528_1530_Sorriso-Perfeito_remix_01jwbmq8mnfev9my4ye2ek9xx0.png'
-    },
-    {
-      id: 10,
-      type: 'video',
-      title: 'A Clínica',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/SANTAMARIAListo.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg'
-    },
-    {
-      id: 15,
-      type: 'video',
-      title: 'Odontopediatria',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/CRIANCAS.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-48-scaled.jpg'
-    },
-    {
-      id: 2,
-      type: 'video',
-      title: 'Sorrisos',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/SORRISO.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/05/20250528_1530_Sorriso-Perfeito_remix_01jwbmq8mnfev9my4ye2ek9xx0.png'
-    },
-    {
-      id: 16,
-      type: 'video',
-      title: 'Prevenção Ativa',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/PREVENCAO.mp4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-EAA32118-B8DB-4848-ABC0-210B0ACBFDC2.jpeg'
-    },
-    {
-      id: 6,
-      type: 'video',
-      title: 'Avaliação',
-      src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/DJI_20250902154919_0145_D.MP4',
-      thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-BA8B4A41-1D6A-44A9-AD46-A79BBAE94C63.jpeg'
-    }
+    { id: 1, type: 'video', title: 'Alinhadores', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_ALINHADORES.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-D089534F-903E-476C-BB13-26CAB404F1F3.jpeg' },
+    { id: 2, type: 'video', title: 'Aparelho', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_APARALHO.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-100-scaled.jpg' },
+    { id: 3, type: 'video', title: 'Consulta', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_CONSULTA.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg' },
+    { id: 4, type: 'video', title: 'Dia Anterior', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_DIAANTERIOR.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg' },
+    { id: 5, type: 'video', title: 'Dores', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_DIAANTERIOR.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/05/20250528_1530_Sorriso-Perfeito_remix_01jwbmq8mnfev9my4ye2ek9xx0.png' },
+    { id: 6, type: 'video', title: 'Dr Julio', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_DRJULIO.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg' },
+    { id: 7, type: 'video', title: 'Endodontia', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_EDODONTIA.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-48-scaled.jpg' },
+    { id: 8, type: 'video', title: 'Fratura', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_FRATURA.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/05/20250528_1530_Sorriso-Perfeito_remix_01jwbmq8mnfev9my4ye2ek9xx0.png' },
+    { id: 9, type: 'video', title: 'Gengiva', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_GENGIVA.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-EAA32118-B8DB-4848-ABC0-210B0ACBFDC2.jpeg' },
+    { id: 10, type: 'video', title: 'Implantes', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_IMPLANTES.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-BA8B4A41-1D6A-44A9-AD46-A79BBAE94C63.jpeg' },
+    { id: 11, type: 'video', title: 'Limpeza', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_LIMPEZA.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-D089534F-903E-476C-BB13-26CAB404F1F3.jpeg' },
+    { id: 12, type: 'video', title: 'Mexem', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_MEXEM.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-100-scaled.jpg' },
+    { id: 13, type: 'video', title: 'Mitos', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_MITOS.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg' },
+    { id: 14, type: 'video', title: 'Perda Dentária', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_PERDADENTARIA.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg' },
+    { id: 15, type: 'video', title: 'Periodontite', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_PERIODONTITE.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/05/20250528_1530_Sorriso-Perfeito_remix_01jwbmq8mnfev9my4ye2ek9xx0.png' },
+    { id: 16, type: 'video', title: 'Reabilitação', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_REABILITAC%CC%A7A%CC%83O.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg' },
+    { id: 17, type: 'video', title: 'Sorriso Sem Escalas', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_SEMESCALAS.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-48-scaled.jpg' },
+    { id: 18, type: 'video', title: 'Sorriso', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_SORRISO.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/05/20250528_1530_Sorriso-Perfeito_remix_01jwbmq8mnfev9my4ye2ek9xx0.png' },
+    { id: 19, type: 'video', title: 'Dr Tomas', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_TOMAS.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-EAA32118-B8DB-4848-ABC0-210B0ACBFDC2.jpeg' }
   ],
   team: {
     medical: [

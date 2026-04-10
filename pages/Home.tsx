@@ -166,28 +166,27 @@ const Home: React.FC = () => {
   useEffect(() => {
     const syncPlayback = async () => {
       if (!isStoriesVisible) {
-        videoRefs.current.forEach(v => { if (v) { v.pause(); v.muted = true; } });
+        videoRefs.current.forEach(v => { if (v) { v.pause(); v.currentTime = 0; } });
         return;
       }
 
-      // Play all videos when section is visible, but only center one can have audio
       videoRefs.current.forEach((v, i) => {
-        if (v) {
-          if (i !== centerIndex) {
+        if (!v) return;
+
+        if (i === centerIndex) {
+          // Center video: play and handle audio
+          v.muted = !hasInteracted;
+          v.play().catch(() => {
             v.muted = true;
             v.play().catch(() => {});
-          } else {
-            v.muted = !hasInteracted;
-            v.play().catch(() => {
-              v.muted = true;
-              v.play().catch(() => {});
-            });
-          }
+          });
+        } else {
+          // Other videos: pause and reset
+          v.pause();
+          v.currentTime = 0;
+          v.muted = true;
         }
       });
-
-      if (expVideoRef.current) { expVideoRef.current.muted = true; setIsExpMuted(true); }
-      if (campVideoRef.current) { campVideoRef.current.muted = true; setIsCampMuted(true); }
     };
 
     syncPlayback();
@@ -196,7 +195,7 @@ const Home: React.FC = () => {
     const interval = setInterval(() => {
       const activeVideo = videoRefs.current[centerIndex];
       if (activeVideo && activeVideo.paused && isStoriesVisible) {
-        activeVideo.muted = true;
+        activeVideo.muted = !hasInteracted;
         activeVideo.play().catch(() => {});
       }
     }, 2000);
@@ -295,18 +294,16 @@ const Home: React.FC = () => {
                 <div className="absolute inset-0 bg-black">
                   {story.type === 'video' && story.src ? (
                     <video 
-                      key={story.src} 
+                      key={story.id} 
                       ref={(el) => (videoRefs.current[index] = el)} 
                       src={story.src} 
                       poster={story.thumbnail || `${story.src}#t=0.1`} 
                       className="absolute inset-0 w-full h-full object-cover scale-[1.05]" 
                       style={{ transform: 'translateZ(0)' }}
-                      muted 
                       playsInline 
                       webkit-playsinline="true" 
                       referrerPolicy="no-referrer"
-                      preload="auto"
-                      autoPlay={isCenter}
+                      preload="metadata"
                       onEnded={isCenter ? handleNextStory : undefined} 
                     />
                   ) : story.type === 'video' ? (

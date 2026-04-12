@@ -123,32 +123,32 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </header>
 
       <div className={`fixed inset-0 bg-white/70 backdrop-blur-[10px] [-webkit-backdrop-filter:blur(10px)] z-[90] flex flex-col items-center overflow-y-auto pt-[100px] pb-[50px] transition-all duration-500 ease-in-out ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
-        <nav className="w-full">
-          <ul className="text-center space-y-5 md:space-y-8 px-6">
+        <nav className="w-full h-full flex flex-col justify-center">
+          <ul className="text-center space-y-4 md:space-y-6 px-6 mt-12">
             {navigation.map((item: any, index: number) => (
-              <li key={index} style={{ transitionDelay: `${index * 75}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              <li key={index} style={{ transitionDelay: `${index * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
                 <Link 
                   to={item.path} 
-                  className="font-sans text-base sm:text-xl md:text-2xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-2"
+                  className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.label}
                 </Link>
               </li>
             ))}
-            <li style={{ transitionDelay: `${navigation.length * 75}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <li style={{ transitionDelay: `${navigation.length * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
               <button 
-                className="font-sans text-base sm:text-xl md:text-2xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-2 flex items-center justify-center gap-2 w-full"
+                className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1 flex items-center justify-center gap-2 w-full"
                 onClick={() => setIsServicesOpen(!isServicesOpen)}
               >
                 Serviços <i className={`fas fa-chevron-down text-sm transition-transform ${isServicesOpen ? 'rotate-180' : ''}`}></i>
               </button>
-              <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm overflow-hidden transition-all duration-300 ${isServicesOpen ? 'max-h-[800px] py-4' : 'max-h-0'}`}>
+              <div className={`grid grid-cols-2 gap-x-4 gap-y-1 text-sm md:text-base overflow-hidden transition-all duration-300 ${isServicesOpen ? 'max-h-[600px] py-2' : 'max-h-0'}`}>
                 {services.map((service) => (
                   <Link 
                     key={service.slug} 
                     to={`/servicos/${service.slug}`} 
-                    className="text-clinic-blue hover:text-clinic-purple py-1 px-2" 
+                    className="text-clinic-blue hover:text-clinic-purple py-1 px-1 font-medium" 
                     onClick={() => { setIsMenuOpen(false); setIsServicesOpen(false); }}
                   >
                     {service.title}
@@ -156,10 +156,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 ))}
               </div>
             </li>
-            <li style={{ transitionDelay: `${(navigation.length + 1) * 75}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <li style={{ transitionDelay: `${(navigation.length + 1) * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
               <Link 
                 to="/faq" 
-                className="font-sans text-base sm:text-xl md:text-2xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-2"
+                className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1"
                 onClick={() => setIsMenuOpen(false)}
               >
                 FAQ

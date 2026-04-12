@@ -75,7 +75,28 @@ export const serviceDetails: Record<string, any> = {
 };
 
 export const faq = [
-  { question: "¿Qual o valor da consulta de avaliação?", answer: "O valor da nossa consulta de avaliação é de 20,00€." },
-  { question: "¿Aceitam seguradoras?", answer: "Não temos protocolos diretos com seguradoras, mas emitimos fatura detalhada para que possa solicitar o seu reembolso." },
-  { question: "¿Como funcionam os pagamentos?", answer: "Os tratamentos são pagos conforme realizados. No caso de implantes, o pagamento é efetuado no dia da cirurgia." }
+  {
+    category: "Sobre Consultas e Marcações",
+    items: [
+      { question: "Qual é o valor da consulta de avaliação?", answer: "A nossa consulta de avaliação profissional tem o valor de 20,00€. Este passo é essencial para que a nossa equipa clínica possa realizar um diagnóstico preciso e delinear o plano de tratamento mais adequado às suas necessidades." },
+      { question: "Qual é o horário de atendimento da clínica?", answer: "Para sua conveniência, estamos abertos de segunda a sexta-feira, das 10:00 às 19:00, e aos sábados, das 10:00 às 13:00." },
+      { question: "Onde se localiza a clínica?", answer: "A Clínica Santa Maria dos Olivais situa-se na Estrada de Moscavide, nº 32 C, em Lisboa (1800-279)." }
+    ]
+  },
+  {
+    category: "Sobre Pagamentos e Seguros",
+    items: [
+      { question: "Têm acordos com seguradoras?", answer: "De momento, não dispomos de protocolos diretos com seguradoras. No entanto, emitimos sempre uma fatura detalhada de todos os atos clínicos para que possa solicitar o respetivo reembolso junto da sua entidade seguradora ou subsistema de saúde, de acordo com as condições da sua apólice." },
+      { question: "Quais são as condições de pagamento para tratamentos de Implantologia?", answer: "No caso dos tratamentos de implantes, o pagamento deverá ser efetuado integralmente no dia da intervenção cirúrgica. Para os restantes tratamentos, o pagamento é realizado individualmente à medida que os procedimentos são executados." }
+    ]
+  },
+  {
+    category: "Sobre Tratamentos Específicos",
+    items: [
+      { question: "Quais as opções disponíveis para substituir dentes em falta?", answer: "Dispomos de soluções avançadas de Implantologia, com implantes unitários ou protocolos de arcada completa, bem como diversas opções de Próteses Removíveis (acrílicas, esqueléricas ou flexíveis) adaptadas a cada caso." },
+      { question: "Realizam tratamentos de estética dentária?", answer: "Sim. A nossa equipa clínica realiza tratamentos de Branqueamento Dentário (em consultório ou kit doméstico), Facetas e restaurações estéticas para devolver a harmonia ao seu sorriso." },
+      { question: "Trabalham com Ortodontia invisível?", answer: "Sim. Além dos aparelhos fixos convencionais, oferecemos o sistema Invisalign, que permite alinhar o seu sorriso de forma discreta e confortável. O orçamento para este tratamento é fornecido sob consulta após a avaliação clínica." },
+      { question: "A clínica presta atendimento a crianças?", answer: "Sim. Dispomos de uma área dedicada à Odontopediatria (Medicina Dentária para crianças), focada na prevenção e no acompanhamento da saúde oral dos mais jovens num ambiente acolhedor." }
+    ]
+  }
 ];

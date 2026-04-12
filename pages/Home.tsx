@@ -155,7 +155,7 @@ const Home: React.FC = () => {
           }
         });
       },
-      { threshold: 0.05, rootMargin: '200px' }
+      { threshold: 0.2, rootMargin: '0px' }
     );
     if (storiesSectionRef.current) observer.observe(storiesSectionRef.current);
     if (expVideoRef.current) observer.observe(expVideoRef.current);
@@ -313,25 +313,24 @@ const Home: React.FC = () => {
                 onClick={() => setCenterIndex(index)} 
               >
                 <div className="absolute inset-0 bg-black">
-                  {story.type === 'video' && story.src ? (
+                  {story.type === 'video' ? (
                     <video 
                       key={story.src} 
                       ref={(el) => (videoRefs.current[index] = el)} 
-                      src={story.src}
-                      poster={story.thumbnail || `${story.src}#t=0.1`} 
-                      className="absolute inset-0 w-full h-full object-cover scale-[1.05]" 
-                      style={{ transform: 'translateZ(0)' }}
+                      src={`${story.src}#t=0.001`}
+                      poster={story.thumbnail || `${story.src}#t=0.001`} 
+                      className={`absolute inset-0 w-full h-full object-cover scale-[1.05] bg-clinic-bg transition-all duration-500 ${isCenter ? 'opacity-100' : 'opacity-70'}`}
+                      style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
                       playsInline 
                       muted={!isCenter || !hasInteracted}
                       webkit-playsinline="true" 
-                      preload={isCenter ? "auto" : "metadata"}
-                      onEnded={isCenter ? handleNextStory : undefined}
+                      preload="metadata"
+                      onEnded={(e) => {
+                        e.currentTarget.load();
+                        if (isCenter) handleNextStory();
+                      }}
                       crossOrigin="anonymous"
                     />
-                  ) : story.type === 'video' ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                      <i className="fas fa-video-slash text-gray-400"></i>
-                    </div>
                   ) : (
                     <img 
                       src={story.thumbnail || story.src} 

@@ -166,7 +166,9 @@ const Home: React.FC = () => {
   useEffect(() => {
     const syncPlayback = async () => {
       if (!isStoriesVisible) {
-        videoRefs.current.forEach(v => { if (v) { v.pause(); v.currentTime = 0; } });
+        videoRefs.current.forEach(v => { 
+          if (v && !v.paused) v.pause(); 
+        });
         return;
       }
 
@@ -176,14 +178,19 @@ const Home: React.FC = () => {
         if (i === centerIndex) {
           // Center video: play and handle audio
           v.muted = !hasInteracted;
-          v.play().catch(() => {
-            v.muted = true;
-            v.play().catch(() => {});
-          });
+          
+          // Use a small delay to allow the DOM to settle
+          const timer = setTimeout(() => {
+            v.play().catch((err) => {
+              console.warn("Autoplay prevented, retrying muted:", err);
+              v.muted = true;
+              v.play().catch(e => console.error("Final play attempt failed:", e));
+            });
+          }, 50);
+          return () => clearTimeout(timer);
         } else {
-          // Other videos: pause and reset
-          v.pause();
-          v.currentTime = 0;
+          // Other videos: pause
+          if (!v.paused) v.pause();
           v.muted = true;
         }
       });
@@ -191,17 +198,31 @@ const Home: React.FC = () => {
 
     syncPlayback();
     
-    // Retry mechanism for autoplay
+    // Watchdog for stalls
+    const stallTimeout = setTimeout(() => {
+      const activeVideo = videoRefs.current[centerIndex];
+      if (activeVideo && isStoriesVisible && activeVideo.readyState < 2) {
+        console.warn(`Video ${centerIndex} stalled (Bunny.net), skipping...`);
+        handleNextStory();
+      }
+    }, 15000);
+
+    return () => clearTimeout(stallTimeout);
+  }, [centerIndex, isStoriesVisible, hasInteracted, handleNextStory]);
+
+  // Separate effect for autoplay retry
+  useEffect(() => {
+    if (!isStoriesVisible) return;
+
     const interval = setInterval(() => {
       const activeVideo = videoRefs.current[centerIndex];
       if (activeVideo && activeVideo.paused && isStoriesVisible) {
-        activeVideo.muted = !hasInteracted;
         activeVideo.play().catch(() => {});
       }
-    }, 2000);
+    }, 3000);
 
     return () => clearInterval(interval);
-  }, [centerIndex, isStoriesVisible, hasInteracted]);
+  }, [centerIndex, isStoriesVisible]);
 
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e: React.TouchEvent) => {
@@ -294,17 +315,18 @@ const Home: React.FC = () => {
                 <div className="absolute inset-0 bg-black">
                   {story.type === 'video' && story.src ? (
                     <video 
-                      key={story.id} 
+                      key={story.src} 
                       ref={(el) => (videoRefs.current[index] = el)} 
-                      src={story.src} 
+                      src={story.src}
                       poster={story.thumbnail || `${story.src}#t=0.1`} 
                       className="absolute inset-0 w-full h-full object-cover scale-[1.05]" 
                       style={{ transform: 'translateZ(0)' }}
                       playsInline 
+                      muted={!isCenter || !hasInteracted}
                       webkit-playsinline="true" 
-                      referrerPolicy="no-referrer"
-                      preload="metadata"
-                      onEnded={isCenter ? handleNextStory : undefined} 
+                      preload={isCenter ? "auto" : "metadata"}
+                      onEnded={isCenter ? handleNextStory : undefined}
+                      crossOrigin="anonymous"
                     />
                   ) : story.type === 'video' ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-100">

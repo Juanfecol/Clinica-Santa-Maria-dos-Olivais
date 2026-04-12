@@ -18,7 +18,8 @@ const CookiesPolicy = lazy(() => import('./pages/CookiesPolicy'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
 const ThankYou = lazy(() => import('./pages/ThankYou'));
-import { ServiceDetail } from './pages/ServiceDetail';
+import { ServiceTemplate } from './pages/ServiceTemplate';
+import { FAQ } from './pages/FAQ';
 
 // Loading fallback
 const PageLoader = () => <div className="flex justify-center items-center h-screen text-clinic-blue font-bold">Carregando...</div>;
@@ -103,7 +104,8 @@ const App: React.FC = () => {
             <Route path="/privacidade" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
             <Route path="/termos" element={<Suspense fallback={<PageLoader />}><TermsAndConditions /></Suspense>} />
             <Route path="/obrigado" element={<Suspense fallback={<PageLoader />}><ThankYou /></Suspense>} />
-            <Route path="/servicos/:slug" element={<ServiceDetail />} />
+            <Route path="/faq" element={<Suspense fallback={<PageLoader />}><FAQ /></Suspense>} />
+            <Route path="/servicos/:slug" element={<ServiceTemplate />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>

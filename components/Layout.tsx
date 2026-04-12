@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 import { useGoogleAds } from '../hooks/useGoogleAds';
+import { services } from '../constants/servicesData';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
   const location = useLocation();
   const { trackWhatsApp, trackPhone } = useGoogleAds();
   
@@ -15,6 +17,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     setIsMenuOpen(false);
+    setIsServicesOpen(false);
   }, [location]);
 
   useEffect(() => {
@@ -132,14 +135,34 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 </Link>
               </li>
             ))}
-            <li className="pt-4 border-t border-clinic-blue/20">
-              <span className="text-xs font-bold text-clinic-purple uppercase tracking-widest block mb-2">Serviços</span>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <Link to="/servicos/implantologia" className="text-clinic-blue hover:text-clinic-purple" onClick={() => setIsMenuOpen(false)}>Implantologia</Link>
-                <Link to="/servicos/ortodontia" className="text-clinic-blue hover:text-clinic-purple" onClick={() => setIsMenuOpen(false)}>Ortodontia</Link>
-                <Link to="/servicos/facetas" className="text-clinic-blue hover:text-clinic-purple" onClick={() => setIsMenuOpen(false)}>Facetas</Link>
-                <Link to="/servicos/clinica-geral" className="text-clinic-blue hover:text-clinic-purple" onClick={() => setIsMenuOpen(false)}>Clínica Geral</Link>
+            <li style={{ transitionDelay: `${navigation.length * 75}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              <button 
+                className="font-sans text-base sm:text-xl md:text-2xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-2 flex items-center justify-center gap-2 w-full"
+                onClick={() => setIsServicesOpen(!isServicesOpen)}
+              >
+                Serviços <i className={`fas fa-chevron-down text-sm transition-transform ${isServicesOpen ? 'rotate-180' : ''}`}></i>
+              </button>
+              <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm overflow-hidden transition-all duration-300 ${isServicesOpen ? 'max-h-[800px] py-4' : 'max-h-0'}`}>
+                {services.map((service) => (
+                  <Link 
+                    key={service.slug} 
+                    to={`/servicos/${service.slug}`} 
+                    className="text-clinic-blue hover:text-clinic-purple py-1 px-2" 
+                    onClick={() => { setIsMenuOpen(false); setIsServicesOpen(false); }}
+                  >
+                    {service.title}
+                  </Link>
+                ))}
               </div>
+            </li>
+            <li style={{ transitionDelay: `${(navigation.length + 1) * 75}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              <Link 
+                to="/faq" 
+                className="font-sans text-base sm:text-xl md:text-2xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                FAQ
+              </Link>
             </li>
           </ul>
         </nav>

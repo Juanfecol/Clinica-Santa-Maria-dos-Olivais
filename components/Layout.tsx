@@ -122,7 +122,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </button>
       </header>
 
-      <div className={`fixed inset-0 bg-white/95 backdrop-blur-2xl z-[90] flex flex-col items-center overflow-y-auto pt-[100px] pb-[50px] transition-all duration-500 ease-in-out ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
+      <div className={`fixed inset-0 bg-white/70 backdrop-blur-[10px] [-webkit-backdrop-filter:blur(10px)] z-[90] flex flex-col items-center overflow-y-auto pt-[100px] pb-[50px] transition-all duration-500 ease-in-out ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
         <nav className="w-full">
           <ul className="text-center space-y-5 md:space-y-8 px-6">
             {navigation.map((item: any, index: number) => (

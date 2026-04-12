@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
+import { services } from '../constants/servicesData';
 
 interface ContactFormProps {
   especialidadeInicial?: string;
@@ -58,9 +59,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial =
         <div>
           <label className="block text-sm font-bold text-clinic-blue mb-1">Especialidade</label>
           <select name="especialidade" defaultValue={especialidadeInicial} className="w-full p-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-clinic-lime outline-none">
-            <option value="Implantologia">Implantologia</option>
-            <option value="Ortodontia">Ortodontia</option>
-            <option value="Periodontologia">Periodontologia</option>
+            {services.map((service) => (
+              <option key={service.slug} value={service.title}>{service.title}</option>
+            ))}
           </select>
         </div>
         <button 

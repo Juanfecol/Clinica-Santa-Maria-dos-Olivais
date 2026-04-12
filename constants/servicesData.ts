@@ -12,87 +12,70 @@ export const services = [
 export const serviceDetails: Record<string, any> = {
   implantologia: {
     title: 'Implantologia',
-    doctor: 'Dra. Ana Mata (Diretora Clínica)',
-    schedule: 'Seg e Sex (14h-18h30), Ter e Qui (11h-16h)',
-    description: 'Recupere o seu sorriso fixo com implantes de titânio de alta qualidade.',
-    prices: [
-      { name: 'Implante Unitário + Coroa Metalo-cerâmica', value: '745€' },
-      { name: 'Protocolo Superior (4 a 6 implantes + prótese fixa final)', value: '4.800€' },
-      { name: 'Enxerto Ósseo', value: 'A partir de 200€ (ou 500€ conforme complexidade)' }
-    ],
-    note: "Nota: Os implantes são pagos no dia da cirurgia."
-  },
-  facetas: {
-    title: 'Estética e Facetas',
-    doctor: 'R.O.',
-    schedule: 'Sob consulta',
-    description: 'Melhoria da estética e harmonia do sorriso através da dentisteria avançada.',
-    prices: [
-      { name: 'Facetas 4 Dentes Anteriores (Zona Estética)', value: '1.800€' },
-      { name: 'Facetas 1 Arcada (10 dentes)', value: '4.550€' },
-      { name: 'Facetas 2 Arcadas (20 dentes)', value: '6.500€' },
-      { name: 'Branqueamento em Consultório', value: '200€' }
-    ]
+    description: 'Reabilitação oral e estética através de implantes unitários ou protocolos completos para recuperar a função mastigatória e o sorriso.',
+    prices: [{ name: 'Consulta de avaliação', value: '20,00€' }],
+    note: "Nota: Os tratamentos são pagos conforme realizados. No caso de implantes, o pagamento é efetuado no dia da cirurgia.",
+    videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMPLANTEHOJE.mp4'
   },
   ortodontia: {
     title: 'Ortodontia',
-    doctor: 'Dra. Mariana Aberto',
-    schedule: 'Quarta-feira',
-    description: 'Alinhamento dentário moderno com aparelhos fixos ou alinhadores invisíveis.',
-    prices: [
-      { name: 'Aparelho Ortodôntico Fixo', value: '450€ por arcada' },
-      { name: 'Consulta de Manutenção', value: '65€' },
-      { name: 'Invisalign', value: 'Preço sob consulta' },
-      { name: 'Manutenção Invisalign', value: '75€' },
-      { name: 'Aparelhos de Contenção (Fixo/Removível)', value: '150€ a 180€' }
-    ]
+    description: 'Soluções avançadas para alinhamento dentário, utilizando aparelhos fixos ou sistemas invisíveis (Invisalign) para um sorriso alinhado.',
+    prices: [{ name: 'Consulta de avaliação', value: '20,00€' }],
+    note: "Nota: Os tratamentos são pagos conforme realizados.",
+    videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/SORRISO.mp4'
+  },
+  facetas: {
+    title: 'Facetas',
+    description: 'Melhoria estética do sorriso com lâminas de alta precisão, garantindo um resultado natural e duradouro.',
+    prices: [{ name: 'Consulta de avaliação', value: '20,00€' }],
+    note: "Nota: Os tratamentos são pagos conforme realizados.",
+    videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/FACETAS.mp4'
   },
   'clinica-geral': {
-    title: 'Clínica Geral e Desvitalização',
-    doctor: 'Dra. Orizanda Claret (Terça), Dr. Francisco (Quinta), Tomás Machado (Segunda)',
-    schedule: 'Vários dias',
-    description: 'Cuidados dentários gerais e tratamentos de desvitalização.',
+    title: 'Clínica Geral',
+    description: 'Cuidados essenciais de saúde oral, incluindo restaurações e higiene oral preventiva.',
     prices: [
-      { name: 'Desvitalização Molar', value: '240€' },
-      { name: 'Desvitalização Incisivo/Canino', value: '180€' },
-      { name: 'Extração de Siso (Erupcionado/Incluso)', value: '75€ a 200€' }
-    ]
+      { name: 'Consulta de avaliação', value: '20,00€' },
+      { name: 'Destartarização', value: '40,00€' }
+    ],
+    note: "Nota: Os tratamentos são pagos conforme realizados.",
+    videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/GENERALISTA.mp4'
   },
   desvitalizacao: {
     title: "Desvitalização",
-    description: "Tratamento para salvar dentes danificados, eliminando a dor e prevenindo a perda dentária.",
-    doctor: 'Dra. Orizanda Claret',
-    schedule: 'Sob consulta',
+    description: "Tratamento especializado de canais para preservação da peça dentária natural e alívio imediato da dor.",
     prices: [{ name: 'Consulta de avaliação', value: '20,00€' }],
-    note: "Nota: Os implantes são pagos no dia da cirurgia."
+    note: "Nota: Os tratamentos são pagos conforme realizados.",
+    videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_EDODONTIA.mp4'
   },
   branqueamento: {
     title: "Branqueamento",
-    description: "Recupere a luminosidade do seu sorriso com técnicas seguras e eficazes.",
-    doctor: 'Dra. Ana Mata',
-    schedule: 'Sob consulta',
-    prices: [{ name: 'Consulta de avaliação', value: '20,00€' }],
-    note: "Nota: Os implantes são pagos no dia da cirurgia."
+    description: "Estética profissional segura para um sorriso mais luminoso.",
+    prices: [
+      { name: 'Branqueamento em Consultório', value: '200,00€' },
+      { name: 'Kit Branqueamento Doméstico', value: '150,00€' }
+    ],
+    note: "Nota: Os tratamentos são pagos conforme realizados.",
+    videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_LIMPEZA.mp4'
   },
   proteses: {
     title: "Próteses",
-    description: "Soluções fixas ou removíveis para restaurar a função e estética do seu sorriso.",
-    doctor: 'Dra. Ana Mata',
-    schedule: 'Sob consulta',
-    prices: [{ name: 'Consulta de avaliação', value: '20,00€' }],
-    note: "Nota: Os implantes são pagos no dia da cirurgia."
+    description: "Opções acrílicas e flexíveis para recuperação da função mastigatória e estética.",
+    prices: [{ name: 'Próteses', value: 'Desde 180,00€' }],
+    note: "Nota: Os tratamentos são pagos conforme realizados.",
+    videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/PROTESISFIXAS.mp4'
   },
   odontopediatria: {
     title: "Odontopediatria",
-    description: "Cuidados especializados para a saúde oral dos mais pequenos.",
-    doctor: 'Dra. Mariana Aberto',
-    schedule: 'Sob consulta',
+    description: "Cuidados especializados de saúde oral dedicados às crianças num ambiente tranquilo e acolhedor.",
     prices: [{ name: 'Consulta de avaliação', value: '20,00€' }],
-    note: "Nota: Os implantes são pagos no dia da cirurgia."
+    note: "Nota: Os tratamentos são pagos conforme realizados.",
+    videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/ODONTO02.mp4'
   }
 };
 
 export const faq = [
-  { question: "¿Cómo puedo agendar una cita?", answer: "Puedes agendar a través de nuestro sitio web, llamándonos o por WhatsApp." },
-  { question: "¿Aceptan seguros?", answer: "Sí, trabajamos en régimen de reembolso." }
+  { question: "¿Qual o valor da consulta de avaliação?", answer: "O valor da nossa consulta de avaliação é de 20,00€." },
+  { question: "¿Aceitam seguradoras?", answer: "Não temos protocolos diretos com seguradoras, mas emitimos fatura detalhada para que possa solicitar o seu reembolso." },
+  { question: "¿Como funcionam os pagamentos?", answer: "Os tratamentos são pagos conforme realizados. No caso de implantes, o pagamento é efetuado no dia da cirurgia." }
 ];

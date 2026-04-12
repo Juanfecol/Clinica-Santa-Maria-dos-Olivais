@@ -3,22 +3,19 @@ import React, { useState } from 'react';
 import { useContent } from '../context/ContentContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGoogleAds } from '../hooks/useGoogleAds';
+import { services } from '../constants/servicesData';
 
 const Appointments: React.FC = () => {
   const { content } = useContent();
   const { trackForm } = useGoogleAds();
-  const appointmentsData = content.appointments || { heroImage: "", services: [] };
-  const services = appointmentsData.services || [];
+  const appointmentsData = content.appointments || { heroImage: "" };
   
   const location = useLocation();
   const navigate = useNavigate();
   const incomingService = location.state?.service;
-  const initialService = incomingService 
-    ? services.find((s: string) => s.toLowerCase() === incomingService.toLowerCase()) || "" 
-    : "";
+  const initialService = incomingService || "";
 
   const [isSending, setIsSending] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,7 +23,6 @@ const Appointments: React.FC = () => {
     if (!form.checkValidity()) { form.reportValidity(); return; }
     if (isSending) return;
     setIsSending(true);
-    setSuccessMessage('');
 
     const formData = new FormData(form);
     const dataObj = Object.fromEntries(formData.entries());
@@ -87,16 +83,15 @@ const Appointments: React.FC = () => {
           }); 
         }
         
-        setSuccessMessage('Mensagem enviada com sucesso! Entraremos em contacto em breve.');
-        form.reset();
+        navigate('/obrigado', { state: { nome: dataObj.nome, email: dataObj.email, telemovel: dataObj.telemovel, servico: dataObj.servico } });
       } else {
         const errorData = await response.json();
         const errorMessage = errorData.error?.message || errorData.error || "Ocorreu um erro ao enviar o formulário.";
         alert(`Erro: ${errorMessage}`);
+        setIsSending(false);
       }
     } catch (error) {
       alert("Erro de ligação. Verifique a sua ligação.");
-    } finally {
       setIsSending(false);
     }
   };
@@ -117,11 +112,6 @@ const Appointments: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
-            {successMessage && (
-              <div className="bg-clinic-lime/10 border border-clinic-lime text-clinic-blue p-4 rounded-2xl text-center font-medium animate-fade-in">
-                {successMessage}
-              </div>
-            )}
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-clinic-purple uppercase tracking-[0.2em] ml-2">Nome Completo</label>
               <input name="nome" type="text" placeholder="Ex: João Silva" className="w-full px-6 py-4 rounded-2xl border border-gray-100 focus:border-clinic-blue outline-none transition-all shadow-sm text-lg" required />
@@ -143,7 +133,7 @@ const Appointments: React.FC = () => {
               <div className="relative">
                 <select name="servico" defaultValue={initialService} className="w-full px-6 py-4 rounded-2xl border border-gray-100 focus:border-clinic-blue outline-none transition-all appearance-none cursor-pointer shadow-sm text-lg text-gray-700 bg-white">
                   <option value="" disabled>Escolha o tratamento...</option>
-                  {services.map((s: string, i: number) => <option key={i} value={s}>{s}</option>)}
+                  {services.map((s) => <option key={s.slug} value={s.title}>{s.title}</option>)}
                 </select>
                 <i className="fas fa-chevron-down absolute right-6 top-1/2 -translate-y-1/2 text-clinic-purple pointer-events-none"></i>
               </div>

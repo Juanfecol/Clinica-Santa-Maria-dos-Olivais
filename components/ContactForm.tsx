@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { services } from '../constants/servicesData';
 
 interface ContactFormProps {
@@ -8,6 +9,7 @@ interface ContactFormProps {
 
 export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial = '' }) => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,6 +39,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial =
           });
         }
         setStatus('success');
+        navigate('/obrigado', { state: { nome: data.nome, servico: data.especialidade } });
       } else {
         setStatus('error');
       }

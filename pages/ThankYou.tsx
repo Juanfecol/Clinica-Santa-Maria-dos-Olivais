@@ -44,34 +44,15 @@ const ThankYou: React.FC = () => {
           <i className="fas fa-check text-green-500 text-5xl"></i>
         </div>
 
-        <h1 className="text-3xl md:text-5xl font-bold text-clinic-blue mb-4">Obrigado pelo seu contacto!</h1>
+        <h1 className="text-3xl md:text-5xl font-bold text-clinic-blue mb-4">Obrigado! Recebemos o seu pedido de marcação.</h1>
         <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-          Agradecemos a sua mensagem. A nossa equipa entrará em contacto consigo brevemente para esclarecer todas as suas dúvidas e agendar a sua consulta.
+          A nossa equipa entrará em contacto consigo nas próximas 24 horas para confirmar o horário.
         </p>
 
         {/* Data Summary Card */}
         <div className="bg-white/60 rounded-2xl p-6 mb-8 text-left border border-gray-100 shadow-sm mx-auto max-w-md">
-          <h3 className="text-sm uppercase tracking-wide text-gray-400 font-bold mb-4 border-b pb-2">Resumo do Pedido</h3>
-          <div className="space-y-3">
-             <div className="flex justify-between">
-               <span className="text-gray-500">Nome:</span>
-               <span className="font-medium text-clinic-blue truncate ml-4">{displayData.nome}</span>
-             </div>
-             <div className="flex justify-between">
-               <span className="text-gray-500">Email:</span>
-               <span className="font-medium text-clinic-blue truncate ml-4">{displayData.email}</span>
-             </div>
-             <div className="flex justify-between">
-               <span className="text-gray-500">Telemóvel:</span>
-               <span className="font-medium text-clinic-blue">{displayData.telemovel}</span>
-             </div>
-             {displayData.servico && (
-               <div className="flex justify-between">
-                 <span className="text-gray-500">Interesse:</span>
-                 <span className="font-medium text-clinic-purple">{displayData.servico}</span>
-               </div>
-             )}
-          </div>
+          <h3 className="text-sm uppercase tracking-wide text-gray-400 font-bold mb-4 border-b pb-2">Localização da Clínica</h3>
+          <p className="text-clinic-blue font-medium">Estrada de Moscavide n 32 c, 1800-279 Lisboa</p>
         </div>
 
         {/* Action Buttons */}

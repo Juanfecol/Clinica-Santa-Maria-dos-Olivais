@@ -12,6 +12,13 @@ export const ServiceTemplate: React.FC = () => {
         service: slug
       });
     }
+    // Google Tag Manager Data Layer
+    if ((window as any).dataLayer) {
+      (window as any).dataLayer.push({
+        event: 'view_service_page',
+        service_category: slug
+      });
+    }
   }, [slug]);
 
   const service = slug ? serviceDetails[slug] : null;
@@ -40,6 +47,11 @@ export const ServiceTemplate: React.FC = () => {
                   loop
                   muted
                   playsInline
+                  onClick={() => {
+                    if ((window as any).trackEvent) {
+                      (window as any).trackEvent('click_service_video', { service: slug });
+                    }
+                  }}
                 />
               </div>
             </div>

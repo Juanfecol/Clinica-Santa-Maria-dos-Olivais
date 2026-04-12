@@ -68,6 +68,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial =
           </select>
         </div>
         <button 
+          id="btn-form-submit"
           disabled={status === 'submitting'}
           className="w-full bg-clinic-blue text-white py-4 rounded-lg font-bold hover:bg-clinic-purple transition-all flex items-center justify-center gap-2"
         >

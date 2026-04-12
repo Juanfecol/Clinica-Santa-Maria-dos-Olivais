@@ -111,6 +111,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           />
         </Link>
         <button 
+          id="btn-menu-toggle"
           className="flex flex-col justify-between w-[24px] h-[16px] md:w-[30px] md:h-[22px] cursor-pointer z-[110] flex-shrink-0 transition-all" 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle Menu"
@@ -188,10 +189,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <h4 className="text-lg md:text-xl font-medium text-clinic-purple mb-4 uppercase tracking-wider">Redes sociais</h4>
                 <div className="flex gap-4">
                   {global.socials?.instagram && (
-                    <a href={global.socials.instagram} target="_blank" rel="noreferrer" onClick={() => trackGtagEvent('social_media_click', { 'event_category': 'engagement', 'event_label': 'Instagram' })} className="w-12 h-12 rounded-full bg-clinic-lime flex items-center justify-center text-clinic-blue hover:bg-clinic-purple hover:text-white transition-all transform hover:-translate-y-1 shadow-md"><i className="fab fa-instagram text-xl"></i></a>
+                    <a id="btn-social-instagram" href={global.socials.instagram} target="_blank" rel="noreferrer" onClick={() => trackGtagEvent('social_media_click', { 'event_category': 'engagement', 'event_label': 'Instagram' })} className="w-12 h-12 rounded-full bg-clinic-lime flex items-center justify-center text-clinic-blue hover:bg-clinic-purple hover:text-white transition-all transform hover:-translate-y-1 shadow-md"><i className="fab fa-instagram text-xl"></i></a>
                   )}
                   {global.socials?.facebook && (
-                    <a href={global.socials.facebook} target="_blank" rel="noreferrer" onClick={() => trackGtagEvent('social_media_click', { 'event_category': 'engagement', 'event_label': 'Facebook' })} className="w-12 h-12 rounded-full bg-clinic-lime flex items-center justify-center text-clinic-blue hover:bg-clinic-purple hover:text-white transition-all transform hover:-translate-y-1 shadow-md"><i className="fab fa-facebook-f text-xl"></i></a>
+                    <a id="btn-social-facebook" href={global.socials.facebook} target="_blank" rel="noreferrer" onClick={() => trackGtagEvent('social_media_click', { 'event_category': 'engagement', 'event_label': 'Facebook' })} className="w-12 h-12 rounded-full bg-clinic-lime flex items-center justify-center text-clinic-blue hover:bg-clinic-purple hover:text-white transition-all transform hover:-translate-y-1 shadow-md"><i className="fab fa-facebook-f text-xl"></i></a>
                   )}
                 </div>
               </div>
@@ -240,6 +241,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           Falar agora
         </div>
         <button 
+          id="btn-messenger-main"
           onClick={openMessenger}
           className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 bg-gradient-to-br from-[#0084FF] to-[#0066CC] cursor-pointer"
           aria-label="Falar no Messenger"
@@ -248,7 +250,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </button>
       </div>
 
-      <a href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className={`fixed bottom-[100px] right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-105 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
+      <a id="btn-call-direct" href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className={`fixed bottom-[100px] right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-105 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
         <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl">
           <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple opacity-20 animate-pulse"></span>
           <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple shadow-[0_10px_30px_rgba(107,70,193,0.4)]"></span>
@@ -256,7 +258,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </a>
 
-      <a href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className={`fixed bottom-6 right-6 z-[100] w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
+      <a id="btn-whatsapp-main" href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className={`fixed bottom-6 right-6 z-[100] w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping"></span>
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"></span>
         <i className="fab fa-whatsapp text-3xl md:text-4xl text-white relative z-10"></i>

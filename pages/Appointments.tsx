@@ -139,7 +139,7 @@ const Appointments: React.FC = () => {
               </div>
             </div>
 
-            <button type="submit" disabled={isSending} className={`w-full bg-clinic-blue text-white font-bold text-xl py-5 rounded-2xl transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 ${isSending ? 'opacity-70' : 'hover:bg-clinic-purple'}`}>
+            <button id="btn-form-submit" type="submit" disabled={isSending} className={`w-full bg-clinic-blue text-white font-bold text-xl py-5 rounded-2xl transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 ${isSending ? 'opacity-70' : 'hover:bg-clinic-purple'}`}>
               {isSending ? <><i className="fas fa-spinner animate-spin"></i> A enviar...</> : <>Agendar Agora <i className="fas fa-arrow-right text-sm"></i></>}
             </button>
           </form>

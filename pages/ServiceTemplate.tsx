@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { ContactForm } from '../components/ContactForm';
 import { serviceDetails } from '../constants/servicesData';
 
 export const ServiceTemplate: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   useEffect(() => {
     if ((window as any).trackEvent) {
@@ -20,6 +22,13 @@ export const ServiceTemplate: React.FC = () => {
       });
     }
   }, [slug]);
+
+  const toggleMute = () => {
+    if (!videoRef.current) return;
+    const newMuted = !isMuted;
+    videoRef.current.muted = newMuted;
+    setIsMuted(newMuted);
+  };
 
   const service = slug ? serviceDetails[slug] : null;
 
@@ -41,11 +50,12 @@ export const ServiceTemplate: React.FC = () => {
             <div className="w-full md:w-[60%] flex justify-center">
               <div className="relative w-full max-w-[300px] aspect-[9/16] rounded-[2.5rem] border-[4px] border-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.25)] overflow-hidden bg-black">
                 <video
+                  ref={videoRef}
                   src={service.videoSrc}
                   className="w-full h-full object-cover"
                   autoPlay
                   loop
-                  muted
+                  muted={isMuted}
                   playsInline
                   onClick={() => {
                     if ((window as any).trackEvent) {
@@ -53,6 +63,13 @@ export const ServiceTemplate: React.FC = () => {
                     }
                   }}
                 />
+                <button 
+                  onClick={toggleMute}
+                  aria-label={isMuted ? "Ativar som" : "Desativar som"}
+                  className="absolute bottom-4 right-4 z-40 w-10 h-10 bg-white/20 backdrop-blur-xl rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-clinic-blue transition-all"
+                >
+                  <i className={`fas ${isMuted ? 'fa-volume-xmark' : 'fa-volume-high'} text-sm`}></i>
+                </button>
               </div>
             </div>
           )}

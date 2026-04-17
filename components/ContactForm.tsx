@@ -38,6 +38,10 @@ export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial =
             especialidade: data.especialidade
           });
         }
+        // Google Ads Conversion Tracking
+        if ((window as any).gtag) {
+          (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/form_submit' });
+        }
         setStatus('success');
         navigate('/obrigado', { state: { nome: data.nome, servico: data.especialidade } });
       } else {

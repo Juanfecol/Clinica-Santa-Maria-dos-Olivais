@@ -18,6 +18,8 @@ const CookiesPolicy = lazy(() => import('./pages/CookiesPolicy'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
 const ThankYou = lazy(() => import('./pages/ThankYou'));
+const Blog = lazy(() => import('./pages/Blog'));
+const CaseStudies = lazy(() => import('./pages/CaseStudies'));
 import { ServiceTemplate } from './pages/ServiceTemplate';
 import { FAQ } from './pages/FAQ';
 
@@ -104,6 +106,8 @@ const App: React.FC = () => {
             <Route path="/privacidade" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
             <Route path="/termos" element={<Suspense fallback={<PageLoader />}><TermsAndConditions /></Suspense>} />
             <Route path="/obrigado" element={<Suspense fallback={<PageLoader />}><ThankYou /></Suspense>} />
+            <Route path="/blog" element={<Suspense fallback={<PageLoader />}><Blog /></Suspense>} />
+            <Route path="/casos-clinicos" element={<Suspense fallback={<PageLoader />}><CaseStudies /></Suspense>} />
             <Route path="/faq" element={<Suspense fallback={<PageLoader />}><FAQ /></Suspense>} />
             <Route path="/servicos/:slug" element={<ServiceTemplate />} />
             <Route path="*" element={<Navigate to="/" replace />} />

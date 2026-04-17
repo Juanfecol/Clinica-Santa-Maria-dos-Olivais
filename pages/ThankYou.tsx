@@ -14,6 +14,10 @@ const ThankYou: React.FC = () => {
         service: state?.servico
       });
     }
+    // Google Ads Conversion Tracking
+    if ((window as any).gtag) {
+      (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/thank_you_page' });
+    }
   }, [state]);
 
   // FIX: Datos de respaldo por si se accede directamente (para evitar pantalla en blanco)

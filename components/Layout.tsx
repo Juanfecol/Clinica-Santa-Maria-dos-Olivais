@@ -158,6 +158,24 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </li>
             <li style={{ transitionDelay: `${(navigation.length + 1) * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
               <Link 
+                to="/casos-clinicos" 
+                className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Casos Clínicos
+              </Link>
+            </li>
+            <li style={{ transitionDelay: `${(navigation.length + 2) * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+              <Link 
+                to="/blog" 
+                className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Blog
+              </Link>
+            </li>
+            <li style={{ transitionDelay: `${(navigation.length + 3) * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+              <Link 
                 to="/faq" 
                 className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1"
                 onClick={() => setIsMenuOpen(false)}
@@ -250,7 +268,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </button>
       </div>
 
-      <a id="btn-call-direct" href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className={`fixed bottom-[100px] right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-105 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
+      <a id="btn-call-direct" href={`tel:${cleanCustomerService}`} onClick={() => {
+        trackPhoneClick(customerService);
+        if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_phone' });
+      }} className={`fixed bottom-[100px] right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-105 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
         <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl">
           <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple opacity-20 animate-pulse"></span>
           <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple shadow-[0_10px_30px_rgba(107,70,193,0.4)]"></span>
@@ -258,7 +279,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </a>
 
-      <a id="btn-whatsapp-main" href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className={`fixed bottom-6 right-6 z-[100] w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
+      <a id="btn-whatsapp-main" href={global.socials?.whatsapp || "#"} onClick={() => {
+        trackWhatsAppClick();
+        if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_whatsapp' });
+      }} target="_blank" rel="noreferrer" className={`fixed bottom-6 right-6 z-[100] w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping"></span>
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"></span>
         <i className="fab fa-whatsapp text-3xl md:text-4xl text-white relative z-10"></i>

@@ -35,20 +35,20 @@ export const ServiceTemplate: React.FC = () => {
   if (!service) return <div className="p-20 text-center text-red-600 font-bold text-2xl">Serviço não encontrado: {slug}</div>;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-16">
-      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-clinic-blue mb-8">{service.title}</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+      <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-clinic-blue mb-10 leading-tight">{service.title}</h1>
       
       {service.note && (
-        <div className="bg-clinic-purple text-white p-6 rounded-xl mb-12 shadow-lg text-center font-bold text-lg">
+        <div className="bg-clinic-purple text-white p-8 rounded-2xl mb-16 shadow-lg text-center font-bold text-xl md:text-2xl leading-relaxed">
           {service.note}
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-12">
-        <div className="flex flex-col md:flex-row gap-8 items-start">
+      <div className="grid lg:grid-cols-2 gap-12">
+        <div className="flex flex-col xl:flex-row gap-8 items-start">
           {service.videoSrc && (
-            <div className="w-full md:w-[60%] flex justify-center">
-              <div className="relative w-full max-w-[300px] aspect-[9/16] rounded-[2.5rem] border-[4px] border-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.25)] overflow-hidden bg-black">
+            <div className="w-full xl:w-[55%] flex justify-center">
+              <div className="relative w-full max-w-[280px] aspect-[9/16] rounded-[2.5rem] border-[4px] border-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.25)] overflow-hidden bg-black">
                 <video
                   ref={videoRef}
                   src={service.videoSrc}
@@ -73,7 +73,7 @@ export const ServiceTemplate: React.FC = () => {
               </div>
             </div>
           )}
-          <div className="w-full md:w-[40%]">
+          <div className="w-full xl:w-[45%]">
             <p className="text-xl text-gray-700 mb-6">{service.description}</p>
             {service.doctor && (
               <div className="bg-clinic-bg p-6 rounded-xl border border-clinic-lime mb-8">
@@ -83,14 +83,16 @@ export const ServiceTemplate: React.FC = () => {
             )}
             
             {service.prices && service.prices.length > 0 && (
-              <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
-                <h2 className="text-2xl font-bold text-clinic-blue mb-4">Tabela de Preços</h2>
-                {service.prices.map((p: any, i: number) => (
-                  <div key={i} className="flex justify-between py-2 border-b border-gray-100">
-                    <span>{p.name}</span>
-                    <span className="font-bold text-clinic-purple">{p.value}</span>
-                  </div>
-                ))}
+              <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
+                <h2 className="text-2xl font-bold text-clinic-blue mb-6">Tabela de Preços</h2>
+                <div className="space-y-1">
+                  {service.prices.map((p: any, i: number) => (
+                    <div key={i} className="flex flex-col gap-1 border-b border-gray-100 py-5 last:border-0 w-full group">
+                      <span className="text-base md:text-lg font-semibold text-gray-700 leading-tight break-normal hyphens-none group-hover:text-clinic-purple transition-colors">{p.name}</span>
+                      <span className="text-xl md:text-2xl font-bold text-clinic-purple break-normal hyphens-none">{p.value}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

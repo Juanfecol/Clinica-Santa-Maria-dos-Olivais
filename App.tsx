@@ -1,17 +1,19 @@
 
 import React, { useEffect, Suspense, lazy } from 'react';
-import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
 import { ContentProvider } from './context/ContentContext';
 import { CookieConsent } from './components/CookieConsent';
 
-// Lazy loading pages for performance
-const Home = lazy(() => import('./pages/Home'));
+// Direct imports for primary pages to ensure immediate loading
+import Home from './pages/Home';
+import Appointments from './pages/Appointments';
+
+// Lazy loading secondary pages for performance
 const Team = lazy(() => import('./pages/Team'));
 const Clinic = lazy(() => import('./pages/Clinic'));
 const Contact = lazy(() => import('./pages/Contact'));
-const Appointments = lazy(() => import('./pages/Appointments'));
 const Campaigns = lazy(() => import('./pages/Campaigns'));
 const Admin = lazy(() => import('./pages/Admin'));
 const CookiesPolicy = lazy(() => import('./pages/CookiesPolicy'));
@@ -20,6 +22,7 @@ const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
 const ThankYou = lazy(() => import('./pages/ThankYou'));
 const Blog = lazy(() => import('./pages/Blog'));
 const CaseStudies = lazy(() => import('./pages/CaseStudies'));
+const QuoteCalculator = lazy(() => import('./pages/QuoteCalculator'));
 import { ServiceTemplate } from './pages/ServiceTemplate';
 import { FAQ } from './pages/FAQ';
 
@@ -89,18 +92,18 @@ const PixelRouteTracker: React.FC = () => {
 const App: React.FC = () => {
   return (
     <ContentProvider>
-      <HashRouter>
+      <BrowserRouter>
         <CookieConsent />
         <Layout>
           <ScrollToTop />
           <PixelRouteTracker />
           <Routes>
+            <Route path="/" element={<Home />} />
             <Route path="/admin" element={<Suspense fallback={<PageLoader />}><Admin /></Suspense>} />
-            <Route path="/" element={<Suspense fallback={<PageLoader />}><Home /></Suspense>} />
             <Route path="/equipa" element={<Suspense fallback={<PageLoader />}><Team /></Suspense>} />
             <Route path="/clinica" element={<Suspense fallback={<PageLoader />}><Clinic /></Suspense>} />
             <Route path="/contactos" element={<Suspense fallback={<PageLoader />}><Contact /></Suspense>} />
-            <Route path="/marcacoes" element={<Suspense fallback={<PageLoader />}><Appointments /></Suspense>} />
+            <Route path="/marcacoes" element={<Appointments />} />
             <Route path="/campanhas" element={<Suspense fallback={<PageLoader />}><Campaigns /></Suspense>} />
             <Route path="/cookies" element={<Suspense fallback={<PageLoader />}><CookiesPolicy /></Suspense>} />
             <Route path="/privacidade" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
@@ -108,12 +111,13 @@ const App: React.FC = () => {
             <Route path="/obrigado" element={<Suspense fallback={<PageLoader />}><ThankYou /></Suspense>} />
             <Route path="/blog" element={<Suspense fallback={<PageLoader />}><Blog /></Suspense>} />
             <Route path="/casos-clinicos" element={<Suspense fallback={<PageLoader />}><CaseStudies /></Suspense>} />
+            <Route path="/cotizador" element={<Suspense fallback={<PageLoader />}><QuoteCalculator /></Suspense>} />
             <Route path="/faq" element={<Suspense fallback={<PageLoader />}><FAQ /></Suspense>} />
             <Route path="/servicos/:slug" element={<ServiceTemplate />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
-      </HashRouter>
+      </BrowserRouter>
     </ContentProvider>
   );
 };

@@ -1,15 +1,33 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 import { useGoogleAds } from '../hooks/useGoogleAds';
 import { services } from '../constants/servicesData';
+import { Search, X } from 'lucide-react';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
   const { trackWhatsApp, trackPhone } = useGoogleAds();
+
+  // Basic search logic
+  const filteredServices = services.filter(s => 
+    s.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (filteredServices.length > 0) {
+      navigate(`/servicos/${filteredServices[0].slug}`);
+      setIsSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
   
   const { content } = useContent();
   const navigation = content.navigation || [];
@@ -110,16 +128,71 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             fetchPriority="high"
           />
         </Link>
-        <button 
-          id="btn-menu-toggle"
-          className="flex flex-col justify-between w-[24px] h-[16px] md:w-[30px] md:h-[22px] cursor-pointer z-[110] flex-shrink-0 transition-all" 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle Menu"
-        >
-          <span className={`w-full h-[2px] md:h-[3px] bg-clinic-blue rounded-full transition-all duration-300 ${isMenuOpen ? 'translate-y-[7px] md:translate-y-[9px] rotate-45' : ''}`}></span>
-          <span className={`w-full h-[2px] md:h-[3px] bg-clinic-blue rounded-full transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-          <span className={`w-full h-[2px] md:h-[3px] bg-clinic-blue rounded-full transition-all duration-300 ${isMenuOpen ? '-translate-y-[7px] md:-translate-y-[9px] -rotate-45' : ''}`}></span>
-        </button>
+        
+        <div className="flex items-center gap-4 md:gap-8 z-[110]">
+          {/* Search Bar */}
+          <div className={`relative flex items-center transition-all duration-500 ${isSearchOpen ? 'w-[180px] sm:w-[250px] md:w-[350px]' : 'w-[40px]'}`}>
+            <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center">
+              <input
+                type="text"
+                placeholder="Procurar tratamentos..."
+                className={`w-full bg-white/40 border border-white/50 backdrop-blur-md rounded-full py-2 pl-10 pr-4 text-clinic-blue placeholder:text-clinic-blue/50 focus:outline-none focus:ring-2 focus:ring-clinic-purple/30 transition-all duration-500 ${isSearchOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (isSearchOpen && searchQuery) {
+                    setSearchQuery('');
+                  } else {
+                    setIsSearchOpen(!isSearchOpen);
+                  }
+                }}
+                className={`absolute left-0 w-10 h-10 flex items-center justify-center rounded-full text-clinic-blue hover:text-clinic-purple transition-colors`}
+                aria-label="Search"
+              >
+                {isSearchOpen && searchQuery ? <X size={18} /> : <Search size={22} />}
+              </button>
+            </form>
+
+            {/* Simple Search Results Dropdown */}
+            {isSearchOpen && searchQuery && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white/90 backdrop-blur-xl border border-white/50 rounded-2xl shadow-2xl overflow-hidden max-h-[300px] overflow-y-auto">
+                {filteredServices.length > 0 ? (
+                  <ul className="py-2">
+                    {filteredServices.map((service) => (
+                      <li key={service.slug}>
+                        <Link
+                          to={`/servicos/${service.slug}`}
+                          className="block px-6 py-3 text-clinic-blue hover:bg-clinic-purple hover:text-white transition-colors text-sm font-medium"
+                          onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
+                        >
+                          {service.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="p-6 text-center text-clinic-blue/50 text-sm italic">
+                    Sem resultados para "{searchQuery}"
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <button 
+            id="btn-menu-toggle"
+            className="flex flex-col justify-between w-[24px] h-[16px] md:w-[30px] md:h-[22px] cursor-pointer z-[110] flex-shrink-0 transition-all" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle Menu"
+          >
+            <span className={`w-full h-[2px] md:h-[3px] bg-clinic-blue rounded-full transition-all duration-300 ${isMenuOpen ? 'translate-y-[7px] md:translate-y-[9px] rotate-45' : ''}`}></span>
+            <span className={`w-full h-[2px] md:h-[3px] bg-clinic-blue rounded-full transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
+            <span className={`w-full h-[2px] md:h-[3px] bg-clinic-blue rounded-full transition-all duration-300 ${isMenuOpen ? '-translate-y-[7px] md:-translate-y-[9px] -rotate-45' : ''}`}></span>
+          </button>
+        </div>
       </header>
 
       <div className={`fixed inset-0 bg-white/70 backdrop-blur-[10px] [-webkit-backdrop-filter:blur(10px)] z-[90] flex flex-col items-center overflow-y-auto pt-[100px] pb-[50px] transition-all duration-500 ease-in-out ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
@@ -183,6 +256,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 FAQ
               </Link>
             </li>
+            <li style={{ transitionDelay: `${(navigation.length + 4) * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-30' : 'translate-y-4 opacity-0'}`}>
+              <Link 
+                to="/cotizador" 
+                className="font-sans text-xs uppercase tracking-widest text-clinic-blue hover:text-clinic-purple transition-all inline-block py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                [ Test: Cotizador ]
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
@@ -227,16 +309,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <div>
                 <h4 className="text-lg md:text-xl font-medium text-clinic-purple mb-2 uppercase tracking-wider">Contactos</h4>
                 <div className="space-y-3">
-                  <a href={`mailto:${contactEmail}`} onClick={() => trackEmailClick(contactEmail)} className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold">{contactEmail}</a>
+                  <a href={`mailto:${contactEmail}`} onClick={() => trackEmailClick(contactEmail)} className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold break-normal hyphens-none">{contactEmail}</a>
                   <div className="text-white">
                     <p className="text-xs text-clinic-purple uppercase font-bold tracking-widest mb-1">Apoio ao Cliente 24h</p>
-                    <a href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className="text-base md:text-lg hover:text-clinic-lime transition-colors block font-bold">{customerService} <span className="text-[10px] font-light block opacity-70">(marcação de consultas - urgências e dúvidas)</span></a>
+                    <a href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className="text-base md:text-lg hover:text-clinic-lime transition-colors block font-bold whitespace-nowrap">{customerService} <span className="text-[10px] font-light block opacity-70">(marcação de consultas - urgências e dúvidas)</span></a>
                   </div>
                   <div className="text-white">
                     <p className="text-xs text-clinic-purple uppercase font-bold tracking-widest mb-1">Receção</p>
-                    <a href={`tel:${cleanPhone}`} onClick={() => trackPhoneClick(contactPhone)} className="text-base md:text-lg hover:text-clinic-lime transition-colors block font-bold">{contactPhone}</a>
+                    <a href={`tel:${cleanPhone}`} onClick={() => trackPhoneClick(contactPhone)} className="text-base md:text-lg hover:text-clinic-lime transition-colors block font-bold whitespace-nowrap">{contactPhone}</a>
                   </div>
-                  <a href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold">WhatsApp: {global.mobile}</a>
+                  <a href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold whitespace-nowrap">WhatsApp: {global.mobile}</a>
                 </div>
               </div>
             </div>

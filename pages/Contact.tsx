@@ -25,7 +25,7 @@ const Contact: React.FC = () => {
               <a 
                 href={`mailto:${contactEmail}`} 
                 target="_self"
-                className="text-xl text-gray-700 hover:text-clinic-blue transition-colors break-all"
+                className="text-xl text-gray-700 hover:text-clinic-blue transition-colors break-words"
               >
                 {contactEmail}
               </a>

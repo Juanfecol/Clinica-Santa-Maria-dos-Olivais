@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { Volume2, VolumeX } from 'lucide-react';
 
 const videoTestimonials = [
   "https://clinica-santa-maria-dos-olivais.b-cdn.net/V1.mp4",
@@ -30,10 +31,25 @@ const transformationGallery = [
 
 const CaseStudies: React.FC = () => {
   const [centerIndex, setCenterIndex] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const centerIndexRef = useRef(centerIndex);
   useEffect(() => { centerIndexRef.current = centerIndex; }, [centerIndex]);
+
+  const safePlay = async (video: HTMLVideoElement) => {
+    try {
+      // Small delay to let React's state settle
+      await new Promise(resolve => setTimeout(resolve, 0));
+      if (video.paused) {
+        await video.play();
+      }
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error("Playback failed:", error);
+      }
+    }
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -42,7 +58,7 @@ const CaseStudies: React.FC = () => {
           const video = entry.target as HTMLVideoElement;
           if (entry.isIntersecting) {
             if (videoRefs.current.indexOf(video) === centerIndexRef.current) {
-              video.play().catch(e => console.error("Autoplay failed:", e));
+              safePlay(video);
             }
           } else {
             video.pause();
@@ -63,7 +79,7 @@ const CaseStudies: React.FC = () => {
     videoRefs.current.forEach((video, index) => {
       if (video) {
         if (index === centerIndex) {
-          video.play().catch(e => console.error("Autoplay failed:", e));
+          safePlay(video);
         } else {
           video.pause();
           video.currentTime = 0;
@@ -71,13 +87,6 @@ const CaseStudies: React.FC = () => {
       }
     });
   }, [centerIndex]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCenterIndex((prev) => (prev + 1) % videoTestimonials.length);
-    }, 15000);
-    return () => clearInterval(timer);
-  }, []);
 
   const getStoryStyle = (index: number) => {
     const offset = (index - centerIndex + videoTestimonials.length) % videoTestimonials.length;
@@ -111,10 +120,25 @@ const CaseStudies: React.FC = () => {
                 ref={(el) => (videoRefs.current[index] = el)}
                 src={src}
                 className="w-full h-full object-cover bg-black"
-                muted={index !== centerIndex}
-                loop
+                muted={index === centerIndex ? isMuted : true}
                 playsInline
+                onEnded={() => {
+                    if (isMuted) {
+                        setCenterIndex((prev) => (prev + 1) % videoTestimonials.length);
+                    }
+                }}
               />
+              {index === centerIndex && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMuted(!isMuted);
+                  }}
+                  className="absolute top-4 right-4 z-20 bg-black/50 p-2 rounded-full text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
+                >
+                  {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                </button>
+              )}
             </div>
           ))}
         </div>

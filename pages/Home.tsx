@@ -242,11 +242,11 @@ const Home: React.FC = () => {
     if (diff > stories.length / 2) diff -= stories.length;
     if (diff < -stories.length / 2) diff += stories.length;
     const absDiff = Math.abs(diff);
-    const opacity = absDiff === 0 ? 1 : Math.max(0.45, 0.75 - (absDiff * 0.1));
-    const scale = absDiff === 0 ? 1.3 : Math.max(0.75, 0.9 - (absDiff * 0.12));
-    const translateZ = absDiff === 0 ? 80 : 0;
+    const opacity = absDiff === 0 ? 1 : Math.max(0.40, 0.70 - (absDiff * 0.1));
+    const scale = absDiff === 0 ? 1 : Math.max(0.65, 0.85 - (absDiff * 0.15));
+    const translateZ = absDiff === 0 ? 150 : -200;
     const zIndex = 100 - Math.floor(absDiff * 20);
-    const translateX = diff * 80; 
+    const translateX = diff * 70; // Espaçamento mais dinâmico
 
     return {
       transform: `translate3d(${translateX}%, 0, ${translateZ}px) scale(${scale})`,
@@ -285,27 +285,27 @@ const Home: React.FC = () => {
     <div className="relative animate-fade-in-up overflow-x-hidden bg-clinic-bg">
       
       {/* Hero Section */}
-      <section className="relative z-30 text-center px-4 mb-4 md:mb-8" aria-labelledby="main-heading">
-        <h1 id="main-heading" className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-clinic-blue mb-6 leading-tight">
-          <span className="font-body text-clinic-purple text-lg md:text-3xl lg:text-4xl font-medium mr-2">Clínica Dentária</span>
+      <section className="relative z-30 text-center px-4 sm:px-6 lg:px-8 mb-4 md:mb-12" aria-labelledby="main-heading">
+        <h1 id="main-heading" className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-semibold text-clinic-blue mb-8 leading-tight break-normal hyphens-none">
+          <span className="font-body text-clinic-purple text-lg md:text-3xl lg:text-4xl font-medium mr-2 block sm:inline">Clínica Dentária</span>
           {heroTitle.replace('Clínica', '')}
         </h1>
-        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-800 max-w-3xl mx-auto font-light px-4">{heroSubtitle}</p>
+        <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-800 max-w-4xl mx-auto font-light px-4 leading-relaxed">{heroSubtitle}</p>
       </section>
 
       {/* Stories Section */}
-      <section ref={storiesSectionRef} className="relative h-[340px] md:h-[500px] max-w-[1400px] mx-auto overflow-visible mb-8 flex justify-center items-center" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} aria-label="Histórias de Sucesso">
+      <section ref={storiesSectionRef} className="relative h-[400px] md:h-[600px] xl:h-[700px] max-w-7xl mx-auto overflow-visible mb-16 flex justify-center items-center" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} aria-label="Histórias de Sucesso">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none z-0">
            <div className="absolute inset-[5%] rounded-full blur-[90px] md:blur-[250px] animate-glow-cycle opacity-[0.48]" style={{ background: 'radial-gradient(circle, currentColor 0%, currentColor 12%, #f2f2f2 35%)', willChange: 'filter' }}></div>
         </div>
 
-        <div className="relative z-20 w-full h-full flex justify-center items-center perspective-[1500px]">
+        <div className="relative z-20 w-full h-full flex justify-center items-center perspective-[2000px]">
           {stories.map((story: any, index: number) => {
             const isCenter = centerIndex === index;
             return (
               <div 
                 key={story.id} 
-                className={`absolute w-[125px] aspect-[9/16] md:w-[200px] rounded-[2.5rem] md:rounded-[3.5rem] border-[4px] border-white overflow-hidden cursor-pointer transition-all duration-500 isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)]' : 'shadow-xl'}`}
+                className={`absolute w-[140px] aspect-[9/16] sm:w-[180px] md:w-[240px] xl:w-[280px] rounded-[2.5rem] md:rounded-[4rem] border-[4px] border-white overflow-hidden cursor-pointer transition-all duration-500 isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)] scale-110' : 'shadow-xl'}`}
                 style={{
                   ...getStoryStyle(index),
                   WebkitMaskImage: '-webkit-radial-gradient(white, black)',
@@ -369,42 +369,42 @@ const Home: React.FC = () => {
       </section>
 
       {/* Campanha Sorriso Sem Escalas - Versão Compacta */}
-      <section className="relative z-30 max-w-[1200px] mx-auto px-4 py-12 md:py-16 mb-4 bg-white/40 backdrop-blur-md rounded-[40px] border border-white shadow-2xl overflow-hidden" aria-labelledby="campaign-heading">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <div className="order-2 lg:order-1 lg:pl-16 xl:pl-24">
-            <span className="inline-block bg-clinic-purple text-white px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 shadow-sm">Campanha Exclusiva</span>
-            <h2 id="campaign-heading" className="text-2xl sm:text-4xl md:text-5xl font-bold text-clinic-blue mb-6 leading-tight">Clínica Santa Maria dos Olivais:<br /><span className="text-clinic-purple font-serif italic">Excelência e Proximidade</span></h2>
+      <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 mb-12 bg-white/40 backdrop-blur-md rounded-[40px] md:rounded-[60px] border border-white shadow-2xl overflow-hidden" aria-labelledby="campaign-heading">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div className="order-2 lg:order-1 lg:pl-8">
+            <span className="inline-block bg-clinic-purple text-white px-5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">Campanha Exclusiva</span>
+            <h2 id="campaign-heading" className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-bold text-clinic-blue mb-8 leading-tight">Clínica Santa Maria dos Olivais:<br /><span className="text-clinic-purple font-serif italic">Excelência e Proximidade</span></h2>
             
-            <div className="text-base text-gray-700 mb-8 leading-relaxed space-y-6 font-light">
+            <div className="text-lg text-gray-700 mb-10 leading-relaxed space-y-8 font-light">
               <div>
-                <h3 className="text-xl font-bold text-clinic-blue mb-2">Uma Década a Criar Sorrisos em Lisboa</h3>
+                <h3 className="text-2xl font-bold text-clinic-blue mb-3">Uma Década a Criar Sorrisos em Lisboa</h3>
                 <p>Com 10 anos de experiência, a nossa clínica em Olivais é referência em Implantologia e Estética Dentária. Aliamos o rigor técnico à inovação para oferecer tratamentos personalizados, desde Facetas Estéticas a reabilitações complexas, focando sempre na sua saúde e harmonia facial.</p>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 gap-3 mb-6">
-              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-4 rounded-xl shadow-md border-l-4 border-clinic-lime transition-all hover:scale-[1.02] hover:shadow-lg block group">
-                <div className="flex justify-between items-start mb-1">
-                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-lime transition-colors">Implante Unitário + Coroa</p>
-                  <p className="text-xl font-bold text-clinic-blue whitespace-nowrap">Desde 745 €*</p>
+            <div className="grid grid-cols-1 gap-4 mb-6">
+              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-lime transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
+                <div className="flex flex-col gap-2 w-full mb-3">
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-lime transition-colors leading-tight break-normal hyphens-none">Implante Unitário + Coroa</p>
+                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 745 €*</p>
                 </div>
-                <p className="text-[10px] text-clinic-purple font-medium italic leading-tight">(Inclui fase cirúrgica e coroa metalo-cerâmica)</p>
+                <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">(Inclui fase cirúrgica e coroa metalo-cerâmica)</p>
               </Link>
 
-              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-4 rounded-xl shadow-md border-l-4 border-clinic-purple transition-all hover:scale-[1.02] hover:shadow-lg block group">
-                <div className="flex justify-between items-start mb-1">
-                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-purple transition-colors">Protocolo Superior (Dentes Fixos)</p>
-                  <p className="text-xl font-bold text-clinic-blue whitespace-nowrap">Desde 4.800 €*</p>
+              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-purple transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
+                <div className="flex flex-col gap-2 w-full mb-3">
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-purple transition-colors leading-tight break-normal hyphens-none">Protocolo Superior (Dentes Fixos)</p>
+                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 4.800 €*</p>
                 </div>
-                <p className="text-[10px] text-clinic-purple font-medium italic leading-tight">(Reabilitação total de arcada)</p>
+                <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">(Reabilitação total de arcada)</p>
               </Link>
 
-              <Link to="/marcacoes" state={{ service: "Estética Dentária" }} className="bg-white p-4 rounded-xl shadow-md border-l-4 border-clinic-blue transition-all hover:scale-[1.02] hover:shadow-lg block group">
-                <div className="flex justify-between items-start mb-1">
-                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-blue transition-colors">Facetas Estéticas (Pack 4 dentes)</p>
-                  <p className="text-xl font-bold text-clinic-blue whitespace-nowrap">Desde 1.800 €*</p>
+              <Link to="/marcacoes" state={{ service: "Estética Dentária" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-blue transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
+                <div className="flex flex-col gap-2 w-full mb-3">
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-blue transition-colors leading-tight break-normal hyphens-none">Facetas Estéticas (Pack 4 dentes)</p>
+                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 1.800 €*</p>
                 </div>
-                <p className="text-[10px] text-clinic-purple font-medium italic leading-tight">(Zona estética frontal)</p>
+                <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">(Zona estética frontal)</p>
               </Link>
             </div>
             
@@ -440,10 +440,10 @@ const Home: React.FC = () => {
       </section>
 
       {/* Seção 10 Anos de Experiência */}
-      <section className="px-4 py-6 md:py-10 relative overflow-visible border-t border-clinic-lime/10" aria-labelledby="experience-heading">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center relative z-20">
-          <div className="flex flex-col items-center lg:items-end order-2 lg:order-1 gap-4">
-             <div className="relative w-full max-w-[245px] md:max-w-[340px] aspect-[9/16] rounded-[2.8rem] md:rounded-[4.5rem] flex items-center justify-center overflow-visible">
+      <section className="px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative overflow-visible border-t border-clinic-lime/10" aria-labelledby="experience-heading">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-20">
+          <div className="flex flex-col items-center lg:items-end order-2 lg:order-1 gap-10">
+             <div className="relative w-full max-w-[280px] sm:max-w-[360px] md:max-w-[420px] aspect-[9/16] rounded-[2.8rem] md:rounded-[4.5rem] flex items-center justify-center overflow-visible">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[90%] rounded-full blur-[90px] md:blur-[250px] animate-glow-cycle opacity-[0.48] -z-10" style={{ background: 'radial-gradient(circle, currentColor 0%, currentColor 12%, #f2f2f2 38%)' }}></div>
                 <div className="relative z-20 w-full h-full rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden border-[4px] border-white shadow-[0_35px_70px_-15px_rgba(0,0,0,0.6)] bg-black">
                   <video 
@@ -476,9 +476,11 @@ const Home: React.FC = () => {
       </section>
 
       {/* Serviços */}
-      <section className="relative z-30 max-w-[1100px] mx-auto px-4 py-16 md:py-24" aria-labelledby="services-heading">
-        <h2 id="services-heading" className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif italic text-center mb-16 border-b-4 border-clinic-lime inline-block pb-4 mx-auto block w-fit">Nossos Serviços Dentários</h2>
-        <div className="grid gap-6">
+      <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32" aria-labelledby="services-heading">
+        <div className="text-center mb-20">
+          <h2 id="services-heading" className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif italic border-b-8 border-clinic-lime inline-block pb-4 leading-tight">Nossos Serviços Dentários</h2>
+        </div>
+        <div className="grid gap-8">
           {servicesList.map((service, index) => (
             <details key={index} className="group bg-white rounded-3xl border border-clinic-blue/5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.20)] overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.40)] open:border-clinic-lime"
               onToggle={(e) => {
@@ -505,11 +507,26 @@ const Home: React.FC = () => {
                   
                   <div className="p-5 bg-clinic-bg rounded-2xl border-l-4 border-clinic-lime">
                     <p className="font-bold text-clinic-blue mb-4 italic">{service.highlight}</p>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                        <p className="text-xs font-bold uppercase tracking-wider text-clinic-purple mb-2">Transparência:</p>
-                       {service.transparency.map((line: string, idx: number) => (
-                         <p key={idx} className={`text-base md:text-lg font-semibold text-clinic-blue ${line.startsWith('-') ? 'ml-4 font-normal text-gray-700' : ''}`}>{line}</p>
-                       ))}
+                        {service.transparency.map((line: string, idx: number) => {
+                          const colonIndex = line.lastIndexOf(':');
+                          if (colonIndex !== -1 && !line.startsWith('-')) {
+                            const name = line.substring(0, colonIndex).trim();
+                            const value = line.substring(colonIndex + 1).trim();
+                            return (
+                              <div key={idx} className="flex flex-col gap-1 border-b border-clinic-blue/5 py-4 last:border-0 w-full group">
+                                <span className="text-base md:text-lg font-semibold text-clinic-blue leading-snug break-normal hyphens-none group-hover:text-clinic-purple transition-colors">{name}</span>
+                                <span className="text-lg md:text-xl font-bold text-clinic-purple break-normal hyphens-none">{value}</span>
+                              </div>
+                            );
+                          }
+                          return (
+                            <p key={idx} className={`text-sm md:text-base font-semibold text-clinic-blue py-1.5 ${line.startsWith('-') ? 'ml-4 font-normal text-gray-700 italic border-l-2 border-clinic-lime/20 pl-4 my-2' : ''}`}>
+                              {line}
+                            </p>
+                          );
+                        })}
                     </div>
                   </div>
 
@@ -529,15 +546,15 @@ const Home: React.FC = () => {
       </section>
 
       {/* Seção Seguros e Reembolsos */}
-      <section className="relative z-30 max-w-[1100px] mx-auto px-4 py-16 md:py-24 border-t border-clinic-lime/20" aria-labelledby="insurance-heading">
-        <div className="text-center mb-12">
-          <h2 id="insurance-heading" className="text-3xl md:text-5xl font-bold text-clinic-blue mb-4">Aceitamos o seu Seguro em <span className="text-clinic-purple italic font-serif">Regime de Reembolso</span></h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Na Clínica Santa Maria dos Olivais, escolhe o seu médico pela qualidade, não pela lista da seguradora.
+      <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 border-t border-clinic-lime/20" aria-labelledby="insurance-heading">
+        <div className="text-center mb-16">
+          <h2 id="insurance-heading" className="text-3xl sm:text-5xl md:text-6xl font-bold text-clinic-blue mb-6 leading-tight">Aceitamos o seu Seguro em <br /><span className="text-clinic-purple italic font-serif">Regime de Reembolso</span></h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light leading-relaxed">
+            Na Clínica Santa Maria dos Olivais, escolhe o seu médico pela qualidade, não pela lista da seguradora. Atendimento premium e personalizado.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 mb-16">
           <div className="bg-white p-8 rounded-[30px] shadow-xl border-t-4 border-clinic-lime flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-clinic-bg rounded-full flex items-center justify-center text-clinic-blue mb-6 text-2xl"><i className="fas fa-stethoscope"></i></div>
             <h3 className="text-xl font-bold text-clinic-blue mb-4">1. Tratamento</h3>

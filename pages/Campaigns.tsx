@@ -14,7 +14,7 @@ const Campaigns: React.FC = () => {
         <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-clinic-blue mb-8 flex flex-wrap justify-center items-center gap-4">
           <span>Transforme o seu</span>
           <div className="w-[80px] h-[50px] md:w-[120px] md:h-[80px] rounded-xl overflow-hidden border-4 border-white shadow-xl bg-white/10 flex items-center justify-center">
-              <img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Capture-removebg-preview.png" className="w-[80%] h-[80%] object-contain animate-float" />
+              <img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" className="w-[80%] h-[80%] object-contain animate-float" />
           </div>
           <span className="font-serif italic text-clinic-purple">sorriso</span>
           <span>hoje!</span>

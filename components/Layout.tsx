@@ -122,7 +122,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <header className="fixed top-2 md:top-5 left-0 right-0 mx-auto w-[92%] md:w-[90%] max-w-[1400px] h-[65px] md:h-[90px] bg-white/20 backdrop-blur-md border border-white/30 rounded-[20px] md:rounded-[30px] flex justify-between items-center px-4 md:px-[40px] z-[100] shadow-lg transition-all hover:bg-white/30">
         <Link to="/" className="z-[110] flex-shrink-0">
           <img 
-            src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Capture-removebg-preview.png" 
+            src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" 
             alt="Clínica Santa Maria dos Olivais" 
             className="h-[40px] sm:h-[48px] md:h-[68px] w-auto object-contain transition-transform hover:scale-105" 
             fetchPriority="high"
@@ -279,7 +279,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <footer className="bg-clinic-blue text-[#f2f2f2] pt-[60px] pb-[40px] px-[20px] md:px-[60px]">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12 md:mb-20">
-             <div className="inline-block mb-8"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Capture-removebg-preview.png" alt="Logo Footer" className="max-w-[100px] md:max-w-[180px] mx-auto transition-transform hover:scale-110" loading="lazy" /></div>
+             <div className="inline-block mb-8"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" alt="Logo Footer" className="max-w-[100px] md:max-w-[180px] mx-auto transition-transform hover:scale-110" loading="lazy" /></div>
              <h2 className="text-xl sm:text-2xl md:text-5xl font-semibold leading-tight px-4">Criamos <span className="text-clinic-purple font-serif italic">sorrisos</span> perfeitos,<br className="hidden md:block" /> combinando excelência médica<br className="hidden md:block" /> com <span className="text-clinic-purple font-serif italic">conforto</span> absoluto.</h2>
           </div>
           

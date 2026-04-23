@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 
 const Campaigns: React.FC = () => {
@@ -34,11 +35,29 @@ const Campaigns: React.FC = () => {
         <p className="text-base sm:text-lg text-gray-700">Novas campanhas e promoções especiales serão anunciadas aqui.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full">
         {campaigns.map((camp: any, index: number) => (
-           <div key={index} className="group overflow-hidden rounded-xl shadow-lg border border-white/30 bg-white">
-            <img src={camp.src} className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105" alt={camp.title} />
-          </div>
+           <Link 
+            key={index} 
+            to="/marcacoes" 
+            state={{ service: camp.targetService }}
+            className="group overflow-hidden rounded-[2rem] shadow-2xl border border-white/50 bg-white aspect-[4/5] relative block"
+           >
+            <img 
+              src={camp.src} 
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+              alt={camp.title} 
+              loading="lazy"
+            />
+            {/* Overlay sutil al hacer hover */}
+            <div className="absolute inset-0 bg-clinic-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+               <span className="bg-white text-clinic-blue font-bold px-6 py-2 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                 Agendar consulta
+               </span>
+            </div>
+            {/* Gradiente inferior permanente */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-60" />
+          </Link>
         ))}
       </div>
     </div>

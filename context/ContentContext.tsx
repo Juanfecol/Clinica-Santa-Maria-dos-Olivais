@@ -115,9 +115,9 @@ const defaultData = {
     ]
   },
   campaigns: [
-    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/kids%20clinica%20dentaria%20santa%20maria%20dos%20olivais%20.jpg", title: "Campanha 1" },
-    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/POST-01.jpg", title: "Campanha 2" },
-    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/POST-06.jpg", title: "Campanha 3" }
+    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/kids%20clinica%20dentaria%20santa%20maria%20dos%20olivais%20.jpg", title: "Campanha 1", targetService: "Odontopediatria" },
+    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_6570.jpg", title: "Campanha 2", targetService: "Implantologia" },
+    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_6567%202.jpg", title: "Campanha 3", targetService: "Facetas" }
   ],
   appointments: {
     heroImage: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Carrusel%201-06%20(1).png",
@@ -141,13 +141,9 @@ const ContentContext = createContext<any>(null);
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState(() => {
     try {
-      const saved = localStorage.getItem('site_content_v3');
+      const saved = localStorage.getItem('site_content_v5');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Migração/Segurança: Garantir que as histórias existem no conteúdo guardado
-        if (!parsed.stories || !Array.isArray(parsed.stories) || parsed.stories.length === 0) {
-          parsed.stories = defaultData.stories;
-        }
         return parsed;
       }
     } catch (e) {
@@ -158,12 +154,12 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateContent = (newContent: any) => {
     setContent(newContent);
-    localStorage.setItem('site_content_v3', JSON.stringify(newContent));
+    localStorage.setItem('site_content_v5', JSON.stringify(newContent));
   };
 
   const resetContent = () => {
     setContent(defaultData);
-    localStorage.setItem('site_content_v3', JSON.stringify(defaultData));
+    localStorage.setItem('site_content_v5', JSON.stringify(defaultData));
   };
 
   return (

@@ -53,7 +53,7 @@ const defaultData = {
       {
         name: "Dra. Ana Mata",
         title: "Direção Clínica e Implantologia",
-        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-114.jpeg",
+        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/dra_ana_mata.png",
         bio: "Diretora Clínica e especialista em reabilitação oral avançada com implantes.",
         imgPosition: "object-top"
       },
@@ -141,7 +141,7 @@ const ContentContext = createContext<any>(null);
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState(() => {
     try {
-      const saved = localStorage.getItem('site_content_v5');
+      const saved = localStorage.getItem('site_content_v6');
       if (saved) {
         const parsed = JSON.parse(saved);
         return parsed;
@@ -154,12 +154,12 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateContent = (newContent: any) => {
     setContent(newContent);
-    localStorage.setItem('site_content_v5', JSON.stringify(newContent));
+    localStorage.setItem('site_content_v6', JSON.stringify(newContent));
   };
 
   const resetContent = () => {
     setContent(defaultData);
-    localStorage.setItem('site_content_v5', JSON.stringify(defaultData));
+    localStorage.setItem('site_content_v6', JSON.stringify(defaultData));
   };
 
   return (

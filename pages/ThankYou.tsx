@@ -14,6 +14,15 @@ const ThankYou: React.FC = () => {
         service: state?.servico
       });
     }
+    // Meta Pixel Conversion
+    if ((window as any).trackMeta) {
+      (window as any).trackMeta('Lead', {
+        content_name: state?.servico || 'Consulta Geral',
+        content_category: 'Agendamento Finalizado',
+        value: 10.0,
+        currency: 'EUR'
+      });
+    }
     // Google Ads Conversion Tracking
     if ((window as any).gtag) {
       (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/thank_you_page' });

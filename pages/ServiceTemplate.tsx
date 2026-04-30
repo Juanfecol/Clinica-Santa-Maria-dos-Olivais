@@ -14,6 +14,13 @@ export const ServiceTemplate: React.FC = () => {
         service: slug
       });
     }
+    // Meta Pixel Tracking
+    if ((window as any).trackMeta) {
+      (window as any).trackMeta('ViewContent', {
+        content_name: service?.title || slug,
+        content_category: 'Serviço Odontológico'
+      }, true);
+    }
     // Google Tag Manager Data Layer
     if ((window as any).dataLayer) {
       (window as any).dataLayer.push({

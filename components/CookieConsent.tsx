@@ -24,47 +24,26 @@ export const CookieConsent: React.FC = () => {
   };
 
   const loadScripts = () => {
-    // Meta Pixel
-    (function(f: any, b, e, v, n, t, s) {
-      if (f.fbq) return;
-      n = f.fbq = function(...args: any[]) {
-        n.callMethod ? n.callMethod.apply(n, args) : n.queue.push(args);
-      };
-      if (!f._fbq) f._fbq = n;
-      n.push = n;
-      n.loaded = !0;
-      n.version = '2.0';
-      n.queue = [];
-      t = b.createElement(e);
-      t.async = !0;
-      t.src = v;
-      s = b.getElementsByTagName(e)[0];
-      s.parentNode!.insertBefore(t, s);
-    })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
-    (window as any).fbq('init', '1754959305395666');
-    (window as any).fbq('track', 'PageView');
-
-    // Google Tag
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = "https://www.googletagmanager.com/gtag/js?id=AW-434250599";
-    document.head.appendChild(script);
-
-    (window as any).dataLayer = (window as any).dataLayer || [];
-    function gtag(...args: any[]) {
-      (window as any).dataLayer.push(args);
+    // Scripts are now pre-loaded in index.html for better reliability and performance.
+    // Here we just notify the SDKs (if needed) and ensure global helpers are available.
+    
+    if ((window as any).fbq) {
+      (window as any).fbq('consent', 'grant');
     }
-    gtag('js', new Date());
-    gtag('config', 'AW-434250599');
-    gtag('config', 'AW-1135006626');
 
     (window as any).trackEvent = function(eventName: string, eventParams: object = {}) {
-        gtag('event', eventName, { ...eventParams, 'send_to': ['AW-434250599', 'AW-1135006626'] });
+        if ((window as any).gtag) {
+          (window as any).gtag('event', eventName, { ...eventParams, 'send_to': ['AW-434250599', 'AW-1135006626'] });
+        }
     };
     
-    (window as any).trackMeta = function(eventName: string, params: object = {}, isStandard: boolean = false) {
-        if ((window as any).fbq && isStandard) {
-          (window as any).fbq('track', eventName, params);
+    (window as any).trackMeta = function(eventName: string, params: object = {}, isStandard: boolean = true) {
+        if ((window as any).fbq) {
+          if (isStandard) {
+            (window as any).fbq('track', eventName, params);
+          } else {
+            (window as any).fbq('trackCustom', eventName, params);
+          }
         }
     };
   };

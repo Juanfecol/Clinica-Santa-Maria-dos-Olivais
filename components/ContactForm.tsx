@@ -38,6 +38,15 @@ export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial =
             especialidade: data.especialidade
           });
         }
+        // Meta Pixel Conversion
+        if ((window as any).trackMeta) {
+          (window as any).trackMeta('Lead', {
+            content_name: data.especialidade || 'Contacto Geral',
+            content_category: 'Formulário Rodapé / Laterial',
+            value: 5.0,
+            currency: 'EUR'
+          });
+        }
         // Google Ads Conversion Tracking
         if ((window as any).gtag) {
           (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/form_submit' });

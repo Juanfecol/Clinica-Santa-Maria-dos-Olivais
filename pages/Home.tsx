@@ -177,17 +177,46 @@ const Home: React.FC = () => {
 
         if (i === centerIndex) {
           // Center video: play and handle audio
-          v.muted = !hasInteracted;
-          
-          // Use a small delay to allow the DOM to settle
-          const timer = setTimeout(() => {
-            v.play().catch((err) => {
-              console.warn("Autoplay prevented, retrying muted:", err);
-              v.muted = true;
-              v.play().catch(e => console.error("Final play attempt failed:", e));
-            });
-          }, 50);
-          return () => clearTimeout(timer);
+          const attemptPlay = async () => {
+            try {
+              // Ensure video is ready to play
+              if (v.readyState < 2) {
+                // Wait for metadata or enough data
+                await new Promise((resolve) => {
+                  const onReady = () => {
+                    v.removeEventListener('loadedmetadata', onReady);
+                    v.removeEventListener('canplay', onReady);
+                    resolve(null);
+                  };
+                  v.addEventListener('loadedmetadata', onReady);
+                  v.addEventListener('canplay', onReady);
+                  // Safety timeout
+                  setTimeout(resolve, 2000);
+                });
+              }
+
+              v.muted = !hasInteracted;
+              await v.play();
+            } catch (err: any) {
+              // Only retry if it's a permission issue (NotAllowedError)
+              if (err.name === 'NotAllowedError') {
+                console.warn("Autoplay prevented, retrying muted...");
+                v.muted = true;
+                try {
+                  await v.play();
+                } catch (retryErr) {
+                  // Silent fail for muted autoplay as well
+                }
+              } else if (err.name !== 'AbortError') {
+                // Ignore AbortError (interrupted by pause/src change)
+                // For other errors, just log warning instead of showing as critical
+                console.warn("Video playback attempt failed:", err.name, err.message);
+              }
+            }
+          };
+
+          attemptPlay();
+          return;
         } else {
           // Other videos: pause
           if (!v.paused) v.pause();
@@ -317,13 +346,12 @@ const Home: React.FC = () => {
                     <video 
                       key={story.src} 
                       ref={(el) => (videoRefs.current[index] = el)} 
-                      src={`${story.src}#t=0.001`}
+                      src={story.src}
                       poster={story.thumbnail || `${story.src}#t=0.001`} 
                       className={`absolute inset-0 w-full h-full object-cover scale-[1.05] bg-clinic-bg transition-all duration-500 ${isCenter ? 'opacity-100' : 'opacity-70'}`}
                       style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
                       playsInline 
                       muted={!isCenter || !hasInteracted}
-                      webkit-playsinline="true" 
                       preload="metadata"
                       onEnded={(e) => {
                         e.currentTarget.load();

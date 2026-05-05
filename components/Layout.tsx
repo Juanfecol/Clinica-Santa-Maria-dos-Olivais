@@ -328,6 +328,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Link to="/termos" className="hover:text-clinic-purple transition-colors uppercase">Termos e Condições</Link>
             <Link to="/cookies" className="hover:text-clinic-purple transition-colors uppercase">Política de Cookies</Link>
             <Link to="/privacidade" className="hover:text-clinic-purple transition-colors uppercase">Política de Privacidade</Link>
+            <a href="https://www.livroreclamacoes.pt" target="_blank" rel="noreferrer" className="hover:text-clinic-purple transition-colors uppercase">Livro de Reclamações</a>
           </div>
           <div className="mt-8 text-center text-[10px] text-white/40 uppercase tracking-[0.2em]">
             Sisos & Sorrisos Lda | Estrada de Moscavide n 32 c, 1800-279 Lisboa | © {new Date().getFullYear()} Clínica Santa Maria dos Olivais

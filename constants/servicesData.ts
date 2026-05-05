@@ -90,10 +90,19 @@ export const serviceDetails: Record<string, any> = {
   'clinica-geral': {
     title: 'Clínica Geral',
     description: 'Cuidados essenciais de saúde oral, incluindo restaurações e higiene oral preventiva.',
-    prices: [
-      { name: 'Consulta de avaliação', value: '20,00€' },
-      { name: 'Destartarização', value: '40,00€' }
+    priceGroups: [
+      {
+        title: "Serviços Clínicos Gerais",
+        category: "Higiene e Diagnóstico",
+        items: [
+          { name: 'Consulta de Avaliação', value: '20,00€' },
+          { name: 'Destartarização + Polimento', value: '40,00€' },
+          { name: 'Raio X Periapical', value: '10,00€' },
+          { name: 'Observação Pós-Tratamento', value: '5,00€' }
+        ]
+      }
     ],
+    prices: [{ name: 'Consulta de avaliação', value: '20,00€' }],
     note: "Nota: Os tratamentos são pagos conforme realizados.",
     videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/GENERALISTA.mp4'
   },

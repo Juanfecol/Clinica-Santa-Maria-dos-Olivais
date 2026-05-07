@@ -140,13 +140,18 @@
     <link rel="apple-touch-icon" href="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" />
     
     <script>
-      window.trackEvent = function() {};
+      window.trackEvent = function(name, params) {
+        if (typeof (window as any).gtag === 'function') {
+          (window as any).gtag('event', name, params);
+        }
+      };
+
       window.trackMeta = function(event, data, isStandard = true) {
-        if (window.fbq) {
+        if (typeof (window as any).fbq === 'function') {
           if (isStandard) {
-            window.fbq('track', event, data);
+            (window as any).fbq('track', event, data);
           } else {
-            window.fbq('trackCustom', event, data);
+            (window as any).fbq('trackCustom', event, data);
           }
         }
       };
@@ -159,21 +164,23 @@
       if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
       n.queue=[];t=b.createElement(e);t.async=!0;
       t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      s.parentNode.insertBefore(t,s)}(window,document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1754959305395666');
+      fbq('init', '1754959305395666'); 
       fbq('track', 'PageView');
     </script>
     <!-- End Meta Pixel Code -->
   </head>
   <body>
+    <!-- Meta Pixel Code (noscript) -->
+    <noscript>
+      <img height="1" width="1" style="display:none"
+           src="https://www.facebook.com/tr?id=1754959305395666&ev=PageView&noscript=1"/>
+    </noscript>
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PNVPD8T3"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1754959305395666&ev=PageView&noscript=1"
-    /></noscript>
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
   </body>

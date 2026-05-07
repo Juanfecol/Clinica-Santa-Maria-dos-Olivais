@@ -145,9 +145,25 @@ const QuoteCalculator: React.FC = () => {
   const [selectedProcedures, setSelectedProcedures] = useState<string[]>([]);
 
   const toggleProcedure = (id: string) => {
-    setSelectedProcedures(prev => 
-      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
-    );
+    setSelectedProcedures(prev => {
+      const isAdding = !prev.includes(id);
+      if (isAdding && (window as any).trackMeta) {
+        // Find procedure for metadata
+        let procName = "Aparelho/Tratamento";
+        specialtiesData.forEach(spec => {
+          const p = spec.procedures.find(proc => proc.id === id);
+          if (p) procName = p.name;
+        });
+        
+        (window as any).trackMeta('AddToCart', {
+          content_name: procName,
+          content_type: 'product',
+          content_ids: [id],
+          currency: 'EUR'
+        }, true);
+      }
+      return isAdding ? [...prev, id] : prev.filter(p => p !== id);
+    });
   };
 
   const calculateTotal = () => {
@@ -165,6 +181,19 @@ const QuoteCalculator: React.FC = () => {
     });
     
     return { min, max };
+  };
+
+  const goToResult = () => {
+    const { min } = calculateTotal();
+    if ((window as any).trackMeta) {
+      (window as any).trackMeta('InitiateCheckout', {
+        value: min,
+        currency: 'EUR',
+        content_name: 'Simulação de Orçamento',
+        num_items: selectedProcedures.length
+      }, true);
+    }
+    setStep(3);
   };
 
   const reset = () => {
@@ -304,7 +333,7 @@ const QuoteCalculator: React.FC = () => {
                      <p className="text-sm text-gray-500">Selecionados: <span className="font-bold text-clinic-purple">{selectedProcedures.length} tratamentos</span></p>
                   </div>
                   <button 
-                    onClick={() => setStep(3)}
+                    onClick={goToResult}
                     disabled={selectedProcedures.length === 0}
                     className="w-full sm:w-auto flex items-center justify-center gap-3 bg-clinic-blue text-white font-bold px-12 py-5 rounded-2xl hover:bg-clinic-purple disabled:opacity-50 disabled:grayscale transition-all shadow-xl active:scale-95"
                   >

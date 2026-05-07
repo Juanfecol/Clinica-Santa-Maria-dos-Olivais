@@ -23,6 +23,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (filteredServices.length > 0) {
+      if ((window as any).trackMeta) {
+        (window as any).trackMeta('Search', { 
+          search_string: searchQuery,
+          content_category: 'Services'
+        }, true);
+      }
       navigate(`/servicos/${filteredServices[0].slug}`);
       setIsSearchOpen(false);
       setSearchQuery('');

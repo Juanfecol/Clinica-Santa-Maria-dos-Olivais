@@ -25,6 +25,9 @@ const Contact: React.FC = () => {
               <a 
                 href={`mailto:${contactEmail}`} 
                 target="_self"
+                onClick={() => {
+                  if ((window as any).trackMeta) (window as any).trackMeta('Contact', { content_name: 'Email' }, true);
+                }}
                 className="text-xl text-gray-700 hover:text-clinic-blue transition-colors break-words"
               >
                 {contactEmail}
@@ -36,6 +39,9 @@ const Contact: React.FC = () => {
               <a 
                 href={`tel:${contactPhone}`} 
                 target="_self"
+                onClick={() => {
+                  if ((window as any).trackMeta) (window as any).trackMeta('Contact', { content_name: 'Phone Call' }, true);
+                }}
                 className="text-xl text-gray-700 font-medium hover:text-clinic-blue transition-colors"
               >
                 {global.phone}
@@ -45,7 +51,17 @@ const Contact: React.FC = () => {
             <div>
               <h3 className="text-2xl font-bold text-clinic-blue mb-4">Telemóvel / WhatsApp</h3>
               {/* Links to WhatsApp as per design, opens in new tab/app */}
-              <a href={global.socials?.whatsapp || "#"} target="_blank" rel="noreferrer" className="text-xl text-gray-700 font-medium hover:text-clinic-blue transition-colors">{global.mobile}</a>
+              <a 
+                href={global.socials?.whatsapp || "#"} 
+                target="_blank" 
+                rel="noreferrer" 
+                onClick={() => {
+                  if ((window as any).trackMeta) (window as any).trackMeta('Contact', { content_name: 'WhatsApp', content_category: 'Messenger' }, true);
+                }}
+                className="text-xl text-gray-700 font-medium hover:text-clinic-blue transition-colors"
+              >
+                {global.mobile}
+              </a>
               <div className="text-sm text-gray-500 mt-1">(Preço de uma chamada de Rede Móvel Nacional)</div>
             </div>
             
@@ -79,6 +95,9 @@ const Contact: React.FC = () => {
             href={global.mapsLink || "#"}
             target="_blank"
             rel="noreferrer"
+            onClick={() => {
+              if ((window as any).trackMeta) (window as any).trackMeta('FindLocation', { content_name: 'Clinic Address' }, true);
+            }}
             className="absolute bottom-4 right-4 bg-white text-clinic-blue px-4 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity font-semibold text-sm"
           >
             Abrir no Google Maps

@@ -2,11 +2,11 @@ export const services = [
   { id: "01", slug: "implantologia", title: "Implantologia", category: "IMPLANTOLOGIA" },
   { id: "02", slug: "ortodontia", title: "Ortodontia", category: "ORTODONTIA" },
   { id: "03", slug: "facetas", title: "Facetas", category: "ESTÉTICA" },
-  { id: "04", slug: "clinica-geral", title: "Clínica Geral", category: "CLÍNICA GERAL" },
-  { id: "05", slug: "desvitalizacao", title: "Desvitalização", category: "CLÍNICA GERAL" },
+  { id: "04", slug: "medicina-dentaria", title: "Medicina Dentária", category: "MEDICINA DENTÁRIA" },
+  { id: "05", slug: "desvitalizacao", title: "Desvitalização", category: "MEDICINA DENTÁRIA" },
   { id: "06", slug: "branqueamento", title: "Branqueamento", category: "ESTÉTICA" },
   { id: "07", slug: "proteses", title: "Próteses", category: "IMPLANTOLOGIA" },
-  { id: "08", slug: "odontopediatria", title: "Odontopediatria", category: "CLÍNICA GERAL" }
+  { id: "08", slug: "odontopediatria", title: "Odontopediatria", category: "MEDICINA DENTÁRIA" }
 ];
 
 export const serviceDetails: Record<string, any> = {
@@ -87,8 +87,8 @@ export const serviceDetails: Record<string, any> = {
     note: "Nota: Os tratamentos são pagos conforme realizados.",
     videoSrc: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/FACETAS.mp4'
   },
-  'clinica-geral': {
-    title: 'Clínica Geral',
+  'medicina-dentaria': {
+    title: 'Medicina Dentária',
     description: 'Cuidados essenciais de saúde oral, incluindo restaurações e higiene oral preventiva.',
     priceGroups: [
       {

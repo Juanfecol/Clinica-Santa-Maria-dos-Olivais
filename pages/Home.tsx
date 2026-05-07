@@ -65,9 +65,9 @@ const Home: React.FC = () => {
     },
     {
       id: "04",
-      slug: "clinica-geral",
-      category: "CLÍNICA GERAL E DESVITALIZAÇÃO",
-      title: "Clínica Geral e Desvitalização",
+      slug: "medicina-dentaria",
+      category: "MEDICINA DENTÁRIA E DESVITALIZAÇÃO",
+      title: "Medicina Dentária e Desvitalização",
       description: "Cuidados dentários gerais e tratamentos de desvitalização.",
       highlight: "Diagnóstico médico rigoroso com tecnologia digital.",
       transparency: [
@@ -450,6 +450,7 @@ const Home: React.FC = () => {
                 muted 
                 playsInline 
                 preload="metadata"
+                poster="https://clinica-santa-maria-dos-olivais.b-cdn.net/0309.mp4#t=0.1"
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover scale-[1.05]"
                 aria-label="Vídeo informativo sobre cuidados dentários em Portugal"
@@ -481,6 +482,7 @@ const Home: React.FC = () => {
                     muted 
                     playsInline 
                     preload="metadata" 
+                    poster="https://clinica-santa-maria-dos-olivais.b-cdn.net/clinicadentaria-santamariadosolivais.mp4#t=0.1"
                     autoPlay
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover scale-[1.05]" 

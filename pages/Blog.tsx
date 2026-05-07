@@ -36,7 +36,14 @@ const Blog: React.FC = () => {
         {educationalVideos.map((video, index) => (
           <div key={index} className="bg-white p-4 rounded-3xl shadow-xl border border-gray-100 flex flex-col gap-4">
             <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-black">
-                <video src={video.src} className="w-full h-full object-cover" controls playsInline />
+                <video 
+                  src={video.src} 
+                  className="w-full h-full object-cover" 
+                  controls 
+                  playsInline 
+                  preload="none"
+                  poster={`${video.src}#t=0.1`}
+                />
             </div>
             <h3 className="text-lg font-bold text-clinic-blue text-center px-2">{video.title}</h3>
           </div>

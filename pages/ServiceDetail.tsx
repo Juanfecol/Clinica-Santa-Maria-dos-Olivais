@@ -39,8 +39,8 @@ const servicesData: Record<string, any> = {
       { name: 'Aparelhos de Contenção (Fixo/Removível)', value: '150€ a 180€' }
     ]
   },
-  'clinica-geral': {
-    title: 'Clínica Geral e Desvitalização',
+  'medicina-dentaria': {
+    title: 'Medicina Dentária e Desvitalização',
     doctor: 'Dra. Orizanda Claret (Terça), Dr. Francisco (Quinta), Tomás Machado (Segunda)',
     schedule: 'Vários dias',
     description: 'Cuidados dentários gerais e tratamentos de desvitalização.',

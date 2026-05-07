@@ -72,6 +72,8 @@ export const ServiceTemplate: React.FC = () => {
                     loop
                     muted={isMuted}
                     playsInline
+                    preload="metadata"
+                    poster={`${service.videoSrc}#t=0.1`}
                     onClick={() => {
                       if ((window as any).trackEvent) {
                         (window as any).trackEvent('click_service_video', { service: slug });

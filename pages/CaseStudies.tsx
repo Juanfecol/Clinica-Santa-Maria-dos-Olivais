@@ -122,6 +122,8 @@ const CaseStudies: React.FC = () => {
                 className="w-full h-full object-cover bg-black"
                 muted={index === centerIndex ? isMuted : true}
                 playsInline
+                preload="metadata"
+                poster={`${src}#t=0.1`}
                 onEnded={() => {
                     if (isMuted) {
                         setCenterIndex((prev) => (prev + 1) % videoTestimonials.length);

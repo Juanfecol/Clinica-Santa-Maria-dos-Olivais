@@ -31,6 +31,8 @@ export const FAQ: React.FC = () => {
               loop
               muted
               playsInline
+              preload="metadata"
+              poster="https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_CONSULTA.mp4#t=0.1"
             />
           </div>
         </div>

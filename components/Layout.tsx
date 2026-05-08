@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 import { useGoogleAds } from '../hooks/useGoogleAds';
+import { useMetaConversions } from '../hooks/useMetaConversions';
 import { services } from '../constants/servicesData';
 import { Search, X } from 'lucide-react';
 
@@ -14,6 +15,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { trackWhatsApp, trackPhone } = useGoogleAds();
+    const { trackContact } = useMetaConversions();
 
   // Basic search logic
   const filteredServices = services.filter(s => 
@@ -67,6 +69,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const trackWhatsAppClick = () => {
     trackWhatsApp(); // Google Ads Conversion
+      trackContact('whatsapp'); // Meta Conversions API (server-side)
     if ((window as any).trackMeta) {
       // Evento estándar 'Contact' para clics en WhatsApp
       (window as any).trackMeta('Contact', { 
@@ -82,6 +85,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const trackPhoneClick = (number: string) => {
     trackPhone(); // Google Ads Conversion
+      trackContact('phone'); // Meta Conversions API (server-side)
     if ((window as any).trackMeta) {
       (window as any).trackMeta('Contact', { content_name: 'Phone Call' }, true);
     }

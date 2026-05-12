@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useContent } from '../context/ContentContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGoogleAds } from '../hooks/useGoogleAds';
@@ -17,84 +17,22 @@ const Appointments: React.FC = () => {
 
   const [isSending, setIsSending] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    if (!form.checkValidity()) { form.reportValidity(); return; }
-    if (isSending) return;
-    setIsSending(true);
-
-    const formData = new FormData(form);
-    const dataObj = Object.fromEntries(formData.entries());
-    
-    // Map form fields to API expected names
-    const payload = {
-      name: dataObj.nome,
-      email: dataObj.email,
-      phone: dataObj.telemovel,
-      message: `Serviço de interesse: ${dataObj.servico || 'Não especificado'}`
-    };
-
-    try {
-      const response = await fetch('/api/send', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok) {
-        trackForm(); // Google Ads Conversion
-        
-        // --- GOOGLE ADS CONVERSION (Legacy) ---
-        if (typeof (window as any).gtag === 'function') {
-          (window as any).gtag('event', 'conversion', { 
-            'send_to': 'AW-434250599', 
-            'value': 25.0, 
-            'currency': 'EUR'
-          });
-          
-          (window as any).gtag('event', 'conversion', { 
-            'send_to': 'AW-1135006626/form_submission', 
-            'value': 10.0, 
-            'currency': 'EUR' 
-          });
-        }
-        
-        // --- META PIXEL CONVERSION ---
-        if ((window as any).trackMeta) {
-          (window as any).trackMeta('Lead', { 
-            content_name: dataObj.servico || 'Consulta Clínica',
-            content_category: 'Formulário',
-            value: 25.0,
-            currency: 'EUR'
-          }, true);
-          
-          (window as any).trackMeta('Schedule', {
-            content_name: dataObj.servico || 'Consulta Clínica',
-            value: 25.0,
-            currency: 'EUR'
-          }, true);
-        }
-
-        if ((window as any).trackEvent) { 
-          (window as any).trackEvent('form_submission_success', { 
-            'event_category': 'conversion',
-            'service': dataObj.servico || 'Geral'
-          }); 
-        }
-        
-        navigate('/obrigado', { state: { nome: dataObj.nome, email: dataObj.email, telemovel: dataObj.telemovel, servico: dataObj.servico } });
+  useEffect(() => {
+    // Initialize Calendly inline widget
+    const initCalendly = () => {
+      if ((window as any).Calendly) {
+        (window as any).Calendly.initInlineWidget({
+          url: 'https://calendly.com/clinicasmod/30min?primary_color=d4e157',
+          parentElement: document.getElementById('calendly-inline-container'),
+          prefill: {},
+          utm: {}
+        });
       } else {
-        const errorData = await response.json();
-        const errorMessage = errorData.error?.message || errorData.error || "Ocorreu um erro ao enviar o formulário.";
-        alert(`Erro: ${errorMessage}`);
-        setIsSending(false);
+        setTimeout(initCalendly, 500);
       }
-    } catch (error) {
-      alert("Erro de ligação. Verifique a sua ligação.");
-      setIsSending(false);
-    }
-  };
+    };
+    initCalendly();
+  }, []);
 
   return (
     <div className="animate-fade-in-up max-w-[1300px] mx-auto px-4 py-8 md:py-16">
@@ -105,44 +43,17 @@ const Appointments: React.FC = () => {
            <div className="absolute bottom-12 left-10 text-white max-w-sm"><h3 className="text-3xl font-serif italic leading-tight">Cuidamos de si com a proximidade de quem está ao seu lado.</h3></div>
         </div>
 
-        <div className="bg-white/70 backdrop-blur-2xl p-6 sm:p-10 md:p-14 rounded-[3rem] shadow-2xl border border-white relative overflow-hidden">
-          <div className="mb-10 text-center lg:text-left">
-            <h1 className="text-3xl md:text-5xl font-bold text-clinic-blue mb-4 leading-tight">Marque a sua <span className="text-clinic-purple italic font-serif">Consulta</span></h1>
-            <p className="text-base sm:text-lg text-gray-600 font-light">Preencha os seus dados e a nossa equipa entrará em contacto para confirmar o seu horário.</p>
+        <div className="bg-white/70 backdrop-blur-2xl p-4 sm:p-6 rounded-[3rem] shadow-2xl border border-white relative overflow-hidden min-h-[750px]">
+          <div className="mb-6 text-center lg:text-left px-4">
+            <h1 className="text-3xl md:text-5xl font-bold text-clinic-blue mb-4 leading-tight">Agende a sua <span className="text-clinic-purple italic font-serif">Consulta</span></h1>
+            <p className="text-base sm:text-lg text-gray-600 font-light">Escolha o mejor horário para si diretamente no nosso calendário oficial.</p>
           </div>
 
-          <form onSubmit={handleSubmit} noValidate className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-clinic-purple uppercase tracking-[0.2em] ml-2">Nome Completo</label>
-              <input name="nome" type="text" placeholder="Ex: João Silva" className="w-full px-6 py-4 rounded-2xl border border-gray-100 focus:border-clinic-blue outline-none transition-all shadow-sm text-lg" required />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-clinic-purple uppercase tracking-[0.2em] ml-2">Email</label>
-                <input name="email" type="email" placeholder="nome@exemplo.pt" className="w-full px-6 py-4 rounded-2xl border border-gray-100 focus:border-clinic-blue outline-none transition-all shadow-sm text-lg" required />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-clinic-purple uppercase tracking-[0.2em] ml-2">Telemóvel</label>
-                <input name="telemovel" type="tel" placeholder="912 345 678" className="w-full px-6 py-4 rounded-2xl border border-gray-100 focus:border-clinic-blue outline-none transition-all shadow-sm text-lg" required />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-clinic-purple uppercase tracking-[0.2em] ml-2">Serviço de Interesse</label>
-              <div className="relative">
-                <select name="servico" defaultValue={initialService} className="w-full px-6 py-4 rounded-2xl border border-gray-100 focus:border-clinic-blue outline-none transition-all appearance-none cursor-pointer shadow-sm text-lg text-gray-700 bg-white">
-                  <option value="" disabled>Escolha o tratamento...</option>
-                  {services.map((s) => <option key={s.slug} value={s.title}>{s.title}</option>)}
-                </select>
-                <i className="fas fa-chevron-down absolute right-6 top-1/2 -translate-y-1/2 text-clinic-purple pointer-events-none"></i>
-              </div>
-            </div>
-
-            <button id="btn-form-submit" type="submit" disabled={isSending} className={`w-full bg-clinic-blue text-white font-bold text-xl py-5 rounded-2xl transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 ${isSending ? 'opacity-70' : 'hover:bg-clinic-purple'}`}>
-              {isSending ? <><i className="fas fa-spinner animate-spin"></i> A enviar...</> : <>Agendar Agora <i className="fas fa-arrow-right text-sm"></i></>}
-            </button>
-          </form>
+          <div 
+            id="calendly-inline-container" 
+            className="calendly-inline-widget" 
+            style={{ minWidth: '320px', height: '700px' }}
+          ></div>
         </div>
       </div>
     </div>

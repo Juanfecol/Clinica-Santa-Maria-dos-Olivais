@@ -141,17 +141,17 @@
     
     <script>
       window.trackEvent = function(name, params) {
-        if (typeof (window as any).gtag === 'function') {
-          (window as any).gtag('event', name, params);
+        if (typeof gtag === 'function') {
+          gtag('event', name, params);
         }
       };
 
       window.trackMeta = function(event, data, isStandard = true) {
-        if (typeof (window as any).fbq === 'function') {
+        if (typeof fbq === 'function') {
           if (isStandard) {
-            (window as any).fbq('track', event, data);
+            fbq('track', event, data);
           } else {
-            (window as any).fbq('trackCustom', event, data);
+            fbq('trackCustom', event, data);
           }
         }
       };
@@ -177,6 +177,11 @@
       <img height="1" width="1" style="display:none"
            src="https://www.facebook.com/tr?id=1754959305395666&ev=PageView&noscript=1"/>
     </noscript>
+
+    <!-- Calendly badge widget resources -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PNVPD8T3"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>

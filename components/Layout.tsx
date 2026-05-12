@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 import { useGoogleAds } from '../hooks/useGoogleAds';
-import { useMetaConversions } from '../hooks/useMetaConversions';
 import { services } from '../constants/servicesData';
 import { Search, X } from 'lucide-react';
 
@@ -15,7 +14,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { trackWhatsApp, trackPhone } = useGoogleAds();
-    const { trackContact } = useMetaConversions();
 
   // Basic search logic
   const filteredServices = services.filter(s => 
@@ -69,7 +67,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const trackWhatsAppClick = () => {
     trackWhatsApp(); // Google Ads Conversion
-      trackContact('whatsapp'); // Meta Conversions API (server-side)
     if ((window as any).trackMeta) {
       // Evento estándar 'Contact' para clics en WhatsApp
       (window as any).trackMeta('Contact', { 
@@ -85,7 +82,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const trackPhoneClick = (number: string) => {
     trackPhone(); // Google Ads Conversion
-      trackContact('phone'); // Meta Conversions API (server-side)
     if ((window as any).trackMeta) {
       (window as any).trackMeta('Contact', { content_name: 'Phone Call' }, true);
     }
@@ -106,26 +102,26 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     trackGtagEvent('location_click', { 'event_category': 'contact', 'event_label': 'Maps' });
   };
 
-  const openMessenger = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Dimensões para uma janela tipo "chat"
-    const width = 450;
-    const height = 650;
-    const left = window.screen.width - width - 20;
-    const top = window.screen.height - height - 80;
-    
-    window.open(
-      'https://m.me/clinicasmod?ref=w51400971',
-      'MessengerChat',
-      `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`
-    );
-  };
 
   const [bgLoaded, setBgLoaded] = useState(false);
 
   useEffect(() => {
     setBgLoaded(true);
   }, []);
+
+  const openCalendly = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if ((window as any).Calendly) {
+      (window as any).Calendly.showPopupWidget('https://calendly.com/clinicasmod/30min');
+      
+      if ((window as any).trackMeta) {
+        (window as any).trackMeta('Schedule', {
+          content_name: 'Calendly Appointment',
+          content_category: 'Booking'
+        }, true);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen font-sans text-clinic-blue bg-clinic-bg overflow-x-hidden">
@@ -346,27 +342,32 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </footer>
       
-      {/* ManyChat Messenger Button */}
-      <div className={`fixed bottom-[180px] right-6 z-[100] flex items-center gap-3 group ${isMenuOpen ? 'hidden' : ''}`}>
-        <div className="hidden md:block bg-white text-clinic-blue py-3 px-5 rounded-full shadow-xl font-medium text-sm opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10">
-          Falar agora
+      {/* Custom Calendly Floating Button */}
+      <button 
+        id="btn-calendly-main"
+        onClick={openCalendly}
+        className={`fixed bottom-6 right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
+        aria-label="Agende a sua consulta"
+      >
+        <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
+          Agendar Consulta
         </div>
-        <button 
-          id="btn-messenger-main"
-          onClick={openMessenger}
-          className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 bg-gradient-to-br from-[#0084FF] to-[#0066CC] cursor-pointer"
-          aria-label="Falar no Messenger"
-        >
-          <span className="text-2xl md:text-3xl text-white">💬</span>
-        </button>
-      </div>
+        <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-[#2d3277] opacity-30 animate-ping"></span>
+          <span className="absolute inline-flex h-full w-full rounded-full bg-[#2d3277] shadow-[0_10px_30px_rgba(45,50,119,0.4)]"></span>
+          <div className="w-full h-full flex items-center justify-center rounded-full bg-[#2d3277] relative overflow-hidden transition-all duration-300 ring-2 ring-white/20">
+            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+            <i className="fas fa-calendar-check text-2xl md:text-3xl text-[#d4e157] relative z-10"></i>
+          </div>
+        </div>
+      </button>
 
       <a id="btn-call-direct" href={`tel:${cleanCustomerService}`} onClick={() => {
         trackPhoneClick(customerService);
         if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_phone' });
-      }} className={`fixed bottom-[100px] right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-105 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
+      }} className={`fixed bottom-[190px] right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-105 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
         <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl">
-          <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple opacity-20 animate-pulse"></span>
+          <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple opacity-30 animate-ping"></span>
           <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple shadow-[0_10px_30px_rgba(107,70,193,0.4)]"></span>
           <i className="fas fa-phone-alt text-2xl md:text-3xl text-white relative z-10"></i>
         </div>
@@ -375,7 +376,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <a id="btn-whatsapp-main" href={global.socials?.whatsapp || "#"} onClick={() => {
         trackWhatsAppClick();
         if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_whatsapp' });
-      }} target="_blank" rel="noreferrer" className={`fixed bottom-6 right-6 z-[100] w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
+      }} target="_blank" rel="noreferrer" className={`fixed bottom-[110px] right-6 z-[100] w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping"></span>
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"></span>
         <i className="fab fa-whatsapp text-3xl md:text-4xl text-white relative z-10"></i>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { services } from '../constants/servicesData';
-import { useMetaConversions } from '../hooks/useMetaConversions';
 
 interface ContactFormProps {
   especialidadeInicial?: string;
@@ -11,7 +10,6 @@ interface ContactFormProps {
 export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial = '' }) => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const navigate = useNavigate();
-    const { trackCompleteRegistration } = useMetaConversions();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,11 +32,6 @@ export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial =
 
       if (response.ok) {
         // Rastreamento de Conversão
-                // Meta Conversions API (server-side)
-          trackCompleteRegistration({
-            name: data.nome as string,
-            phone: data.telefone as string,
-          });
         if ((window as any).trackEvent) {
           (window as any).trackEvent('generate_lead', {
             event_category: 'conversion',

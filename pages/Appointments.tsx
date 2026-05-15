@@ -38,9 +38,7 @@ const Appointments: React.FC = () => {
     <div className="animate-fade-in-up max-w-[1300px] mx-auto px-4 py-8 md:py-16">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
         <div className="hidden lg:block sticky top-[130px] rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white group">
-           <img className="w-full h-auto min-h-[600px] object-cover transition-transform duration-1000 group-hover:scale-110" src={appointmentsData.heroImage || "https://clinica-santa-maria-dos-olivais.b-cdn.net/Carrusel%201-06%20(1).png"} alt="Agendamento" />
-           <div className="absolute inset-0 bg-gradient-to-t from-clinic-blue/60 to-transparent"></div>
-           <div className="absolute bottom-12 left-10 text-white max-w-sm"><h3 className="text-3xl font-serif italic leading-tight">Cuidamos de si com a proximidade de quem está ao seu lado.</h3></div>
+           <img className="w-full h-auto min-h-[600px] object-cover transition-transform duration-1000 group-hover:scale-110" src="https://clinica-santa-maria-dos-olivais.b-cdn.net/doctora_ana_mata_agendamiento_online.jpg" alt="Agendamento" />
         </div>
 
         <div className="bg-white/80 backdrop-blur-2xl p-6 sm:p-10 rounded-[3.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/50 relative overflow-hidden min-h-[750px] ring-1 ring-black/5">

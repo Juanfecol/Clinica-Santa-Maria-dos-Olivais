@@ -22,7 +22,7 @@ const Appointments: React.FC = () => {
     const initCalendly = () => {
       if ((window as any).Calendly) {
         (window as any).Calendly.initInlineWidget({
-          url: 'https://calendly.com/clinicasmod/30min?primary_color=d4e157',
+          url: 'https://calendly.com/clinicasmod/30min?primary_color=d4e157&text_color=2d3277&hide_landing_page_details=1&hide_gdpr_banner=1',
           parentElement: document.getElementById('calendly-inline-container'),
           prefill: {},
           utm: {}
@@ -43,16 +43,17 @@ const Appointments: React.FC = () => {
            <div className="absolute bottom-12 left-10 text-white max-w-sm"><h3 className="text-3xl font-serif italic leading-tight">Cuidamos de si com a proximidade de quem está ao seu lado.</h3></div>
         </div>
 
-        <div className="bg-white/70 backdrop-blur-2xl p-4 sm:p-6 rounded-[3rem] shadow-2xl border border-white relative overflow-hidden min-h-[750px]">
-          <div className="mb-6 text-center lg:text-left px-4">
-            <h1 className="text-3xl md:text-5xl font-bold text-clinic-blue mb-4 leading-tight">Agende a sua <span className="text-clinic-purple italic font-serif">Consulta</span></h1>
-            <p className="text-base sm:text-lg text-gray-600 font-light">Escolha o mejor horário para si diretamente no nosso calendário oficial.</p>
+        <div className="bg-white/80 backdrop-blur-2xl p-6 sm:p-10 rounded-[3.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/50 relative overflow-hidden min-h-[750px] ring-1 ring-black/5">
+          <div className="mb-10 text-center lg:text-left px-4">
+            <div className="inline-block px-4 py-1 bg-clinic-purple/10 text-clinic-purple rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">Marcações Online</div>
+            <h1 className="text-4xl md:text-5xl font-bold text-clinic-blue mb-4 leading-tight">Agende a sua <span className="text-clinic-purple italic font-serif">Consulta</span></h1>
+            <p className="text-base sm:text-lg text-gray-600 font-light max-w-md">Escolha o melhor horário para si diretamente no nosso calendário oficial de forma simples e rápida.</p>
           </div>
 
           <div 
             id="calendly-inline-container" 
-            className="calendly-inline-widget" 
-            style={{ minWidth: '320px', height: '700px' }}
+            className="calendly-inline-widget rounded-[2rem] overflow-hidden" 
+            style={{ minWidth: '320px', height: '650px' }}
           ></div>
         </div>
       </div>

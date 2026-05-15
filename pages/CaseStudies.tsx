@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { Volume2, VolumeX } from 'lucide-react';
 
 const videoTestimonials = [
+  "https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_santa_maria_1.mp4",
+  "https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_santa_maria_2.mp4",
+  "https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_santa_maria_3.mp4",
   "https://clinica-santa-maria-dos-olivais.b-cdn.net/V1.mp4",
   "https://clinica-santa-maria-dos-olivais.b-cdn.net/V2.mp4",
   "https://clinica-santa-maria-dos-olivais.b-cdn.net/V3.MOV",
@@ -116,20 +119,27 @@ const CaseStudies: React.FC = () => {
               style={getStoryStyle(index)}
               onClick={() => setCenterIndex(index)}
             >
-              <video 
-                ref={(el) => (videoRefs.current[index] = el)}
-                src={src}
-                className="w-full h-full object-cover bg-black"
-                muted={index === centerIndex ? isMuted : true}
-                playsInline
-                preload="metadata"
-                poster={`${src}#t=0.1`}
-                onEnded={() => {
-                    if (isMuted) {
+              {(() => {
+                const offset = (index - centerIndex + videoTestimonials.length) % videoTestimonials.length;
+                let position = offset > videoTestimonials.length / 2 ? offset - videoTestimonials.length : offset;
+                const absPosition = Math.abs(position);
+                const isNear = absPosition <= 1;
+
+                return (
+                  <video 
+                    ref={(el) => (videoRefs.current[index] = el)}
+                    src={src}
+                    className={`w-full h-full object-cover bg-gray-900 transition-all duration-500 ${index === centerIndex ? 'opacity-100' : 'opacity-60'}`}
+                    muted={index === centerIndex ? isMuted : true}
+                    playsInline
+                    preload="auto"
+                    poster={`${src}#t=0.1`}
+                    onEnded={() => {
                         setCenterIndex((prev) => (prev + 1) % videoTestimonials.length);
-                    }
-                }}
-              />
+                    }}
+                  />
+                );
+              })()}
               {index === centerIndex && (
                 <button
                   onClick={(e) => {

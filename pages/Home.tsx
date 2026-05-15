@@ -271,7 +271,7 @@ const Home: React.FC = () => {
     if (diff > stories.length / 2) diff -= stories.length;
     if (diff < -stories.length / 2) diff += stories.length;
     const absDiff = Math.abs(diff);
-    const opacity = absDiff === 0 ? 1 : Math.max(0.40, 0.70 - (absDiff * 0.1));
+    const opacity = absDiff === 0 ? 1 : Math.max(0.25, 0.50 - (absDiff * 0.15));
     const scale = absDiff === 0 ? 1 : Math.max(0.65, 0.85 - (absDiff * 0.15));
     const translateZ = absDiff === 0 ? 150 : -200;
     const zIndex = 100 - Math.floor(absDiff * 20);
@@ -282,7 +282,8 @@ const Home: React.FC = () => {
       opacity: opacity,
       zIndex: zIndex,
       transition: 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
-      willChange: 'transform, opacity'
+      willChange: 'transform, opacity',
+      filter: absDiff === 0 ? 'none' : 'blur(1px)'
     };
   };
 
@@ -342,24 +343,33 @@ const Home: React.FC = () => {
                 onClick={() => setCenterIndex(index)} 
               >
                 <div className="absolute inset-0 bg-black">
-                  {story.type === 'video' ? (
-                    <video 
-                      key={story.src} 
-                      ref={(el) => (videoRefs.current[index] = el)} 
-                      src={story.src}
-                      poster={story.thumbnail || `${story.src}#t=0.001`} 
-                      className={`absolute inset-0 w-full h-full object-cover scale-[1.05] bg-clinic-bg transition-all duration-500 ${isCenter ? 'opacity-100' : 'opacity-70'}`}
-                      style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
-                      playsInline 
-                      muted={!isCenter || !hasInteracted}
-                      preload="metadata"
-                      onEnded={(e) => {
-                        e.currentTarget.load();
-                        if (isCenter) handleNextStory();
-                      }}
-                      crossOrigin="anonymous"
-                    />
-                  ) : (
+                  {story.type === 'video' ? (() => {
+                    const diff = index - centerIndex;
+                    let normalizedDiff = diff;
+                    if (normalizedDiff > stories.length / 2) normalizedDiff -= stories.length;
+                    if (normalizedDiff < -stories.length / 2) normalizedDiff += stories.length;
+                    const absDiff = Math.abs(normalizedDiff);
+                    const isNear = absDiff <= 1;
+
+                    return (
+                      <video 
+                        key={story.src} 
+                        ref={(el) => (videoRefs.current[index] = el)} 
+                        src={story.src}
+                        poster={story.thumbnail || `${story.src}#t=0.001`} 
+                        className={`absolute inset-0 w-full h-full object-cover scale-[1.05] bg-gray-900 transition-all duration-500 ${isCenter ? 'opacity-100' : 'opacity-60'}`}
+                        style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
+                        playsInline 
+                        muted={!isCenter || !hasInteracted}
+                        preload="auto"
+                        onEnded={(e) => {
+                          e.currentTarget.load();
+                          if (isCenter) handleNextStory();
+                        }}
+                        crossOrigin="anonymous"
+                      />
+                    );
+                  })() : (
                     <img 
                       src={story.thumbnail || story.src} 
                       className="absolute inset-0 w-full h-full object-cover scale-[1.05]" 
@@ -483,7 +493,6 @@ const Home: React.FC = () => {
                     playsInline 
                     preload="metadata" 
                     poster="https://clinica-santa-maria-dos-olivais.b-cdn.net/clinicadentaria-santamariadosolivais.mp4#t=0.1"
-                    autoPlay
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover scale-[1.05]" 
                   />

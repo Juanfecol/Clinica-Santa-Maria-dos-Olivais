@@ -348,7 +348,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <button 
         id="btn-calendly-main"
         onClick={openCalendly}
-        className={`fixed bottom-6 right-1 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
+        className={`fixed bottom-6 right-0 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
         aria-label="Agende a sua consulta"
       >
         <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
@@ -367,7 +367,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <a id="btn-call-direct" href={`tel:${cleanCustomerService}`} onClick={() => {
         trackPhoneClick(customerService);
         if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_phone' });
-      }} className={`fixed bottom-[176px] right-1 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
+      }} className={`fixed bottom-[176px] right-0 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
         <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
           Chamada
         </div>
@@ -384,7 +384,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <a id="btn-whatsapp-main" href={global.socials?.whatsapp || "#"} onClick={() => {
         trackWhatsAppClick();
         if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_whatsapp' });
-      }} target="_blank" rel="noreferrer" className={`fixed bottom-[100px] right-1 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
+      }} target="_blank" rel="noreferrer" className={`fixed bottom-[100px] right-0 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
         <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
           WhatsApp
         </div>
@@ -402,7 +402,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <button 
         id="btn-contact-form-trigger"
         onClick={() => setIsContactModalOpen(true)}
-        className={`fixed bottom-[252px] right-1 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
+        className={`fixed bottom-[252px] right-0 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
         aria-label="Contactem-me"
       >
         <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">

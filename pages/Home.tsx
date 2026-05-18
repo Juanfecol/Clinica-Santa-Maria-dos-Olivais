@@ -155,7 +155,7 @@ const Home: React.FC = () => {
           }
         });
       },
-      { threshold: 0.2, rootMargin: '0px' }
+      { threshold: 0.1, rootMargin: '100px' }
     );
     if (storiesSectionRef.current) observer.observe(storiesSectionRef.current);
     if (expVideoRef.current) observer.observe(expVideoRef.current);
@@ -177,45 +177,13 @@ const Home: React.FC = () => {
 
         if (i === centerIndex) {
           // Center video: play and handle audio
-          const attemptPlay = async () => {
-            try {
-              // Ensure video is ready to play
-              if (v.readyState < 2) {
-                // Wait for metadata or enough data
-                await new Promise((resolve) => {
-                  const onReady = () => {
-                    v.removeEventListener('loadedmetadata', onReady);
-                    v.removeEventListener('canplay', onReady);
-                    resolve(null);
-                  };
-                  v.addEventListener('loadedmetadata', onReady);
-                  v.addEventListener('canplay', onReady);
-                  // Safety timeout
-                  setTimeout(resolve, 2000);
-                });
-              }
-
-              v.muted = !hasInteracted;
-              await v.play();
-            } catch (err: any) {
-              // Only retry if it's a permission issue (NotAllowedError)
-              if (err.name === 'NotAllowedError') {
-                console.warn("Autoplay prevented, retrying muted...");
-                v.muted = true;
-                try {
-                  await v.play();
-                } catch (retryErr) {
-                  // Silent fail for muted autoplay as well
-                }
-              } else if (err.name !== 'AbortError') {
-                // Ignore AbortError (interrupted by pause/src change)
-                // For other errors, just log warning instead of showing as critical
-                console.warn("Video playback attempt failed:", err.name, err.message);
-              }
+          v.muted = !hasInteracted;
+          v.play().catch(err => {
+            if (err.name === 'NotAllowedError') {
+              v.muted = true;
+              v.play().catch(() => {});
             }
-          };
-
-          attemptPlay();
+          });
           return;
         } else {
           // Other videos: pause
@@ -234,7 +202,7 @@ const Home: React.FC = () => {
         console.warn(`Video ${centerIndex} stalled (Bunny.net), skipping...`);
         handleNextStory();
       }
-    }, 15000);
+    }, 8000);
 
     return () => clearTimeout(stallTimeout);
   }, [centerIndex, isStoriesVisible, hasInteracted, handleNextStory]);
@@ -362,7 +330,13 @@ const Home: React.FC = () => {
                         style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
                         playsInline 
                         muted={!isCenter || !hasInteracted}
-                        preload={isNear ? "metadata" : "none"}
+                        autoPlay={isCenter && isStoriesVisible}
+                        preload={isNear ? "auto" : "metadata"}
+                        onCanPlay={(e) => {
+                          if (isCenter && isStoriesVisible) {
+                            e.currentTarget.play().catch(() => {});
+                          }
+                        }}
                         onEnded={(e) => {
                           e.currentTarget.load();
                           if (isCenter) handleNextStory();

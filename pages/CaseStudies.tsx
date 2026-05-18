@@ -132,7 +132,8 @@ const CaseStudies: React.FC = () => {
                     className={`w-full h-full object-cover bg-gray-900 transition-all duration-500 ${index === centerIndex ? 'opacity-100' : 'opacity-60'}`}
                     muted={index === centerIndex ? isMuted : true}
                     playsInline
-                    preload={isNear ? "metadata" : "none"}
+                    autoPlay={index === centerIndex}
+                    preload={isNear ? "auto" : "metadata"}
                     poster={`${src}#t=0.1`}
                     onEnded={() => {
                         setCenterIndex((prev) => (prev + 1) % videoTestimonials.length);

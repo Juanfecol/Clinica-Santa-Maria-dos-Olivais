@@ -26,6 +26,8 @@ const MemberCard: React.FC<{ member: Member }> = ({ member }) => (
               alt={member.name} 
               className={`w-full h-full object-cover ${member.imgPosition || 'object-center'}`}
               referrerPolicy="no-referrer"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         ) : (

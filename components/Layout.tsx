@@ -5,11 +5,13 @@ import { useContent } from '../context/ContentContext';
 import { useGoogleAds } from '../hooks/useGoogleAds';
 import { services } from '../constants/servicesData';
 import { Search, X } from 'lucide-react';
+import { ContactForm } from './ContactForm';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
@@ -285,7 +287,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <footer className="bg-clinic-blue text-[#f2f2f2] pt-[60px] pb-[40px] px-[20px] md:px-[60px]">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12 md:mb-20">
-             <div className="inline-block mb-8"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" alt="Logo Footer" className="max-w-[100px] md:max-w-[180px] mx-auto transition-transform hover:scale-110" loading="lazy" /></div>
+             <div className="inline-block mb-8"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" alt="Logo Footer" className="max-w-[100px] md:max-w-[180px] mx-auto transition-transform hover:scale-110" loading="lazy" decoding="async" /></div>
              <h2 className="text-xl sm:text-2xl md:text-5xl font-semibold leading-tight px-4">Criamos <span className="text-clinic-purple font-serif italic">sorrisos</span> perfeitos,<br className="hidden md:block" /> combinando excelência médica<br className="hidden md:block" /> com <span className="text-clinic-purple font-serif italic">conforto</span> absoluto.</h2>
           </div>
           
@@ -346,7 +348,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <button 
         id="btn-calendly-main"
         onClick={openCalendly}
-        className={`fixed bottom-6 right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
+        className={`fixed bottom-6 right-1 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
         aria-label="Agende a sua consulta"
       >
         <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
@@ -365,22 +367,80 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <a id="btn-call-direct" href={`tel:${cleanCustomerService}`} onClick={() => {
         trackPhoneClick(customerService);
         if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_phone' });
-      }} className={`fixed bottom-[190px] right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-105 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
-        <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl">
+      }} className={`fixed bottom-[176px] right-1 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
+        <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
+          Chamada
+        </div>
+        <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300">
           <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple opacity-30 animate-ping"></span>
           <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple shadow-[0_10px_30px_rgba(107,70,193,0.4)]"></span>
-          <i className="fas fa-phone-alt text-2xl md:text-3xl text-white relative z-10"></i>
+          <div className="w-full h-full flex items-center justify-center rounded-full bg-clinic-purple relative overflow-hidden transition-all duration-300 ring-2 ring-white/20">
+            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+            <i className="fas fa-phone-alt text-2xl md:text-3xl text-white relative z-10"></i>
+          </div>
         </div>
       </a>
 
       <a id="btn-whatsapp-main" href={global.socials?.whatsapp || "#"} onClick={() => {
         trackWhatsAppClick();
         if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_whatsapp' });
-      }} target="_blank" rel="noreferrer" className={`fixed bottom-[110px] right-6 z-[100] w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all hover:scale-110 active:scale-90 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
-        <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping"></span>
-        <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"></span>
-        <i className="fab fa-whatsapp text-3xl md:text-4xl text-white relative z-10"></i>
+      }} target="_blank" rel="noreferrer" className={`fixed bottom-[100px] right-1 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
+        <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
+          WhatsApp
+        </div>
+        <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping"></span>
+          <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"></span>
+          <div className="w-full h-full flex items-center justify-center rounded-full bg-[#25D366] relative overflow-hidden transition-all duration-300 ring-2 ring-white/20">
+            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+            <i className="fab fa-whatsapp text-3xl md:text-4xl text-white relative z-10"></i>
+          </div>
+        </div>
       </a>
+
+      {/* Floating Contact Form Button */}
+      <button 
+        id="btn-contact-form-trigger"
+        onClick={() => setIsContactModalOpen(true)}
+        className={`fixed bottom-[252px] right-1 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
+        aria-label="Contactem-me"
+      >
+        <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
+          Contactem-me
+        </div>
+        <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-blue opacity-30 animate-ping"></span>
+          <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-blue shadow-[0_10px_30px_rgba(45,50,119,0.4)]"></span>
+          <div className="w-full h-full flex items-center justify-center rounded-full bg-clinic-blue relative overflow-hidden transition-all duration-300 ring-2 ring-white/20">
+            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+            <i className="fas fa-comment-dots text-2xl md:text-3xl text-clinic-lime relative z-10"></i>
+          </div>
+        </div>
+      </button>
+
+      {/* Contact Modal */}
+      {isContactModalOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-clinic-blue/60 backdrop-blur-sm" onClick={() => setIsContactModalOpen(false)}></div>
+          <div className="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up">
+            <div className="p-6 md:p-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-clinic-blue">Contactem-me</h3>
+                  <p className="text-sm text-gray-500">Deixe os seus dados e entraremos em contacto brevemente.</p>
+                </div>
+                <button 
+                  onClick={() => setIsContactModalOpen(false)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-clinic-purple hover:text-white transition-all"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <ContactForm submitButtonText="Contactem-me" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

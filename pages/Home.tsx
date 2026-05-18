@@ -350,6 +350,7 @@ const Home: React.FC = () => {
                     if (normalizedDiff < -stories.length / 2) normalizedDiff += stories.length;
                     const absDiff = Math.abs(normalizedDiff);
                     const isNear = absDiff <= 1;
+                    const isVisible = absDiff === 0;
 
                     return (
                       <video 
@@ -361,7 +362,7 @@ const Home: React.FC = () => {
                         style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
                         playsInline 
                         muted={!isCenter || !hasInteracted}
-                        preload="auto"
+                        preload={isNear ? "metadata" : "none"}
                         onEnded={(e) => {
                           e.currentTarget.load();
                           if (isCenter) handleNextStory();

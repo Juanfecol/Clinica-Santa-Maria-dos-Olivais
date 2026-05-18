@@ -5,9 +5,15 @@ import { services } from '../constants/servicesData';
 
 interface ContactFormProps {
   especialidadeInicial?: string;
+  submitButtonText?: string;
+  successMessage?: string;
 }
 
-export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial = '' }) => {
+export const ContactForm: React.FC<ContactFormProps> = ({ 
+  especialidadeInicial = '',
+  submitButtonText = 'Agendar Avaliação',
+  successMessage = 'Mensagem enviada com sucesso!'
+}) => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const navigate = useNavigate();
 
@@ -85,10 +91,10 @@ export const ContactForm: React.FC<ContactFormProps> = ({ especialidadeInicial =
           disabled={status === 'submitting'}
           className="w-full bg-clinic-blue text-white py-4 rounded-lg font-bold hover:bg-clinic-purple transition-all flex items-center justify-center gap-2"
         >
-          {status === 'submitting' ? <Loader2 className="animate-spin" /> : <><Send size={18} /> Agendar Avaliação</>}
+          {status === 'submitting' ? <Loader2 className="animate-spin" /> : <><Send size={18} /> {submitButtonText}</>}
         </button>
       </div>
-      {status === 'success' && <p className="mt-4 text-green-600 font-bold text-center">Mensagem enviada com sucesso!</p>}
+      {status === 'success' && <p className="mt-4 text-green-600 font-bold text-center">{successMessage}</p>}
       {status === 'error' && <p className="mt-4 text-red-600 font-bold text-center">Erro ao enviar. Tente novamente.</p>}
     </form>
   );

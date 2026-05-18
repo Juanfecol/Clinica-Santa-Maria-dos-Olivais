@@ -132,7 +132,7 @@ const CaseStudies: React.FC = () => {
                     className={`w-full h-full object-cover bg-gray-900 transition-all duration-500 ${index === centerIndex ? 'opacity-100' : 'opacity-60'}`}
                     muted={index === centerIndex ? isMuted : true}
                     playsInline
-                    preload="auto"
+                    preload={isNear ? "metadata" : "none"}
                     poster={`${src}#t=0.1`}
                     onEnded={() => {
                         setCenterIndex((prev) => (prev + 1) % videoTestimonials.length);
@@ -166,7 +166,7 @@ const CaseStudies: React.FC = () => {
                className="relative h-96 group cursor-pointer overflow-hidden rounded-3xl border-4 border-white shadow-xl"
                whileHover={{ scale: 1.02 }}
              >
-               <img src={item.src} className="w-full h-full object-cover group-hover:brightness-100 brightness-50 transition-all duration-500" />
+               <img src={item.src} loading="lazy" className="w-full h-full object-cover group-hover:brightness-100 brightness-50 transition-all duration-500" alt={`Transformação ${i + 1}`} />
              </motion.div>
            ))}
         </div>

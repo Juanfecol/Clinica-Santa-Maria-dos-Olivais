@@ -163,29 +163,21 @@ const Home: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Robust play function similar to CaseStudies.tsx
+  // Robust play function
   const safePlay = async (video: HTMLVideoElement, shouldBeMuted: boolean) => {
     try {
       video.muted = shouldBeMuted;
-      // Small pause if src just changed or element just mounted
-      if (video.readyState < 1) {
-        await new Promise(resolve => {
-          const onLoaded = () => {
-            video.removeEventListener('loadedmetadata', onLoaded);
-            resolve(null);
-          };
-          video.addEventListener('loadedmetadata', onLoaded);
-          setTimeout(resolve, 1000); // safety
-        });
-      }
-      
       if (video.paused) {
         await video.play();
       }
     } catch (err: any) {
       if (err.name === 'NotAllowedError') {
         video.muted = true;
-        video.play().catch(() => {});
+        try {
+          await video.play();
+        } catch (retryErr) {
+          // Silent fail
+        }
       }
     }
   };
@@ -203,10 +195,14 @@ const Home: React.FC = () => {
         if (!v) return;
 
         if (i === centerIndex) {
+          // Center video: ensure attributes and play
+          v.preload = "auto";
           safePlay(v, !hasInteracted);
         } else {
+          // Other videos: pause and reduce resource usage
           if (!v.paused) v.pause();
           v.muted = true;
+          v.preload = "metadata";
         }
       });
     };
@@ -347,9 +343,14 @@ const Home: React.FC = () => {
                         className={`absolute inset-0 w-full h-full object-cover scale-[1.05] bg-gray-900 transition-all duration-500 ${isCenter ? 'opacity-100' : 'opacity-60'}`}
                         style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
                         playsInline 
-                        muted={!isCenter || !hasInteracted}
+                        muted={true}
                         autoPlay={isCenter}
-                        preload={isCenter ? "auto" : (isNear ? "auto" : "metadata")}
+                        preload={isCenter ? "auto" : "metadata"}
+                        onCanPlay={(e) => {
+                          if (isCenter && isStoriesVisible) {
+                            e.currentTarget.play().catch(() => {});
+                          }
+                        }}
                         onEnded={(e) => {
                           e.currentTarget.load();
                           if (isCenter) handleNextStory();

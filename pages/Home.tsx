@@ -14,7 +14,7 @@ const Home: React.FC = () => {
   const touchStartX = useRef<number | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   
-  const [isStoriesVisible, setIsStoriesVisible] = useState(false);
+  const [isStoriesVisible, setIsStoriesVisible] = useState(true); // Default to true as it is the hero section
   const storiesSectionRef = useRef<HTMLElement>(null);
   const expVideoRef = useRef<HTMLVideoElement>(null);
   const campVideoRef = useRef<HTMLVideoElement>(null);
@@ -163,6 +163,33 @@ const Home: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Robust play function similar to CaseStudies.tsx
+  const safePlay = async (video: HTMLVideoElement, shouldBeMuted: boolean) => {
+    try {
+      video.muted = shouldBeMuted;
+      // Small pause if src just changed or element just mounted
+      if (video.readyState < 1) {
+        await new Promise(resolve => {
+          const onLoaded = () => {
+            video.removeEventListener('loadedmetadata', onLoaded);
+            resolve(null);
+          };
+          video.addEventListener('loadedmetadata', onLoaded);
+          setTimeout(resolve, 1000); // safety
+        });
+      }
+      
+      if (video.paused) {
+        await video.play();
+      }
+    } catch (err: any) {
+      if (err.name === 'NotAllowedError') {
+        video.muted = true;
+        video.play().catch(() => {});
+      }
+    }
+  };
+
   useEffect(() => {
     const syncPlayback = async () => {
       if (!isStoriesVisible) {
@@ -176,17 +203,8 @@ const Home: React.FC = () => {
         if (!v) return;
 
         if (i === centerIndex) {
-          // Center video: play and handle audio
-          v.muted = !hasInteracted;
-          v.play().catch(err => {
-            if (err.name === 'NotAllowedError') {
-              v.muted = true;
-              v.play().catch(() => {});
-            }
-          });
-          return;
+          safePlay(v, !hasInteracted);
         } else {
-          // Other videos: pause
           if (!v.paused) v.pause();
           v.muted = true;
         }
@@ -199,10 +217,10 @@ const Home: React.FC = () => {
     const stallTimeout = setTimeout(() => {
       const activeVideo = videoRefs.current[centerIndex];
       if (activeVideo && isStoriesVisible && activeVideo.readyState < 2) {
-        console.warn(`Video ${centerIndex} stalled (Bunny.net), skipping...`);
+        console.warn(`Video ${centerIndex} stalled, skipping...`);
         handleNextStory();
       }
-    }, 8000);
+    }, 10000);
 
     return () => clearTimeout(stallTimeout);
   }, [centerIndex, isStoriesVisible, hasInteracted, handleNextStory]);
@@ -325,18 +343,13 @@ const Home: React.FC = () => {
                         key={story.src} 
                         ref={(el) => (videoRefs.current[index] = el)} 
                         src={story.src}
-                        poster={story.thumbnail || `${story.src}#t=0.001`} 
+                        poster={story.thumbnail || `${story.src}#t=0.1`} 
                         className={`absolute inset-0 w-full h-full object-cover scale-[1.05] bg-gray-900 transition-all duration-500 ${isCenter ? 'opacity-100' : 'opacity-60'}`}
                         style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
                         playsInline 
                         muted={!isCenter || !hasInteracted}
-                        autoPlay={isCenter && isStoriesVisible}
-                        preload={isNear ? "auto" : "metadata"}
-                        onCanPlay={(e) => {
-                          if (isCenter && isStoriesVisible) {
-                            e.currentTarget.play().catch(() => {});
-                          }
-                        }}
+                        autoPlay={isCenter}
+                        preload={isCenter ? "auto" : (isNear ? "auto" : "metadata")}
                         onEnded={(e) => {
                           e.currentTarget.load();
                           if (isCenter) handleNextStory();

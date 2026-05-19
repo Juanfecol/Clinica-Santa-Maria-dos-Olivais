@@ -31,9 +31,32 @@ export const CookieConsent: React.FC = () => {
       (window as any).fbq('consent', 'grant');
     }
 
+    // Global tracking for elements with ID (buttons, links)
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const element = target.closest?.('[id]') as HTMLElement | null;
+      if (element && element.id && (window as any).MC) {
+         (window as any).MC.track('element_click', {
+           element_id: element.id,
+           text: element.innerText?.substring(0, 50) || element.textContent?.substring(0, 50) || '',
+           path: window.location.pathname
+         });
+      }
+    };
+    document.addEventListener('click', handleGlobalClick);
+
+    // Initial PageView for Manychat
+    if ((window as any).MC) {
+      (window as any).MC.track('page_view', { path: window.location.pathname });
+    }
+
     (window as any).trackEvent = function(eventName: string, eventParams: object = {}) {
         if ((window as any).gtag) {
           (window as any).gtag('event', eventName, { ...eventParams, 'send_to': ['AW-434250599', 'AW-1135006626'] });
+        }
+        // Manychat event tracking
+        if ((window as any).MC) {
+          (window as any).MC.track(eventName, eventParams);
         }
     };
     

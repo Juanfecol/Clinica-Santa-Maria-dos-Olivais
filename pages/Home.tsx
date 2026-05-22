@@ -9,6 +9,43 @@ const Home: React.FC = () => {
   const heroSubtitle = content?.home?.heroSubtitle || "";
   const stories = content?.stories || [];
 
+  const getFallbackThumbnail = (title: string, originalThumbnail: string) => {
+    const key = title.trim().toLowerCase();
+    
+    // Clean, high-quality maps strictly utilizing photos of doctors or the physical clinic interior/lobby (no machinery/drones)
+    const fallbacks: Record<string, string> = {
+      'alinhadores': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-132.jpeg', // Dra. Mariana Aberto (Ortodontia)
+      'aparelho': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG', // Clinic Lobby area
+      'consulta': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5650.JPG', // Fully-focused Clinical Room/Cabinet
+      'dia anterior': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-51.jpeg', // Dra. Orizanda Claret
+      'dr julio': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-227.jpeg', // Dr. Tomás Machado
+      'endodontia': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5650.JPG', // Clean Treatment Cabinet
+      'fratura': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG', // Reception sofa / Waiting lounge area
+      'gengiva': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-67.jpeg', // Dra. Alexandra Lucas (Periodontologia)
+      'implantes': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-51.jpeg', // Dra. Orizanda Claret
+      'limpeza': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5650.JPG', // Elegant Clinic Treatment Cabinet
+      'mexem': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-94.jpeg', // Reception Front Desk Carla Claro
+      'mitos': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG', // Beautiful main lobby reception desk perspective
+      'perda dentária': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-132.jpeg', // Dra. Mariana Aberto
+      'periodontite': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-67.jpeg', // Dra. Alexandra Lucas
+      'reabilitação': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-227.jpeg', // Dr. Tomás Machado
+      'sorriso sem escalas': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-94.jpeg', // Front Desk Carla Claro
+      'sorriso': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-51.jpeg', // Dra. Orizanda Claret
+      'dr tomas': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-227.jpeg' // Dr. Tomás Machado
+    };
+
+    if (fallbacks[key]) {
+      return fallbacks[key];
+    }
+
+    // Default to the main elegant clinic lobby area photo if not matched or old domain
+    if (!originalThumbnail || originalThumbnail.includes('clinicasantamariadosolivais.pt')) {
+      return 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG';
+    }
+
+    return originalThumbnail;
+  };
+
   const [centerIndex, setCenterIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -325,27 +362,25 @@ const Home: React.FC = () => {
                 onClick={() => setCenterIndex(index)} 
               >
                 <div className="absolute inset-0 bg-black">
-                  {story.type === 'video' ? (() => {
+                  {story.type === 'video' && (() => {
                     const diff = index - centerIndex;
                     let normalizedDiff = diff;
                     if (normalizedDiff > stories.length / 2) normalizedDiff -= stories.length;
                     if (normalizedDiff < -stories.length / 2) normalizedDiff += stories.length;
                     const absDiff = Math.abs(normalizedDiff);
                     const isNear = absDiff <= 1;
-                    const isVisible = absDiff === 0;
 
                     return (
                       <video 
                         key={story.src} 
                         ref={(el) => (videoRefs.current[index] = el)} 
-                        src={story.src}
-                        poster={story.thumbnail || `${story.src}#t=0.1`} 
-                        className={`absolute inset-0 w-full h-full object-cover scale-[1.05] bg-gray-900 transition-all duration-500 ${isCenter ? 'opacity-100' : 'opacity-60'}`}
+                        src={`${story.src}#t=0.1`}
+                        className={`absolute inset-0 w-full h-full object-cover scale-[1.05] transition-all duration-500 bg-black/40 ${isCenter ? 'opacity-100 pointer-events-auto' : 'opacity-80 pointer-events-none'}`}
                         style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
                         playsInline 
                         muted={true}
                         autoPlay={isCenter}
-                        preload={isCenter ? "auto" : "metadata"}
+                        preload="auto"
                         onCanPlay={(e) => {
                           if (isCenter && isStoriesVisible) {
                             e.currentTarget.play().catch(() => {});
@@ -358,18 +393,7 @@ const Home: React.FC = () => {
                         crossOrigin="anonymous"
                       />
                     );
-                  })() : (
-                    <img 
-                      src={story.thumbnail || story.src} 
-                      className="absolute inset-0 w-full h-full object-cover scale-[1.05]" 
-                      style={{ transform: 'translateZ(0)' }}
-                      alt={story.title} 
-                      referrerPolicy="no-referrer"
-                      loading={index < 3 ? "eager" : "lazy"} 
-                      decoding="async"
-                      {...(index === 0 ? { fetchPriority: "high" } : {})}
-                    />
-                  )}
+                  })()}
                   
                   {isCenter && (
                     <>

@@ -50,58 +50,6 @@ const Home: React.FC = () => {
   const [hasInteracted, setHasInteracted] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-
-  // Deep linking and share URL states
-  const [expandedService, setExpandedService] = useState<string | null>(null);
-  const [highlightedPrice, setHighlightedPrice] = useState<string | null>(null);
-  const [copiedText, setCopiedText] = useState<string | null>(null);
-
-  // Helper to slugify accent characters so URLs look clean and modern
-  const slugify = useCallback((text: string) => {
-    return text
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-  }, []);
-
-  // Update query parameter dynamically in the top URL bar without triggering reload
-  const updateURL = useCallback((key: string, value: string | null) => {
-    try {
-      const url = new URL(window.location.href);
-      if (value) {
-        url.searchParams.set(key, value);
-      } else {
-        url.searchParams.delete(key);
-      }
-      window.history.replaceState(null, '', url.toString());
-    } catch (e) {
-      console.error("Could not update URL parameter:", e);
-    }
-  }, []);
-
-  // Copy share button command
-  const copyShareLink = useCallback((type: 'story' | 'service' | 'price', value: string) => {
-    try {
-      const url = new URL(window.location.origin + window.location.pathname);
-      url.searchParams.set(type, value);
-      navigator.clipboard.writeText(url.toString()).then(() => {
-        let label = '';
-        if (type === 'story') label = `vídeo "${value.replace(/-/g, ' ')}"`;
-        else if (type === 'service') label = `serviço de "${value.replace(/-/g, ' ')}"`;
-        else if (type === 'price') label = `preço de "${value.replace(/-/g, ' ')}"`;
-
-        setCopiedText(`Link direto para ${label} copiado!`);
-        setTimeout(() => setCopiedText(null), 3000);
-      }).catch(() => {
-        // Fallback or permission block
-      });
-    } catch (err) {
-      console.error("Error copy share link: ", err);
-    }
-  }, []);
   
   const [isStoriesVisible, setIsStoriesVisible] = useState(true); // Default to true as it is the hero section
   const storiesSectionRef = useRef<HTMLElement>(null);
@@ -324,58 +272,6 @@ const Home: React.FC = () => {
     return () => clearInterval(interval);
   }, [centerIndex, isStoriesVisible]);
 
-  // Read URL parameters on initial component mount to deep link to specific video story, service, or pricing card
-  useEffect(() => {
-    if (stories.length === 0) return;
-
-    const params = new URLSearchParams(window.location.search);
-    const storyParam = params.get('story');
-    const serviceParam = params.get('service');
-    const priceParam = params.get('price');
-
-    if (storyParam) {
-      const matchIndex = stories.findIndex((s: any) => slugify(s.title) === storyParam);
-      if (matchIndex !== -1) {
-        setCenterIndex(matchIndex);
-      }
-    }
-
-    if (serviceParam) {
-      const serviceSlug = serviceParam.toLowerCase().trim();
-      const matchService = servicesList.find(s => s.slug === serviceSlug);
-      if (matchService) {
-        setExpandedService(matchService.slug);
-        setTimeout(() => {
-          const el = document.getElementById(`service-details-${matchService.slug}`);
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }, 800);
-      }
-    }
-
-    if (priceParam) {
-      const priceVal = priceParam.toLowerCase().trim();
-      setHighlightedPrice(priceVal);
-      setTimeout(() => {
-        const el = document.getElementById(`price-${priceVal}`);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 800);
-    }
-  }, [stories, slugify]);
-
-  // Update dynamic URL parameter 'story' whenever center-focused story changes
-  useEffect(() => {
-    if (stories.length > 0 && stories[centerIndex]) {
-      const storyTitle = stories[centerIndex].title;
-      if (storyTitle) {
-        updateURL('story', slugify(storyTitle));
-      }
-    }
-  }, [centerIndex, stories, slugify, updateURL]);
-
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null || stories.length === 0) return;
@@ -509,21 +405,10 @@ const Home: React.FC = () => {
                         />
                       </div>
                       
-                      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-black/95 to-transparent z-10 flex flex-col items-center justify-center gap-1.5">
+                      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-black/95 to-transparent z-10 flex justify-center items-center">
                         <p className="text-white text-[9px] md:text-xs font-bold uppercase tracking-widest text-center drop-shadow-md">
                           {story.title}
                         </p>
-                        <button
-                          title="Partilhar este vídeo"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyShareLink('story', slugify(story.title));
-                          }}
-                          className="bg-white/20 hover:bg-clinic-lime hover:text-clinic-blue text-white px-3 py-1 rounded-full text-[9px] font-bold transition-all uppercase tracking-wide flex items-center justify-center gap-1.5 backdrop-blur-md border border-white/10 active:scale-95 pointer-events-auto"
-                        >
-                          <i className="fas fa-link text-[8px]" />
-                          <span>Partilhar</span>
-                        </button>
                       </div>
                     </>
                   )}
@@ -549,112 +434,28 @@ const Home: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 gap-4 mb-6">
-              <Link 
-                to="/marcacoes" 
-                state={{ service: "Implantologia" }} 
-                id="price-implante-745"
-                onClick={() => {
-                  updateURL('price', 'implante-745');
-                  setHighlightedPrice('implante-745');
-                }}
-                className={`bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-lime transition-all duration-300 hover:scale-[1.02] hover:shadow-lg block group overflow-hidden relative ${highlightedPrice === 'implante-745' ? 'ring-4 ring-clinic-lime scale-[1.02] shadow-xl' : ''}`}
-              >
-                <div className="flex justify-between items-start gap-4 mb-3">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-lime transition-colors leading-tight break-normal hyphens-none">Implante Unitário + Coroa</p>
-                    <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 745 €*</p>
-                  </div>
-                  <button
-                    title="Partilhar este preço"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      updateURL('price', 'implante-745');
-                      setHighlightedPrice('implante-745');
-                      copyShareLink('price', 'implante-745');
-                    }}
-                    className="p-1.5 px-2.5 rounded-lg bg-clinic-bg hover:bg-clinic-lime hover:text-clinic-blue text-clinic-purple transition-all text-xs flex items-center gap-1 z-20 border border-clinic-blue/5 shadow-sm"
-                  >
-                    <i className="fas fa-link text-[9px]" />
-                    <span className="text-[9px] font-bold uppercase">Partilhar Preço</span>
-                  </button>
+              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-lime transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
+                <div className="flex flex-col gap-2 w-full mb-3">
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-lime transition-colors leading-tight break-normal hyphens-none">Implante Unitário + Coroa</p>
+                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 745 €*</p>
                 </div>
                 <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">(Inclui fase cirúrgica e coroa metalo-cerâmica)</p>
-                {highlightedPrice === 'implante-745' && (
-                  <span className="absolute top-0 right-0 bg-clinic-lime text-clinic-blue text-[9px] font-bold px-3 py-1 rounded-bl-xl tracking-wider uppercase shadow-md">Preço Partilhado</span>
-                )}
               </Link>
 
-              <Link 
-                to="/marcacoes" 
-                state={{ service: "Implantologia" }} 
-                id="price-protocolo-4800"
-                onClick={() => {
-                  updateURL('price', 'protocolo-4800');
-                  setHighlightedPrice('protocolo-4800');
-                }}
-                className={`bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-purple transition-all duration-300 hover:scale-[1.02] hover:shadow-lg block group overflow-hidden relative ${highlightedPrice === 'protocolo-4800' ? 'ring-4 ring-clinic-purple scale-[1.02] shadow-xl' : ''}`}
-              >
-                <div className="flex justify-between items-start gap-4 mb-3">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-purple transition-colors leading-tight break-normal hyphens-none">Protocolo Superior (Dentes Fixos)</p>
-                    <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 4.800 €*</p>
-                  </div>
-                  <button
-                    title="Partilhar este preço"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      updateURL('price', 'protocolo-4800');
-                      setHighlightedPrice('protocolo-4800');
-                      copyShareLink('price', 'protocolo-4800');
-                    }}
-                    className="p-1.5 px-2.5 rounded-lg bg-clinic-bg hover:bg-clinic-purple hover:text-white text-clinic-purple transition-all text-xs flex items-center gap-1 z-20 border border-clinic-blue/5 shadow-sm"
-                  >
-                    <i className="fas fa-link text-[9px]" />
-                    <span className="text-[9px] font-bold uppercase">Partilhar Preço</span>
-                  </button>
+              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-purple transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
+                <div className="flex flex-col gap-2 w-full mb-3">
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-purple transition-colors leading-tight break-normal hyphens-none">Protocolo Superior (Dentes Fixos)</p>
+                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 4.800 €*</p>
                 </div>
                 <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">(Reabilitação total de arcada)</p>
-                {highlightedPrice === 'protocolo-4800' && (
-                  <span className="absolute top-0 right-0 bg-clinic-purple text-white text-[9px] font-bold px-3 py-1 rounded-bl-xl tracking-wider uppercase shadow-md">Preço Partilhado</span>
-                )}
               </Link>
 
-              <Link 
-                to="/marcacoes" 
-                state={{ service: "Estética Dentária" }} 
-                id="price-facetas-1800"
-                onClick={() => {
-                  updateURL('price', 'facetas-1800');
-                  setHighlightedPrice('price-facetas-1800');
-                }}
-                className={`bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-blue transition-all duration-300 hover:scale-[1.02] hover:shadow-lg block group overflow-hidden relative ${highlightedPrice === 'facetas-1800' ? 'ring-4 ring-clinic-blue scale-[1.02] shadow-xl' : ''}`}
-              >
-                <div className="flex justify-between items-start gap-4 mb-3">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-blue transition-colors leading-tight break-normal hyphens-none">Facetas Estéticas (Pack 4 dentes)</p>
-                    <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 1.800 €*</p>
-                  </div>
-                  <button
-                    title="Partilhar este preço"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      updateURL('price', 'facetas-1800');
-                      setHighlightedPrice('facetas-1800');
-                      copyShareLink('price', 'facetas-1800');
-                    }}
-                    className="p-1.5 px-2.5 rounded-lg bg-clinic-bg hover:bg-clinic-blue hover:text-white text-clinic-purple transition-all text-xs flex items-center gap-1 z-20 border border-clinic-blue/5 shadow-sm"
-                  >
-                    <i className="fas fa-link text-[9px]" />
-                    <span className="text-[9px] font-bold uppercase">Partilhar Preço</span>
-                  </button>
+              <Link to="/marcacoes" state={{ service: "Estética Dentária" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-blue transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
+                <div className="flex flex-col gap-2 w-full mb-3">
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-blue transition-colors leading-tight break-normal hyphens-none">Facetas Estéticas (Pack 4 dentes)</p>
+                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 1.800 €*</p>
                 </div>
                 <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">(Zona estética frontal)</p>
-                {highlightedPrice === 'facetas-1800' && (
-                  <span className="absolute top-0 right-0 bg-clinic-blue text-white text-[9px] font-bold px-3 py-1 rounded-bl-xl tracking-wider uppercase shadow-md">Preço Partilhado</span>
-                )}
               </Link>
             </div>
             
@@ -733,45 +534,19 @@ const Home: React.FC = () => {
         </div>
         <div className="grid gap-8">
           {servicesList.map((service, index) => (
-            <details 
-              key={index} 
-              id={`service-details-${service.slug}`}
-              open={expandedService === service.slug}
-              className="group bg-white rounded-3xl border border-clinic-blue/5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.20)] overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.40)] open:border-clinic-lime animate-fade-in-up"
+            <details key={index} className="group bg-white rounded-3xl border border-clinic-blue/5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.20)] overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.40)] open:border-clinic-lime"
+              onToggle={(e) => {
+                if ((e.target as HTMLDetailsElement).open) {
+                  trackGtagEvent('view_service_detail', { 'event_category': 'engagement', 'event_label': service.category });
+                }
+              }}
             >
-              <summary 
-                className="flex justify-between items-center cursor-pointer p-6 md:p-8 list-none select-none"
-                onClick={(e) => {
-                  e.preventDefault(); // Control state manually to support dynamic URL parameters & deep links smoothly
-                  const newExpanded = expandedService === service.slug ? null : service.slug;
-                  setExpandedService(newExpanded);
-                  updateURL('service', newExpanded);
-                  if (newExpanded) {
-                    trackGtagEvent('view_service_detail', { 'event_category': 'engagement', 'event_label': service.category });
-                  }
-                }}
-              >
+              <summary className="flex justify-between items-center cursor-pointer p-6 md:p-8 list-none">
                 <div className="flex items-center gap-6">
                   <span className="text-3xl md:text-5xl font-serif italic text-clinic-lime/20 font-bold group-open:text-clinic-lime" aria-hidden="true">{service.id}</span>
                   <div className="flex flex-col">
                     <span className="text-[10px] md:text-xs font-bold text-clinic-purple tracking-widest uppercase mb-1">{service.category}</span>
-                    <h3 className="text-base sm:text-lg md:text-3xl font-semibold text-clinic-blue group-open:text-clinic-purple transition-colors uppercase leading-tight flex items-center gap-2.5 flex-wrap">
-                      <span>{service.title}</span>
-                      <button
-                        title="Partilhar este serviço"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          updateURL('service', service.slug);
-                          setExpandedService(service.slug);
-                          copyShareLink('service', service.slug);
-                        }}
-                        className="p-1 px-2.5 text-[9px] rounded-lg bg-clinic-bg hover:bg-clinic-purple hover:text-white text-clinic-purple/70 transition-all font-sans font-bold uppercase tracking-wide flex items-center gap-1 border border-clinic-blue/5 shadow-sm"
-                      >
-                        <i className="fas fa-link text-[8px]" />
-                        <span>Partilhar</span>
-                      </button>
-                    </h3>
+                    <h3 className="text-base sm:text-lg md:text-3xl font-semibold text-clinic-blue group-open:text-clinic-purple transition-colors uppercase leading-tight">{service.title}</h3>
                   </div>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-clinic-bg flex items-center justify-center text-clinic-blue transition-all group-open:rotate-180 group-open:bg-clinic-blue group-open:text-white"><i className="fas fa-chevron-down"></i></div>
@@ -873,14 +648,6 @@ const Home: React.FC = () => {
           <Link to="/marcacoes" className="inline-block bg-clinic-blue text-white px-6 py-4 rounded-full text-base font-bold shadow-2xl hover:bg-clinic-purple transition-all transform hover:-translate-y-2 text-center w-full max-w-[320px] sm:w-auto sm:px-12 sm:py-5 sm:text-xl active:scale-95">Agende Sua Consulta <span className="animate-pulse ml-2 inline-block">♥</span></Link>
         </div>
       </section>
-
-      {/* Floating Dynamic Link Copy Toast Notifier */}
-      {copiedText && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-clinic-blue text-white border-2 border-clinic-lime/60 px-6 py-3.5 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] font-bold tracking-wide flex items-center gap-3 animate-fade-in text-center text-sm md:text-base">
-          <i className="fas fa-circle-check text-clinic-lime animate-pulse text-base sm:text-lg"></i>
-          <span>{copiedText}</span>
-        </div>
-      )}
     </div>
   );
 };

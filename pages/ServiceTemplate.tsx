@@ -9,11 +9,121 @@ export const ServiceTemplate: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [isMuted, setIsMuted] = useState(true);
   const [isAllOpen, setIsAllOpen] = useState(false); // Default closed
+  const [openGroups, setOpenGroups] = useState<Record<number, boolean>>({});
+  const [selectedItemSlug, setSelectedItemSlug] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const toggleAll = () => {
     setIsAllOpen(prev => !prev);
   };
+
+  const slugify = (text: string) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .normalize('NFD') // Normaliza acentos como á -> a, ç -> c
+      .replace(/[\u0300-\u036f]/g, '') // Elimina los acentos
+      .replace(/[^\w\s-]/g, '') // Filtra caracteres no alfanuméricos (\w incluye letras, números y guión bajo)
+      .trim()
+      .replace(/\s+/g, '-') // Reemplaza espacios por guiones
+      .replace(/-+/g, '-') // Evita guiones consecutivos
+      .replace(/^-+|-+$/g, ''); // Remueve guiones al inicio o al final para URLs impecables
+  };
+
+  const getCleanValueStr = (val: string) => {
+    return val.replace(/[^0-9]/g, '');
+  };
+
+  const isGroupOpen = (idx: number) => {
+    if (openGroups[idx] !== undefined) {
+      return openGroups[idx];
+    }
+    return isAllOpen;
+  };
+
+  const toggleGroup = (idx: number) => {
+    setOpenGroups(prev => ({
+      ...prev,
+      [idx]: !isGroupOpen(idx)
+    }));
+  };
+
+  const handleItemClick = (itemName: string, itemValue: string, groupIdx?: number) => {
+    const itemSlug = slugify(itemName);
+    setSelectedItemSlug(itemSlug);
+
+    // Update the URL query parameter cleanly
+    const newUrl = `${window.location.pathname}?item=${itemSlug}`;
+    window.history.replaceState(null, '', newUrl);
+
+    // Copy the link to clipboard automatically to let them easily grab campaign links!
+    const fullUrl = `${window.location.origin}${newUrl}`;
+    navigator.clipboard.writeText(fullUrl).catch(() => {});
+
+    // Hook tracking if available
+    if ((window as any).trackEvent) {
+      (window as any).trackEvent('select_treatment_item_campaign', {
+        service: slug,
+        item: itemName,
+        value: itemValue,
+        slug: itemSlug
+      });
+    }
+  };
+
+  const service = slug ? serviceDetails[slug] : null;
+
+  useEffect(() => {
+    if (!service) return;
+
+    // Read query params
+    const queryParams = new URLSearchParams(window.location.search);
+    const itemQuery = queryParams.get('item') || queryParams.get('p') || queryParams.get('preco');
+
+    if (itemQuery) {
+      const targetQuery = itemQuery.toLowerCase();
+      let foundGroupIdx: number | null = null;
+      let foundItemSlug: string | null = null;
+
+      if (service.priceGroups && service.priceGroups.length > 0) {
+        service.priceGroups.forEach((group: any, groupIdx: number) => {
+          group.items.forEach((item: any) => {
+            const itemSlug = slugify(item.name);
+            const valNum = getCleanValueStr(item.value);
+            if (itemSlug === targetQuery || valNum === targetQuery) {
+              foundGroupIdx = groupIdx;
+              foundItemSlug = itemSlug;
+            }
+          });
+        });
+      }
+
+      if (service.prices && service.prices.length > 0) {
+        service.prices.forEach((item: any) => {
+          const itemSlug = slugify(item.name);
+          const valNum = getCleanValueStr(item.value);
+          if (itemSlug === targetQuery || valNum === targetQuery) {
+            foundItemSlug = itemSlug;
+          }
+        });
+      }
+
+      if (foundItemSlug) {
+        setSelectedItemSlug(foundItemSlug);
+        if (foundGroupIdx !== null) {
+          setOpenGroups(prev => ({ ...prev, [foundGroupIdx!]: true }));
+        }
+
+        // Scroll to the element
+        setTimeout(() => {
+          const element = document.getElementById(`price-item-${foundItemSlug}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 850);
+      }
+    }
+  }, [slug, service]);
   
   useEffect(() => {
     if ((window as any).trackEvent) {
@@ -43,8 +153,6 @@ export const ServiceTemplate: React.FC = () => {
     videoRef.current.muted = newMuted;
     setIsMuted(newMuted);
   };
-
-  const service = slug ? serviceDetails[slug] : null;
 
   if (!service) return <div className="p-20 text-center text-red-600 font-bold text-2xl">Serviço não encontrado: {slug}</div>;
 
@@ -115,7 +223,7 @@ export const ServiceTemplate: React.FC = () => {
           <div className="flex items-end justify-between border-b-2 border-clinic-purple/10 pb-6">
             <div>
               <h2 className="text-3xl font-bold text-clinic-blue">Tabela de Preços</h2>
-              <p className="text-sm text-gray-400 mt-2 font-medium">Soluções de Reabilitação Oral de Alta Precisão</p>
+              <p className="text-sm text-gray-400 mt-2 font-medium font-sans">Soluções de Reabilitação Oral de Alta Precisão (Clique num item para copiar o link da campanha 🔗)</p>
             </div>
           </div>
           
@@ -123,7 +231,7 @@ export const ServiceTemplate: React.FC = () => {
             {service.priceGroups.map((group: any, idx: number) => (
               <div key={idx} className="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden group/card transition-all hover:border-clinic-purple/20 h-full">
                 <button 
-                  onClick={() => setIsAllOpen(!isAllOpen)}
+                  onClick={() => toggleGroup(idx)}
                   className="w-full flex items-center justify-between p-8 text-left bg-gradient-to-r from-white to-gray-50/50 hover:to-gray-100 transition-all border-b border-gray-50"
                 >
                   <div className="flex flex-col">
@@ -131,7 +239,7 @@ export const ServiceTemplate: React.FC = () => {
                     <span className="text-2xl font-bold text-clinic-blue group-hover/card:text-clinic-purple transition-colors">{group.title}</span>
                   </div>
                   <motion.div
-                    animate={{ rotate: isAllOpen ? 180 : 0 }}
+                    animate={{ rotate: isGroupOpen(idx) ? 180 : 0 }}
                     className="w-14 h-14 rounded-full bg-clinic-bg flex items-center justify-center text-clinic-purple shadow-sm border border-white"
                   >
                     <ChevronDown className="w-6 h-6" />
@@ -139,7 +247,7 @@ export const ServiceTemplate: React.FC = () => {
                 </button>
                 
                 <AnimatePresence>
-                  {isAllOpen && (
+                  {isGroupOpen(idx) && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
@@ -148,25 +256,35 @@ export const ServiceTemplate: React.FC = () => {
                     >
                       <div className="p-8">
                          <div className="flex flex-col gap-3">
-                           {group.items.map((p: any, i: number) => (
-                             <motion.div 
-                               initial={{ y: 20, opacity: 0 }}
-                               animate={{ y: 0, opacity: 1 }}
-                               transition={{ delay: i * 0.1 }}
-                               key={i} 
-                               className="bg-clinic-bg/40 p-4 rounded-2xl border border-white hover:border-clinic-lime transition-all flex justify-between items-center group/item hover:bg-white hover:shadow-lg"
-                             >
-                               <div className="flex flex-col">
-                                 <span className="text-sm font-bold text-clinic-blue leading-tight group-hover/item:text-clinic-purple transition-colors">{p.name}</span>
-                                 {p.description && (
-                                   <span className="text-[9px] text-gray-400 uppercase font-black tracking-widest">{p.description}</span>
-                                 )}
-                               </div>
-                               <div className="ml-4">
-                                  <span className="text-lg font-black text-clinic-purple">{p.value}</span>
-                               </div>
-                             </motion.div>
-                           ))}
+                           {group.items.map((p: any, i: number) => {
+                             const itemSlug = slugify(p.name);
+                             const isSelected = selectedItemSlug === itemSlug;
+                             return (
+                               <motion.div 
+                                 initial={{ y: 20, opacity: 0 }}
+                                 animate={{ y: 0, opacity: 1 }}
+                                 transition={{ delay: i * 0.1 }}
+                                 key={i} 
+                                 id={`price-item-${itemSlug}`}
+                                 onClick={() => handleItemClick(p.name, p.value, idx)}
+                                 className={`p-4 rounded-2xl border transition-all flex justify-between items-center group/item cursor-pointer hover:shadow-lg ${
+                                   isSelected 
+                                     ? 'bg-clinic-bg border-clinic-purple ring-2 ring-clinic-purple/40 scale-[1.01] shadow-md' 
+                                     : 'bg-clinic-bg/40 border-white hover:border-clinic-lime hover:bg-white'
+                                 }`}
+                               >
+                                 <div className="flex flex-col">
+                                   <span className="text-sm font-bold text-clinic-blue leading-tight group-hover/item:text-clinic-purple transition-colors">{p.name}</span>
+                                   {p.description && (
+                                     <span className="text-[9px] text-gray-400 uppercase font-black tracking-widest">{p.description}</span>
+                                   )}
+                                 </div>
+                                 <div className="ml-4 flex items-center gap-3">
+                                   <span className="text-lg font-black text-clinic-purple">{p.value}</span>
+                                 </div>
+                               </motion.div>
+                             );
+                           })}
                          </div>
                       </div>
                     </motion.div>
@@ -181,14 +299,36 @@ export const ServiceTemplate: React.FC = () => {
       {/* Standard Simple Price List */}
       {service.prices && service.prices.length > 0 && !service.priceGroups && (
         <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden mt-16">
-          <h2 className="text-2xl font-bold text-clinic-blue mb-6">Tabela de Preços</h2>
+          <h2 className="text-2xl font-bold text-clinic-blue mb-2">Tabela de Preços</h2>
+          <p className="text-sm text-gray-400 mb-6 font-medium font-sans">Clique num tratamento para copiar o link da campanha 🔗</p>
           <div className="space-y-1">
-            {service.prices.map((p: any, i: number) => (
-              <div key={i} className="flex flex-col gap-1 border-b border-gray-100 py-5 last:border-0 w-full group">
-                <span className="text-base md:text-lg font-semibold text-gray-700 leading-tight break-normal hyphens-none group-hover:text-clinic-purple transition-colors">{p.name}</span>
-                <span className="text-xl md:text-2xl font-bold text-clinic-purple break-normal hyphens-none">{p.value}</span>
-              </div>
-            ))}
+            {service.prices.map((p: any, i: number) => {
+              const itemSlug = slugify(p.name);
+              const isSelected = selectedItemSlug === itemSlug;
+              return (
+                <div 
+                  key={i} 
+                  id={`price-item-${itemSlug}`}
+                  onClick={() => handleItemClick(p.name, p.value)}
+                  className={`flex justify-between items-center border-b border-gray-100 py-5 last:border-0 w-full group cursor-pointer transition-all px-4 rounded-xl ${
+                    isSelected 
+                      ? 'bg-clinic-bg border-l-4 border-l-clinic-purple shadow-sm' 
+                      : 'hover:bg-clinic-bg/40'
+                  }`}
+                >
+                  <div className="flex flex-col gap-1">
+                    <span className="text-base md:text-lg font-semibold text-gray-700 leading-tight break-normal hyphens-none group-hover:text-clinic-purple transition-colors">
+                      {p.name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl md:text-2xl font-bold text-clinic-purple break-normal hyphens-none">
+                      {p.value}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

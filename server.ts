@@ -6,7 +6,7 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: '50mb' }));
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -39,8 +39,7 @@ async function startServer() {
 
           attachments.push({
             filename: filename,
-            content: base64Data,
-            encoding: 'base64',
+            content: Buffer.from(base64Data, 'base64'),
             contentType: contentType
           });
 
@@ -48,9 +47,8 @@ async function startServer() {
                <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 0 12px 12px 0;">
                  <h4 style="color: #57009C; margin: 0 0 10px 0; font-family: sans-serif;">Foto de Diagnóstico do Sorriso:</h4>
                  <p style="color: #666; font-size: 13px; margin: 0 0 12px 0; font-family: sans-serif;">
-                   Esta foto também foi anexada ao email como: <strong>${filename}</strong>
+                   Esta foto também foi anexada ao email.
                  </p>
-                 <img src="cid:sorriso" alt="Foto do Sorriso" style="max-width: 100%; max-height: 500px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
                </div>`;
         } else {
           // Fallback if formatting doesn't match standard data uri

@@ -37,33 +37,34 @@ async function startServer() {
           const extension = contentType.split('/')[1] || 'jpg';
           const filename = `sorriso_${Date.now()}.${extension}`;
 
+          // Resend SDK only supports 'filename' and 'content' (Buffer or string)
           attachments.push({
             filename: filename,
-            content: Buffer.from(base64Data, 'base64'),
-            contentType: contentType
+            content: Buffer.from(base64Data, 'base64')
           });
 
           htmlBody += `
-               <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 0 12px 12px 0;">
+               <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 12px;">
                  <h4 style="color: #57009C; margin: 0 0 10px 0; font-family: sans-serif;">Foto de Diagnóstico do Sorriso:</h4>
                  <p style="color: #666; font-size: 13px; margin: 0 0 12px 0; font-family: sans-serif;">
-                   Esta foto também foi anexada ao email.
+                   Esta foto foi anexada e pode ser visualizada abaixo:
                  </p>
+                 <img src="${photo}" alt="Foto do Sorriso" style="max-width: 100%; max-height: 500px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
                </div>`;
         } else {
           // Fallback if formatting doesn't match standard data uri
           htmlBody += `
-               <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 0 12px 12px 0;">
+               <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 12px;">
                  <h4 style="color: #57009C; margin: 0 0 10px 0; font-family: sans-serif;">Foto de Diagnóstico do Sorriso:</h4>
-                 <img src="${photo}" alt="Foto do Sorriso" style="max-width: 100%; max-height: 450px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
+                 <img src="${photo}" alt="Foto do Sorriso" style="max-width: 100%; max-height: 500px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
                </div>`;
         }
       } else if (photo) {
         // Fallback or external link
         htmlBody += `
-               <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 0 12px 12px 0;">
+               <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 12px;">
                  <h4 style="color: #57009C; margin: 0 0 10px 0; font-family: sans-serif;">Foto de Diagnóstico do Sorriso:</h4>
-                 <img src="${photo}" alt="Foto do Sorriso" style="max-width: 100%; max-height: 450px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
+                 <img src="${photo}" alt="Foto do Sorriso" style="max-width: 100%; max-height: 500px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
                </div>`;
       }
 

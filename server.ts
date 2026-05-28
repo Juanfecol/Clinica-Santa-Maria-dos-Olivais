@@ -15,6 +15,8 @@ async function startServer() {
     try {
       const { name, email, message, phone, photo } = req.body;
       
+      console.log('Received photo in request:', photo ? `${photo.substring(0, 50)}...` : 'No photo');
+      
       if (!name || !email || !message) {
         return res.status(400).json({ error: 'Missing required fields: name, email, or message' });
       }

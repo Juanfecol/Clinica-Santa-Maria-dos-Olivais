@@ -253,6 +253,9 @@ const QuoteCalculator: React.FC = () => {
       canvas.height = video.videoHeight || 480;
       const ctx = canvas.getContext('2d');
       if (ctx) {
+        // Mirrored capture mapping (horizontal inversion)
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
         setCapturedPhoto(dataUrl);
@@ -655,7 +658,10 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                           <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-xs cursor-pointer">
                             <button
                               type="button"
-                              onClick={startCamera}
+                              onClick={() => {
+                                setIsCameraModalOpen(true);
+                                startCamera();
+                              }}
                               className="w-full bg-clinic-purple hover:bg-clinic-purple/95 text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-clinic-purple/15 text-center"
                             >
                               <Camera size={14} /> Ativar Câmara 📸
@@ -679,44 +685,75 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                       )}
 
                       {isCameraModalOpen && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4">
-                          <div className="relative w-full max-w-2xl bg-black rounded-[2.5rem] overflow-hidden aspect-video border-2 border-clinic-purple shadow-2xl">
-                            <video
-                              ref={videoRef}
-                              className="w-full h-full object-cover absolute top-0 left-0 transform scale-x-[-1]"
-                              autoPlay
-                              playsInline
-                              muted
-                            />
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-fade-in">
+                          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#121626] to-[#0a0c16] rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl flex flex-col">
                             
-                            <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex items-center justify-center">
-                              <div className="w-[85%] h-[55%] border-4 border-dashed border-clinic-lime/60 rounded-full flex items-center justify-center shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]">
-                                <span className="text-[10px] text-white bg-clinic-purple/95 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Molda o Sorriso Aqui</span>
+                            {/* Modal Header */}
+                            <div className="p-5 border-b border-white/5 flex items-center justify-between text-white">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2.5 h-2.5 rounded-full bg-clinic-lime animate-pulse" />
+                                <h3 className="font-bold text-sm md:text-base tracking-tight text-white/90">Diagnóstico de Sorriso - Câmara Ativa</h3>
                               </div>
-                            </div>
-
-                            <div className="absolute bottom-6 left-0 w-full px-6 flex items-center justify-between gap-4 z-10">
                               <button
                                 type="button"
                                 onClick={() => {
                                   stopCamera();
                                   setIsCameraModalOpen(false);
                                 }}
-                                className="bg-white/20 backdrop-blur-md hover:bg-red-600/80 text-white font-bold px-6 py-3 rounded-xl text-sm"
+                                className="text-gray-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-full cursor-pointer"
+                              >
+                                <X size={18} />
+                              </button>
+                            </div>
+
+                            {/* Camera Viewport (Completely free of buttons overlapping) */}
+                            <div className="relative bg-black aspect-video flex items-center justify-center overflow-hidden">
+                              <video
+                                ref={videoRef}
+                                className="w-full h-full object-cover absolute top-0 left-0 transform scale-x-[-1]"
+                                autoPlay
+                                playsInline
+                                muted
+                              />
+                              
+                              {/* Extremely subtle teeth guideline overlay without heavy shadows or blocked mouth */}
+                              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                                <div className="w-[75%] h-[60%] border-2 border-dashed border-clinic-lime/40 rounded-[45%] flex items-center justify-center">
+                                  {/* Clean space in the center to clearly see the person's smile */}
+                                </div>
+                              </div>
+
+                              {/* Small elegant tag out of the way of the face */}
+                              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 p-1.5 px-4 rounded-full bg-clinic-purple/90 backdrop-blur-md text-white font-black text-[9px] md:text-[10px] uppercase tracking-wider z-10 shadow-md border border-white/10 select-none text-center">
+                                Enquadre o seu sorriso dentro do guia 🦷
+                              </div>
+                            </div>
+
+                            {/* Modal Footer / Control Bar (OUTSIDE the video!) */}
+                            <div className="p-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  stopCamera();
+                                  setIsCameraModalOpen(false);
+                                }}
+                                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-bold text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-white/10 cursor-pointer"
                               >
                                 Cancelar
                               </button>
+
                               <button
                                 type="button"
                                 onClick={() => {
                                   capturePhoto();
                                   setIsCameraModalOpen(false);
                                 }}
-                                className="bg-clinic-lime text-clinic-blue font-black px-8 py-3 rounded-xl text-sm flex items-center gap-2 hover:scale-[1.05] transition-transform shadow-lg cursor-pointer animate-pulse"
+                                className="w-full sm:w-auto bg-clinic-lime hover:bg-clinic-lime/90 text-clinic-blue font-black px-8 py-3 rounded-xl text-xs flex items-center justify-center gap-2 hover:scale-[1.03] active:scale-95 transition-all shadow-lg cursor-pointer duration-200"
                               >
-                                <Camera size={18} /> Capturar Foto
+                                <Camera size={14} /> Capturar Sorriso 📸
                               </button>
                             </div>
+
                           </div>
                         </div>
                       )}
@@ -1088,6 +1125,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                               type="button"
                               onClick={() => {
                                 setPhotoOptionConsent('yes');
+                                setIsCameraModalOpen(true);
                                 startCamera();
                               }}
                               className="bg-clinic-purple hover:bg-clinic-blue text-white font-extrabold py-6 px-6 rounded-[2rem] flex flex-col items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-clinic-purple/15 text-center cursor-pointer group"

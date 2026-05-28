@@ -41,8 +41,8 @@ const Appointments: React.FC = () => {
            <img className="w-full h-auto min-h-[600px] object-cover transition-transform duration-1000 group-hover:scale-110" src="https://clinica-santa-maria-dos-olivais.b-cdn.net/doctora_ana_mata_agendamiento_online.jpg" alt="Agendamento" />
         </div>
 
-        <div className="bg-white/80 backdrop-blur-2xl p-6 sm:p-10 rounded-[3.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/50 relative overflow-hidden min-h-[750px] ring-1 ring-black/5">
-          <div className="mb-10 text-center lg:text-left px-4">
+        <div className="bg-white/80 backdrop-blur-2xl p-3 sm:p-10 rounded-[2rem] sm:rounded-[3.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/50 relative overflow-hidden min-h-[750px] ring-1 ring-black/5">
+          <div className="mb-10 text-center lg:text-left px-2 sm:px-4">
             <div className="inline-block px-4 py-1 bg-clinic-purple/10 text-clinic-purple rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">Marcações Online</div>
             <h1 className="text-4xl md:text-5xl font-bold text-clinic-blue mb-4 leading-tight">Agende a sua <span className="text-clinic-purple italic font-serif">Consulta</span></h1>
             <p className="text-base sm:text-lg text-gray-600 font-light max-w-md">Escolha o melhor horário para si diretamente no nosso calendário oficial de forma simples e rápida.</p>
@@ -50,8 +50,8 @@ const Appointments: React.FC = () => {
 
           <div 
             id="calendly-inline-container" 
-            className="calendly-inline-widget rounded-[2rem] overflow-hidden" 
-            style={{ minWidth: '320px', height: '650px' }}
+            className="calendly-inline-widget rounded-[2rem] overflow-hidden w-full" 
+            style={{ width: '100%', minWidth: '100%', height: '650px' }}
           ></div>
         </div>
       </div>

@@ -39,9 +39,9 @@ async function startServer() {
 
           attachments.push({
             filename: filename,
-            content: Buffer.from(base64Data, 'base64'),
-            contentType: contentType,
-            cid: 'sorriso'
+            content: base64Data,
+            encoding: 'base64',
+            contentType: contentType
           });
 
           htmlBody += `

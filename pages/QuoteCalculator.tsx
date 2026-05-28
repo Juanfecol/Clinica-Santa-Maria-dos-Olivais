@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calculator, 
@@ -174,6 +174,15 @@ const QuoteCalculator: React.FC = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  useEffect(() => {
+    if (videoRef.current && videoStream) {
+      if (videoRef.current.srcObject !== videoStream) {
+          videoRef.current.srcObject = videoStream;
+      }
+    }
+  }, [videoStream, isCameraModalOpen]); 
+
+
   const startCamera = async () => {
     try {
       setCameraError(null);
@@ -204,11 +213,6 @@ const QuoteCalculator: React.FC = () => {
 
       setVideoStream(stream);
       setIsCameraActive(true);
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      }, 100);
     } catch (err: any) {
       console.error("Camera error:", err);
       

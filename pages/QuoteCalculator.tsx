@@ -185,9 +185,9 @@ const QuoteCalculator: React.FC = () => {
 
       let stream: MediaStream;
       try {
-        // Try first with user-facing and ideal constraints (perfect for mobile)
+        // Try first with user-facing ideal
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+          video: { facingMode: { ideal: 'user' } }
         });
       } catch (firstErr) {
         console.warn("First camera constraint failed, trying fallback:", firstErr);

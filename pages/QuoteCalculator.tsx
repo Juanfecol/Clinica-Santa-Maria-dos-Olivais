@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calculator, 
@@ -14,7 +14,18 @@ import {
   Activity,
   Scissors,
   Plus,
-  ArrowRight
+  ArrowRight,
+  Camera,
+  Upload,
+  Trash2,
+  Video,
+  User,
+  Phone,
+  Mail,
+  Loader2,
+  CheckCircle,
+  RefreshCw,
+  X
 } from 'lucide-react';
 
 interface Procedure {
@@ -140,9 +151,223 @@ const specialtiesData: Specialty[] = [
 ];
 
 const QuoteCalculator: React.FC = () => {
+  const [flowMode, setFlowMode] = useState<'selector' | 'manual' | 'photo_only'>('selector');
   const [step, setStep] = useState(1);
   const [selectedSpecialty, setSelectedSpecialty] = useState<Specialty | null>(null);
   const [selectedProcedures, setSelectedProcedures] = useState<string[]>([]);
+
+  // Camera & Image States
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [photoOptionConsent, setPhotoOptionConsent] = useState<'yes' | 'no' | 'idle'>('idle');
+
+  // Form Lead States
+  const [leadName, setLeadName] = useState('');
+  const [leadPhone, setLeadPhone] = useState('');
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadNotes, setLeadNotes] = useState('');
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const startCamera = async () => {
+    try {
+      setCameraError(null);
+      
+      // Check if mediaDevices API is available in the current browser/iframe environment
+      if (!navigator?.mediaDevices?.getUserMedia) {
+        setCameraError("De momento, a câmara não é suportada por este navegador ou ambiente (ex: ligação não descodificada ou restrições de iFrame seguro). Por favor, utilize um telemóvel ou carregue uma foto da sua galeria.");
+        return;
+      }
+
+      let stream: MediaStream;
+      try {
+        // Try first with user-facing and ideal constraints (perfect for mobile)
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+      } catch (firstErr) {
+        console.warn("First camera constraint failed, trying fallback:", firstErr);
+        try {
+          // If user-facing fails, try simple video without specific facingMode (fits desktop webcams)
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true
+          });
+        } catch (secondErr) {
+          throw secondErr; // Bubble up to main catch to show error message
+        }
+      }
+
+      setVideoStream(stream);
+      setIsCameraActive(true);
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+    } catch (err: any) {
+      console.error("Camera error:", err);
+      
+      const errorName = err?.name || '';
+      const errorMessage = err?.message || '';
+      
+      if (
+        errorName === 'NotFoundError' || 
+        errorName === 'DevicesNotFoundError' || 
+        errorMessage.toLowerCase().includes('not found') || 
+        errorMessage.toLowerCase().includes('device not found') || 
+        errorMessage.toLowerCase().includes('requested device')
+      ) {
+        setCameraError("Câmara física não encontrada: Não foi detetada nenhuma câmara ou webcam ativa neste dispositivo. Pode selecionar facilmente uma imagem da galeria utilizando o botão 'Carregar Foto 📁'.");
+      } else if (errorName === 'NotAllowedError' || errorName === 'PermissionDeniedError' || errorName === 'PermissionDismissedError') {
+        setCameraError("Acesso à câmara recusado: Por favor ative as permissões de câmara no seu navegador ou carregue um ficheiro usando 'Procurar Foto'.");
+      } else if (errorName === 'OverconstrainedError') {
+        setCameraError("A sua câmara não suporta a resolução solicitada. Por favor, envie uma foto diretamente do seu rolo de câmara.");
+      } else {
+        setCameraError(`Não foi possível iniciar a câmara (${errorName || errorMessage || 'Erro técnico'}). Por favor, carregue uma foto utilizando o botão ao lado.`);
+      }
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoStream) {
+      videoStream.getTracks().forEach(track => track.stop());
+      setVideoStream(null);
+    }
+    setIsCameraActive(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setCapturedPhoto(dataUrl);
+        stopCamera();
+      }
+    }
+  };
+
+  const processFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, envie apenas ficheiros de imagem (JPG, PNG).');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setCapturedPhoto(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      processFile(e.target.files[0]);
+    }
+  };
+
+  const handleCampaignSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leadName || !leadPhone) {
+      alert("Por favor, preencha o seu nome e telemóvel!");
+      return;
+    }
+
+    setSubmitStatus('submitting');
+
+    // Compile selected treatments
+    const treatmentsList: string[] = [];
+    selectedProcedures.forEach(id => {
+      specialtiesData.forEach(spec => {
+        const proc = spec.procedures.find(p => p.id === id);
+        if (proc) {
+          treatmentsList.push(`${proc.name} (${proc.priceMin}€)`);
+        }
+      });
+    });
+
+    const msgText = `Simulador de Sorriso:
+Especialidade: ${selectedSpecialty?.name || 'Não selecionada'}
+Tratamentos Escolhidos: ${treatmentsList.join(', ')}
+Valor Estimado: ${min}€ - ${max}€
+Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
+
+    try {
+      const response = await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: leadName,
+          email: leadEmail || 'contacto@clinica.pt',
+          phone: leadPhone,
+          message: msgText,
+          photo: capturedPhoto || undefined
+        })
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        if ((window as any).trackEvent) {
+          (window as any).trackEvent('quote_submitted_with_photo', { min, max, has_photo: !!capturedPhoto });
+        }
+        if ((window as any).trackMeta) {
+          (window as any).trackMeta('Lead', {
+            content_name: 'Simulador Orçamento com Foto',
+            content_category: 'Simulator',
+            value: Number(min),
+            currency: 'EUR'
+          });
+        }
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (err) {
+      console.error(err);
+      setSubmitStatus('error');
+    }
+  };
+
+  const handleReset = () => {
+    stopCamera();
+    setCapturedPhoto(null);
+    setCameraError(null);
+    setPhotoOptionConsent('idle');
+    setLeadName('');
+    setLeadPhone('');
+    setLeadEmail('');
+    setLeadNotes('');
+    setSubmitStatus('idle');
+    reset();
+  };
 
   const toggleProcedure = (id: string) => {
     setSelectedProcedures(prev => {
@@ -200,42 +425,449 @@ const QuoteCalculator: React.FC = () => {
     setStep(1);
     setSelectedSpecialty(null);
     setSelectedProcedures([]);
+    setFlowMode('selector');
   };
 
   const { min, max } = calculateTotal();
+
+  const getHeaderContent = () => {
+    if (flowMode === 'photo_only') {
+      return {
+        title: <>Diagnóstico Clínico <span className="text-clinic-purple italic font-serif">por Foto</span></>,
+        desc: "Envie uma foto simples do seu sorriso. Os nossos médicos especialistas vão avaliar a anatomia do seu caso para lhe apresentar um orçamento real com 100% de precisão clínica.",
+        icon: <Camera className="text-clinic-purple w-10 h-10" />
+      };
+    }
+    return {
+      title: <>Simulador de <span className="text-clinic-purple italic font-serif">Investimento</span></>,
+      desc: "Simule o seu orçamento oficial com transparência. Opte pelo diagnóstico clínico inovador orientado por foto ou pelo simulador manual passo a passo.",
+      icon: <Calculator className="text-clinic-purple w-10 h-10" />
+    };
+  };
+
+  const header = getHeaderContent();
 
   return (
     <div className="min-h-screen py-16 px-4 md:px-6 max-w-6xl mx-auto">
       <div className="text-center mb-12">
         <motion.div 
+          key={flowMode}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="inline-flex items-center justify-center w-20 h-20 bg-clinic-purple/10 rounded-3xl mb-6"
         >
-          <Calculator className="text-clinic-purple w-10 h-10" />
+          {header.icon}
         </motion.div>
         <h1 className="text-4xl md:text-6xl font-bold text-clinic-blue mb-6 tracking-tight">
-          Simulador de <span className="text-clinic-purple italic font-serif">Investimento</span>
+          {header.title}
         </h1>
         <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed">
-          Planeie o seu tratamento com transparência. Selecione as especialidades para obter uma estimativa baseada na tabela oficial.
+          {header.desc}
         </p>
       </div>
 
       <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-gray-100 min-h-[600px] flex flex-col relative">
         {/* Progress Tracker */}
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-50 flex">
-           <motion.div 
-             className="h-full bg-clinic-lime"
-             initial={{ width: 0 }}
-             animate={{ width: `${(step / 3) * 100}%` }}
-             transition={{ duration: 0.8, ease: "circOut" }}
-           />
-        </div>
+        {flowMode === 'manual' && (
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-50 flex">
+             <motion.div 
+               className="h-full bg-clinic-lime"
+               initial={{ width: 0 }}
+               animate={{ width: `${(step / 3) * 100}%` }}
+               transition={{ duration: 0.8, ease: "circOut" }}
+             />
+          </div>
+        )}
 
-        <div className="p-8 md:p-16 flex-grow">
+        <div className="p-8 md:p-16 flex-grow animate-fade-in">
           <AnimatePresence mode="wait">
-            {step === 1 && (
+            {flowMode === 'selector' && (
+              <motion.div
+                key="mode_selector"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                className="space-y-12"
+              >
+                <div className="text-center space-y-4 max-w-3xl mx-auto">
+                  <span className="bg-clinic-purple/10 text-clinic-purple px-5 py-1.5 rounded-full font-bold text-xs uppercase tracking-widest">
+                    🦷 Avaliação Digital de Sorriso
+                  </span>
+                  <h2 className="text-3xl md:text-5xl font-black text-clinic-blue leading-tight">
+                    Como prefere simular o seu investimento?
+                  </h2>
+                  <p className="text-gray-500 font-light text-sm md:text-base leading-relaxed">
+                    Escolha a opção que melhor se ajusta às suas necessidades. O diagnóstico por foto é validado diretamente por médicos dentistas qualificados de forma 100% gratuita.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch pt-2">
+                  {/* PATH 1: PHOTO DIAGNOSTIC (HERO CARD) */}
+                  <div className="relative rounded-[3rem] p-8 md:p-12 flex flex-col justify-between border-4 border-clinic-purple bg-gradient-to-b from-clinic-purple/[0.03] to-white shadow-2xl transition-all hover:scale-[1.01] hover:shadow-clinic-purple/10 group overflow-hidden">
+                    {/* Glowing highlight effects */}
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-clinic-purple opacity-5 blur-3xl rounded-full"></div>
+                    <div className="absolute -top-3 -right-3 bg-clinic-lime text-clinic-blue font-black text-[11px] px-6 py-2 rounded-full uppercase tracking-wider rotate-3 shadow-md z-10 animate-bounce">
+                      Altamente Recomendado 🚀
+                    </div>
+
+                    <div className="space-y-6 relative z-10">
+                      <div className="inline-flex items-center justify-center p-6 rounded-[2rem] bg-clinic-purple text-white shadow-lg shadow-clinic-purple/20 group-hover:scale-110 transition-transform duration-300">
+                        <Camera className="w-8 h-8" />
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <h3 className="text-2xl md:text-3xl font-black text-clinic-blue group-hover:text-clinic-purple transition-all leading-tight">
+                          Diagnóstico por Imagem <span className="text-clinic-purple italic font-serif block mt-1">100% Real & Gratuito</span>
+                        </h3>
+                        <p className="text-gray-600 text-sm font-light leading-relaxed">
+                          Tire uma fotografia ao seu sorriso com o seu telemóvel ou computador. Os nossos médicos dentistas vão analisar a anatomia do seu sorriso e fornecer-lhe-ão gratuitamente uma estimativa precisa e personalizada.
+                        </p>
+                      </div>
+
+                      <ul className="space-y-3 pt-2">
+                        {[
+                          'Avaliação clínica real por Médicos Dentistas',
+                          'Indicação exata de tratamentos recomendados',
+                          'Privacidade total dos seus dados (RGPD)',
+                          'Resposta célere em menos de 24 horas úteis'
+                        ].map((bullet, idx) => (
+                          <li key={idx} className="flex items-center gap-3 text-xs text-gray-700 font-medium">
+                            <span className="w-5 h-5 rounded-full bg-clinic-purple/10 flex items-center justify-center text-clinic-purple shrink-0">
+                              <Check size={12} className="stroke-[3]" />
+                            </span>
+                            {bullet}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFlowMode('photo_only');
+                        setPhotoOptionConsent('yes');
+                      }}
+                      className="mt-8 w-full bg-clinic-purple hover:bg-clinic-blue text-white font-black py-5 px-8 rounded-[2rem] flex items-center justify-center gap-3 shadow-xl shadow-clinic-purple/20 hover:shadow-clinic-blue/20 transition-all text-sm md:text-base cursor-pointer group-hover:scale-[1.02]"
+                    >
+                      <Camera className="w-5 h-5" /> Iniciar Diagnóstico por Foto 🦷
+                    </button>
+                  </div>
+
+                  {/* PATH 2: MANUAL ESTIMATION CARD */}
+                  <div className="relative rounded-[3rem] p-8 md:p-12 flex flex-col justify-between border-2 border-gray-100 bg-white transition-all hover:border-gray-300 hover:shadow-lg group">
+                    <div className="space-y-6">
+                      <div className="inline-flex items-center justify-center p-6 rounded-[2rem] bg-gray-100 text-clinic-blue group-hover:bg-clinic-blue group-hover:text-white transition-all duration-300">
+                        <Calculator className="w-8 h-8" />
+                      </div>
+
+                      <div className="space-y-3">
+                        <h3 className="text-2xl md:text-3xl font-black text-clinic-blue leading-tight">
+                          Simulador Manual de <span className="text-gray-500 italic font-serif block mt-1">Tratamentos</span>
+                        </h3>
+                        <p className="text-gray-600 text-sm font-light leading-relaxed">
+                          Selecione os tratamentos e especialidades que deseja (implantes, higiene, aparelhos, estética) para consultar os custos de referência aproximados com base na nossa tabela de preços oficial.
+                        </p>
+                      </div>
+
+                      <ul className="space-y-3 pt-2">
+                        {[
+                          'Consulte preços oficiais da tabela clínica',
+                          'Simule múltiplas especialidades juntas',
+                          'Sem necessidade de partilhar imagens',
+                          'Cálculo e estimativa teórica instantânea'
+                        ].map((bullet, idx) => (
+                          <li key={idx} className="flex items-center gap-3 text-xs text-gray-700 font-medium">
+                            <span className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-clinic-blue shrink-0">
+                              <Check size={12} className="stroke-[3]" />
+                            </span>
+                            {bullet}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFlowMode('manual');
+                        setStep(1);
+                      }}
+                      className="mt-8 w-full bg-white border-2 border-clinic-blue text-clinic-blue hover:bg-clinic-blue hover:text-white font-extrabold py-5 px-8 rounded-[2rem] flex items-center justify-center gap-3 transition-all text-sm md:text-base cursor-pointer"
+                    >
+                      <Calculator className="w-5 h-5" /> Simular Manualmente 📋
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {flowMode === 'photo_only' && (
+              <motion.div
+                key="photo_only_flow"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="space-y-8 animate-fade-in"
+              >
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <button 
+                    onClick={() => { stopCamera(); setCapturedPhoto(null); setCameraError(null); setFlowMode('selector'); }} 
+                    className="flex items-center gap-2 text-clinic-purple font-bold text-xs uppercase hover:underline transition-all cursor-pointer"
+                  >
+                    <ChevronLeft size={16} /> Voltar aos métodos
+                  </button>
+                  <div className="flex items-center gap-2 text-xs bg-emerald-50 text-emerald-800 font-bold px-3 py-1.5 rounded-full border border-emerald-100 animate-pulse">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    Diagnóstico Gratuito 100% Seguro
+                  </div>
+                </div>
+
+                {submitStatus !== 'success' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    {/* Camera capture / Image Upload Area */}
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <label className="block text-sm font-bold text-clinic-blue">Fotografia do seu Sorriso/Dentes *</label>
+                        <p className="text-xs text-gray-500 font-light">É necessário carregar ou tirar uma foto para submeter esta consulta.</p>
+                      </div>
+
+                      {!capturedPhoto && !isCameraActive && (
+                        <div 
+                          onDragEnter={handleDrag}
+                          onDragLeave={handleDrag}
+                          onDragOver={handleDrag}
+                          onDrop={handleDrop}
+                          className={`border-2 border-dashed rounded-[2.5rem] p-10 text-center transition-all cursor-pointer flex flex-col items-center justify-center min-h-[300px] ${
+                            dragActive 
+                              ? 'border-clinic-purple bg-clinic-purple/[0.03]' 
+                              : 'border-gray-200 bg-white hover:border-clinic-purple/50'
+                          }`}
+                        >
+                          <Camera className="w-16 h-16 text-clinic-purple/20 mb-4 animate-pulse" />
+                          <p className="font-bold text-clinic-blue text-sm mb-1">Tire uma fotografia ou arraste o ficheiro</p>
+                          <p className="text-xs text-gray-400 font-light mb-6">Suporta formatos JPEG, PNG, WebP do telemóvel ou PC</p>
+                          
+                          <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-xs cursor-pointer">
+                            <button
+                              type="button"
+                              onClick={startCamera}
+                              className="w-full bg-clinic-purple hover:bg-clinic-purple/95 text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-clinic-purple/15 text-center"
+                            >
+                              <Camera size={14} /> Ativar Câmara 📸
+                            </button>
+                            
+                            <label className="w-full bg-white border border-gray-200 hover:bg-gray-50 text-clinic-blue font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-sm text-center">
+                              <Upload size={14} /> Carregar Foto 📁
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={handleFileChange} 
+                              />
+                            </label>
+                          </div>
+
+                          {cameraError && (
+                            <p className="text-red-500 text-[11px] font-bold mt-4 max-w-xs leading-relaxed bg-red-50 p-2.5 rounded-lg border border-red-100">{cameraError}</p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Camera streaming active */}
+                      {isCameraActive && (
+                        <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-clinic-purple max-w-md mx-auto aspect-video bg-black flex flex-col justify-end">
+                          <video
+                            ref={videoRef}
+                            className="w-full h-full object-cover absolute top-0 left-0"
+                            autoPlay
+                            playsInline
+                            muted
+                          />
+                          
+                          {/* Teeth guidelines overlay */}
+                          <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex items-center justify-center">
+                            <div className="w-[85%] h-[55%] border-4 border-dashed border-clinic-lime/60 rounded-full flex items-center justify-center shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]">
+                              <span className="text-[10px] text-white bg-clinic-purple/95 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Molda o Sorriso Aqui</span>
+                            </div>
+                          </div>
+
+                          <div className="relative z-10 p-4 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between gap-4">
+                            <button
+                              type="button"
+                              onClick={stopCamera}
+                              className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-xs"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={capturePhoto}
+                              className="bg-clinic-lime text-clinic-blue font-black px-6 py-2.5 rounded-lg text-xs flex items-center gap-2 hover:scale-[1.02] transition-transform shadow-lg cursor-pointer animate-pulse"
+                            >
+                              <Camera size={14} /> Capturar Foto
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Captured/Uploaded photo preview */}
+                      {capturedPhoto && (
+                        <div className="relative rounded-[2.5rem] border-2 border-clinic-purple overflow-hidden max-w-sm mx-auto shadow-lg bg-white p-3">
+                          <img 
+                            src={capturedPhoto} 
+                            alt="Foto Dental" 
+                            className="w-full rounded-[2rem] aspect-square object-cover" 
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setCapturedPhoto(null)}
+                            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/90 text-red-600 hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center shadow-md border border-gray-100 cursor-pointer"
+                            title="Remover Foto"
+                          >
+                            <X size={16} />
+                          </button>
+                          <div className="text-center mt-3 pb-1">
+                            <span className="text-[10px] text-clinic-purple font-black uppercase tracking-wider">Foto de Sorriso Pronta 🦷 ✓</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Contact details */}
+                    <div className="space-y-4">
+                      <div className="border-b border-gray-100 pb-2">
+                        <span className="text-xs font-bold text-clinic-purple uppercase">Dados para Receber o Diagnóstico</span>
+                      </div>
+                      <form onSubmit={handleCampaignSubmit} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-bold text-clinic-blue mb-1">O seu Nome Completo *</label>
+                          <div className="relative">
+                            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                              <User size={16} />
+                            </span>
+                            <input
+                              type="text"
+                              required
+                              value={leadName}
+                              onChange={(e) => setLeadName(e.target.value)}
+                              placeholder="ex: João Silva"
+                              className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-bold text-clinic-blue mb-1">Telemóvel / WhatsApp *</label>
+                            <div className="relative">
+                              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                <Phone size={16} />
+                              </span>
+                              <input
+                                type="tel"
+                                required
+                                value={leadPhone}
+                                onChange={(e) => setLeadPhone(e.target.value)}
+                                placeholder="ex: 912 345 678"
+                                className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-bold text-clinic-blue mb-1">Email (Opcional)</label>
+                            <div className="relative">
+                              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                <Mail size={16} />
+                              </span>
+                              <input
+                                type="email"
+                                value={leadEmail}
+                                onChange={(e) => setLeadEmail(e.target.value)}
+                                placeholder="ex: joao@email.com"
+                                className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-bold text-clinic-blue mb-1">Diga-nos o que sente ou qual o seu objetivo:</label>
+                          <textarea
+                            value={leadNotes}
+                            onChange={(e) => setLeadNotes(e.target.value)}
+                            placeholder="ex: Gostava de preencher falta de dentes com implantes / corrigir alinhamento."
+                            rows={3}
+                            className="w-full p-4 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm resize-none"
+                          />
+                        </div>
+
+                        {submitStatus === 'error' && (
+                          <p className="text-red-600 text-xs font-bold text-center">Falta de conexão ou erro ao enviar dados. Por favor verifique as informações e o telemóvel.</p>
+                        )}
+
+                        {!capturedPhoto && (
+                          <p className="text-amber-600 text-center font-bold text-xs bg-amber-50 rounded-xl p-3 border border-amber-100 flex items-center justify-center gap-2">
+                            <Info size={14} /> Nota: Carregue ou tire uma foto para poder submeter o diagnóstico.
+                          </p>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={submitStatus === 'submitting' || !capturedPhoto}
+                          className="w-full bg-clinic-purple hover:bg-clinic-blue disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-clinic-purple text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-3 cursor-pointer transition-all active:scale-95 shadow-xl shadow-clinic-purple/10 text-sm md:text-base"
+                        >
+                          {submitStatus === 'submitting' ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              A Enviar Diagnóstico...
+                            </>
+                          ) : (
+                            <>
+                              Enviar Foto Diagnóstico Segura 🚀
+                            </>
+                          )}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <motion.div 
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="text-center p-12 bg-white rounded-[2.5rem] border border-emerald-100 flex flex-col items-center justify-center text-center space-y-6 shadow-xl max-w-2xl mx-auto"
+                    >
+                      <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-2">
+                        <CheckCircle size={44} />
+                      </div>
+                      <h4 className="text-3xl font-black text-clinic-blue">Foto de Diagnóstico Recebida!</h4>
+                      <div className="text-gray-600 font-light max-w-md leading-relaxed text-sm space-y-4">
+                        <p>Muito obrigado pelas informações de Sorriso, <span className="font-bold text-clinic-blue">{leadName}</span>.</p>
+                        <p className="font-semibold text-clinic-purple text-base">O Diretor Clínico da Clínica Santa Maria vai analisar individualmente a anatomia do seu sorriso.</p>
+                        <p>Entraremos em contacto no prazo máximo de 24 horas úteis, enviando um plano e estimativa adequados ao seu caso via WhatsApp/Telemóvel.</p>
+                      </div>
+                      <div className="pt-2">
+                        <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-100 uppercase tracking-widest">
+                          ID de Diagnóstico Dental Seguro ✓
+                        </span>
+                      </div>
+                    </motion.div>
+
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+                      <button 
+                        onClick={handleReset} 
+                        className="w-full bg-clinic-blue text-white font-bold py-4 px-8 rounded-2xl text-center hover:bg-clinic-purple transition-colors shadow-lg cursor-pointer"
+                      >
+                        Simular Outro Caso / Recomeçar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {flowMode === 'manual' && step === 1 && (
               <motion.div 
                 key="step1"
                 initial={{ opacity: 0, x: 30 }}
@@ -244,6 +876,12 @@ const QuoteCalculator: React.FC = () => {
                 className="space-y-10"
               >
                 <div className="flex flex-col gap-2 items-center md:items-start">
+                  <button 
+                    onClick={() => { setFlowMode('selector'); }} 
+                    className="flex items-center gap-1.5 text-clinic-purple font-black text-xs uppercase hover:underline mb-2 cursor-pointer transition-all self-start"
+                  >
+                     <ChevronLeft size={14} /> Voltar ao Início
+                  </button>
                   <span className="bg-clinic-purple/10 text-clinic-purple px-4 py-1 rounded-full font-bold text-xs uppercase tracking-widest">Passo 1: Especialidade</span>
                   <h2 className="text-3xl md:text-4xl font-bold text-clinic-blue text-center md:text-left">O que quer cuidar hoje?</h2>
                 </div>
@@ -253,7 +891,7 @@ const QuoteCalculator: React.FC = () => {
                     <button
                       key={spec.id}
                       onClick={() => { setSelectedSpecialty(spec); setStep(2); }}
-                      className="group relative flex flex-col items-center md:items-start gap-4 p-8 rounded-[2.5rem] border-2 border-gray-100 transition-all hover:border-clinic-purple hover:bg-clinic-purple/[0.02] text-left hover:shadow-xl active:scale-95"
+                      className="group relative flex flex-col items-center md:items-start gap-4 p-8 rounded-[2.5rem] border-2 border-gray-100 transition-all hover:border-clinic-purple hover:bg-clinic-purple/[0.02] text-left hover:shadow-xl active:scale-95 cursor-pointer"
                     >
                       <div className="p-5 rounded-2xl bg-clinic-bg text-clinic-blue group-hover:bg-clinic-purple group-hover:text-white transition-colors shadow-sm">
                         {spec.icon}
@@ -271,7 +909,7 @@ const QuoteCalculator: React.FC = () => {
               </motion.div>
             )}
 
-            {step === 2 && selectedSpecialty && (
+            {flowMode === 'manual' && step === 2 && selectedSpecialty && (
               <motion.div 
                 key="step2"
                 initial={{ opacity: 0, x: 30 }}
@@ -343,7 +981,7 @@ const QuoteCalculator: React.FC = () => {
               </motion.div>
             )}
 
-            {step === 3 && (
+            {flowMode === 'manual' && step === 3 && (
               <motion.div 
                 key="step3"
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -400,6 +1038,426 @@ const QuoteCalculator: React.FC = () => {
                   </div>
                 </div>
 
+                {/* ADVANCED CAMERA & MULTI-UPLOAD SECTION */}
+                <div className="bg-clinic-bg/40 p-8 md:p-12 rounded-[3.5rem] border-2 border-white space-y-8 mt-8">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-100 pb-6">
+                    <div>
+                      <h3 className="text-2xl font-bold text-clinic-blue flex items-center gap-3">
+                        <span className="p-2 rounded-xl bg-clinic-purple/10 text-clinic-purple">
+                          <Camera className="w-6 h-6" />
+                        </span>
+                        Diagnóstico por Foto (Opcional)
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-2 font-light">
+                        Ative a sua câmara ou carregue uma foto da sua boca para que os nossos médicos validem a sua simulação.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs bg-emerald-50 text-emerald-800 font-bold px-3 py-1.5 rounded-full border border-emerald-100 self-start md:self-center">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      100% Seguro e Confidencial
+                    </div>
+                  </div>
+
+                  {submitStatus !== 'success' ? (
+                    <div>
+                      {photoOptionConsent === 'idle' && (
+                        <div className="text-center py-6 max-w-2xl mx-auto space-y-8 animate-fade-in">
+                          <div className="bg-clinic-purple/5 p-6 rounded-[2rem] border border-clinic-purple/10 inline-block">
+                            <span className="text-5xl">🦷</span>
+                          </div>
+                          <div className="space-y-3">
+                            <h4 className="text-3xl font-extrabold text-clinic-blue">Quer receber um Diagnóstico de Sorriso Gratuito?</h4>
+                            <p className="text-sm md:text-base text-gray-600 font-light leading-relaxed">
+                              Envie-nos uma foto do seu sorriso para que os nossos médicos especialistas avaliem a sua simulação de investimento com 100% de precisão clínica e sem custos.
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 text-left">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPhotoOptionConsent('yes');
+                                startCamera();
+                              }}
+                              className="bg-clinic-purple hover:bg-clinic-blue text-white font-extrabold py-6 px-6 rounded-[2rem] flex flex-col items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-clinic-purple/15 text-center cursor-pointer group"
+                            >
+                              <span className="p-3 rounded-2xl bg-white/10 group-hover:scale-110 transition-transform">
+                                <Camera className="w-6 h-6" />
+                              </span>
+                              <div>
+                                <span className="text-sm block">Sim, Ativar Câmara do Telemóvel / PC 📸</span>
+                                <span className="text-[10px] font-medium opacity-80 mt-1 block">Solicitará permissão segura ao seu navegador</span>
+                              </div>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPhotoOptionConsent('yes');
+                              }}
+                              className="bg-white border-2 border-gray-100 hover:border-clinic-purple/40 text-clinic-blue font-extrabold py-6 px-6 rounded-[2rem] flex flex-col items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-95 shadow-sm text-center cursor-pointer group"
+                            >
+                              <span className="p-3 rounded-2xl bg-clinic-bg group-hover:bg-clinic-purple/5 group-hover:scale-110 transition-transform text-clinic-purple">
+                                <Upload className="w-6 h-6" />
+                              </span>
+                              <div>
+                                <span className="text-sm block">Carregar Foto Existente da Galeria 📁</span>
+                                <span className="text-[10px] font-medium text-gray-400 mt-1 block">Suporta ficheiros JPG, PNG, WebP</span>
+                              </div>
+                            </button>
+                          </div>
+
+                          <div className="pt-4">
+                            <button
+                              type="button"
+                              onClick={() => setPhotoOptionConsent('no')}
+                              className="text-gray-400 hover:text-clinic-purple font-semibold text-xs transition-colors underline decoration-dotted"
+                            >
+                              Continuar para os dados sem enviar foto (Apenas estimativa textual)
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {photoOptionConsent === 'yes' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start animate-fade-in">
+                          {/* Left side: Camera or Upload Dropzone */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <label className="block text-sm font-bold text-clinic-blue">Foto do seu Sorriso 🦷</label>
+                              <button 
+                                type="button" 
+                                onClick={() => { stopCamera(); setCapturedPhoto(null); setPhotoOptionConsent('idle'); }} 
+                                className="text-xs text-clinic-purple hover:underline"
+                              >
+                                Alterar Método de Envio
+                              </button>
+                            </div>
+                            
+                            {!capturedPhoto && !isCameraActive && (
+                              <div 
+                                onDragEnter={handleDrag}
+                                onDragLeave={handleDrag}
+                                onDragOver={handleDrag}
+                                onDrop={handleDrop}
+                                className={`border-2 border-dashed rounded-[2.5rem] p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center min-h-[280px] ${
+                                  dragActive 
+                                    ? 'border-clinic-purple bg-clinic-purple/[0.03]' 
+                                    : 'border-gray-200 bg-white hover:border-clinic-purple/50'
+                                }`}
+                              >
+                                <Upload className="w-12 h-12 text-gray-300 group-hover:text-clinic-purple mb-4" />
+                                <p className="font-bold text-clinic-blue text-sm mb-1">Arraste e solte o seu ficheiro aqui</p>
+                                <p className="text-xs text-gray-400 font-light mb-6">Suporta formatos JPG, PNG, WebP</p>
+                                
+                                <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-xs cursor-pointer">
+                                  <button
+                                    type="button"
+                                    onClick={startCamera}
+                                    className="w-full bg-clinic-purple hover:bg-clinic-purple/95 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-clinic-purple/10"
+                                  >
+                                    <Camera size={14} /> Ativar Câmara
+                                  </button>
+                                  
+                                  <label className="w-full bg-white border border-gray-200 hover:bg-gray-50 text-clinic-blue font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-sm text-center">
+                                    <Upload size={14} /> Procurar Foto
+                                    <input 
+                                      type="file" 
+                                      accept="image/*" 
+                                      className="hidden" 
+                                      onChange={handleFileChange} 
+                                    />
+                                  </label>
+                                </div>
+
+                                {cameraError && (
+                                  <p className="text-red-500 text-[11px] font-bold mt-4 max-w-xs leading-relaxed bg-red-50 p-2.5 rounded-lg border border-red-100">{cameraError}</p>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Camera streaming active */}
+                            {isCameraActive && (
+                              <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-clinic-purple max-w-md mx-auto aspect-video bg-black flex flex-col justify-end">
+                                <video
+                                  ref={videoRef}
+                                  className="w-full h-full object-cover absolute top-0 left-0"
+                                  autoPlay
+                                  playsInline
+                                  muted
+                                />
+                                
+                                {/* Teeth guidelines overlay */}
+                                <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex items-center justify-center">
+                                  <div className="w-[80%] h-[50%] border-4 border-dashed border-clinic-lime/60 rounded-full flex items-center justify-center shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]">
+                                    <span className="text-[10px] text-white bg-clinic-purple/90 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Molda o Sorriso Aqui</span>
+                                  </div>
+                                </div>
+
+                                <div className="relative z-10 p-4 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between gap-4">
+                                  <button
+                                    type="button"
+                                    onClick={stopCamera}
+                                    className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-xs"
+                                  >
+                                    Cancelar
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={capturePhoto}
+                                    className="bg-clinic-lime text-clinic-blue font-black px-6 py-2.5 rounded-lg text-xs flex items-center gap-2 hover:scale-[1.02] transition-transform shadow-lg cursor-pointer animate-pulse"
+                                  >
+                                    <Camera size={14} /> Capturar Foto
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Captured/Uploaded photo preview */}
+                            {capturedPhoto && (
+                              <div className="relative rounded-[2.5rem] border-2 border-clinic-purple overflow-hidden max-w-sm mx-auto shadow-lg bg-white p-3">
+                                <img 
+                                  src={capturedPhoto} 
+                                  alt="Foto Dental" 
+                                  className="w-full rounded-[2rem] aspect-square object-cover" 
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setCapturedPhoto(null)}
+                                  className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/90 text-red-600 hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center shadow-md border border-gray-100"
+                                  title="Remover Foto"
+                                >
+                                  <X size={16} />
+                                </button>
+                                <div className="text-center mt-3 pb-1">
+                                  <span className="text-[10px] text-clinic-purple font-black uppercase tracking-wider">Foto do Seu Exame Dental Carregada 🦷 ✓</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Right side: Patient Lead Capture Form */}
+                          <div className="space-y-4">
+                            <div className="border-b border-gray-100 pb-2">
+                              <span className="text-xs font-bold text-clinic-purple uppercase">Dados de Envio Dental</span>
+                            </div>
+                            <form onSubmit={handleCampaignSubmit} className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-bold text-clinic-blue mb-1">O seu Nome Completo *</label>
+                                <div className="relative">
+                                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <User size={16} />
+                                  </span>
+                                  <input
+                                    type="text"
+                                    required
+                                    value={leadName}
+                                    onChange={(e) => setLeadName(e.target.value)}
+                                    placeholder="ex: João Silva"
+                                    className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm font-bold text-clinic-blue mb-1">Telemóvel / WhatsApp *</label>
+                                  <div className="relative">
+                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                      <Phone size={16} />
+                                    </span>
+                                    <input
+                                      type="tel"
+                                      required
+                                      value={leadPhone}
+                                      onChange={(e) => setLeadPhone(e.target.value)}
+                                      placeholder="ex: 912 345 678"
+                                      className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <label className="block text-sm font-bold text-clinic-blue mb-1">Email (Opcional)</label>
+                                  <div className="relative">
+                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                      <Mail size={16} />
+                                    </span>
+                                    <input
+                                      type="email"
+                                      value={leadEmail}
+                                      onChange={(e) => setLeadEmail(e.target.value)}
+                                      placeholder="ex: joao@email.com"
+                                      className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-bold text-clinic-blue mb-1">Diga-nos o que sente ou o seu objetivo:</label>
+                                <textarea
+                                  value={leadNotes}
+                                  onChange={(e) => setLeadNotes(e.target.value)}
+                                  placeholder="ex: Pretendo colocar implantes e gostava de validar esta estimativa de preço."
+                                  rows={3}
+                                  className="w-full p-4 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm resize-none"
+                                />
+                              </div>
+
+                              {submitStatus === 'error' && (
+                                <p className="text-red-600 text-xs font-bold text-center">Falta de conexão ou erro ao enviar dados. Por favor verifique o telemóvel e tente novamente.</p>
+                              )}
+
+                              <button
+                                type="submit"
+                                disabled={submitStatus === 'submitting'}
+                                className="w-full bg-clinic-purple hover:bg-clinic-blue text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-3 cursor-pointer transition-all active:scale-95 shadow-xl shadow-clinic-purple/10 text-sm md:text-base"
+                              >
+                                {submitStatus === 'submitting' ? (
+                                  <>
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    A Enviar Diagnóstico...
+                                  </>
+                                ) : (
+                                  <>
+                                    Enviar Simulador + Foto de Diagnóstico 🚀
+                                  </>
+                                )}
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      )}
+
+                      {photoOptionConsent === 'no' && (
+                        <div className="max-w-xl mx-auto space-y-6 animate-fade-in p-2 bg-white rounded-3xl">
+                          <div className="flex items-center justify-between border-b pb-3">
+                            <div>
+                              <h4 className="text-lg font-bold text-clinic-blue">Finalizar Cálculo Textual</h4>
+                              <p className="text-xs text-gray-400 font-light mt-0.5">Sem envio de foto de sorriso</p>
+                            </div>
+                            <button 
+                              type="button" 
+                              onClick={() => { setPhotoOptionConsent('idle'); }} 
+                              className="text-xs text-clinic-purple font-bold hover:underline"
+                            >
+                              Adicionar Foto de Sorriso (Recomendado)
+                            </button>
+                          </div>
+
+                          <form onSubmit={handleCampaignSubmit} className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-bold text-clinic-blue mb-1">O seu Nome Completo *</label>
+                              <div className="relative">
+                                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                  <User size={16} />
+                                </span>
+                                <input
+                                  type="text"
+                                  required
+                                  value={leadName}
+                                  onChange={(e) => setLeadName(e.target.value)}
+                                  placeholder="ex: João Silva"
+                                  className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-bold text-clinic-blue mb-1">Telemóvel / WhatsApp *</label>
+                                <div className="relative">
+                                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <Phone size={16} />
+                                  </span>
+                                  <input
+                                    type="tel"
+                                    required
+                                    value={leadPhone}
+                                    onChange={(e) => setLeadPhone(e.target.value)}
+                                    placeholder="ex: 912 345 678"
+                                    className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-bold text-clinic-blue mb-1">Email (Opcional)</label>
+                                <div className="relative">
+                                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <Mail size={16} />
+                                  </span>
+                                  <input
+                                    type="email"
+                                    value={leadEmail}
+                                    onChange={(e) => setLeadEmail(e.target.value)}
+                                    placeholder="ex: joao@email.com"
+                                    className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-bold text-clinic-blue mb-1">Diga-nos o que sente ou o seu objetivo:</label>
+                              <textarea
+                                value={leadNotes}
+                                onChange={(e) => setLeadNotes(e.target.value)}
+                                placeholder="ex: Gostava de colocar implantes e validar esta simulação."
+                                rows={3}
+                                className="w-full p-4 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm resize-none"
+                              />
+                            </div>
+
+                            {submitStatus === 'error' && (
+                              <p className="text-red-600 text-xs font-bold text-center">Falta de conexão ou erro ao enviar dados. Por favor verifique o telemóvel e tente novamente.</p>
+                            )}
+
+                            <button
+                              type="submit"
+                              disabled={submitStatus === 'submitting'}
+                              className="w-full bg-clinic-purple hover:bg-clinic-blue text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-3 cursor-pointer transition-all active:scale-95 shadow-xl shadow-clinic-purple/10 text-sm md:text-base"
+                            >
+                              {submitStatus === 'submitting' ? (
+                                <>
+                                  <Loader2 className="w-5 h-5 animate-spin" />
+                                  A Enviar Simulação...
+                                </>
+                              ) : (
+                                <>
+                                  Enviar Simulação Sem Foto 🚀
+                                </>
+                              )}
+                            </button>
+                          </form>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <motion.div 
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="text-center p-8 bg-white rounded-[2.5rem] border border-emerald-100 flex flex-col items-center justify-center text-center space-y-4 shadow-xl"
+                    >
+                      <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-2">
+                        <CheckCircle size={36} />
+                      </div>
+                      <h4 className="text-2xl font-black text-clinic-blue">Orçamento e Foto Enviados!</h4>
+                      <div className="text-gray-600 font-light max-w-lg leading-relaxed text-sm space-y-3">
+                        <p>Recebemos as suas escolhas de tratamentos clínicos acompanhadas da imagem de diagnóstico.</p>
+                        <p className="font-semibold text-clinic-purple">O Diretor Clínico da Clínica Santa Maria irá analisar pessoalmente o seu caso e responder-lhe em menos de 24 horas.</p>
+                        <p>Entraremos em contacto preferencialmente através do telemóvel / WhatsApp fornecido.</p>
+                      </div>
+                      <div className="pt-4">
+                        <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100">
+                          ID de Análise Dental Registado ✓
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+
                 <div className="flex flex-col md:flex-row items-center justify-center gap-6 mt-12 bg-white p-4 rounded-[3rem] shadow-lg border border-gray-100">
                     <button 
                          onClick={() => window.location.href = '#/marcacoes'}
@@ -408,7 +1466,7 @@ const QuoteCalculator: React.FC = () => {
                         Confirmar com Especialista <ArrowRight size={20} />
                     </button>
                     <button 
-                      onClick={reset} 
+                      onClick={handleReset} 
                       className="w-full md:w-auto px-10 py-5 text-clinic-blue font-bold hover:bg-gray-50 rounded-2xl transition-all"
                     >
                         Novo Cálculo

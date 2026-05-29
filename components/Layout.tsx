@@ -57,7 +57,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const contactEmail = global.email || "clinicasmod@gmail.com";
   const contactPhone = global.phone || "211 350 066";
-  const customerService = global.customerService || "923 233 393";
+  const customerService = global.customerService || "300 601 645";
   const cleanPhone = contactPhone.replace(/\s+/g, '');
   const cleanCustomerService = customerService.replace(/\s+/g, '');
 

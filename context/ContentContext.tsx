@@ -6,7 +6,7 @@ const defaultData = {
   global: {
     email: "clinicasmod@gmail.com",
     phone: "211 350 066",
-    customerService: "923 233 393",
+    customerService: "300 601 645",
     mobile: "+351 919 861 310",
     address: "Estrada de Moscavide N 32C, 1800-279, Lisboa",
     mapsLink: "https://www.google.com/maps/search/?api=1&query=Estrada+de+Moscavide+N+32C,+1800-279,+Lisboa",
@@ -141,7 +141,7 @@ const ContentContext = createContext<any>(null);
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState(() => {
     try {
-      const saved = localStorage.getItem('site_content_v6');
+      const saved = localStorage.getItem('site_content_v7');
       if (saved) {
         const parsed = JSON.parse(saved);
         return parsed;
@@ -154,12 +154,12 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateContent = (newContent: any) => {
     setContent(newContent);
-    localStorage.setItem('site_content_v6', JSON.stringify(newContent));
+    localStorage.setItem('site_content_v7', JSON.stringify(newContent));
   };
 
   const resetContent = () => {
     setContent(defaultData);
-    localStorage.setItem('site_content_v6', JSON.stringify(defaultData));
+    localStorage.setItem('site_content_v7', JSON.stringify(defaultData));
   };
 
   return (

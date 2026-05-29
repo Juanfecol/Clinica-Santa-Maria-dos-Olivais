@@ -164,6 +164,8 @@ const QuoteCalculator: React.FC = () => {
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [photoOptionConsent, setPhotoOptionConsent] = useState<'yes' | 'no' | 'idle'>('idle');
+  const [cameraFacingMode, setCameraFacingMode] = useState<'user' | 'environment'>('user');
+  const [mouthFocusActive, setMouthFocusActive] = useState(true);
 
   // Form Lead States
   const [leadName, setLeadName] = useState('');
@@ -182,8 +184,18 @@ const QuoteCalculator: React.FC = () => {
     }
   }, [videoStream, isCameraModalOpen]); 
 
+  // UX Improvement: Smoothly scroll to the main card when content options change or load
+  useEffect(() => {
+    const cardEl = document.getElementById('simulator-main-card');
+    if (cardEl) {
+      setTimeout(() => {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
+  }, [flowMode]);
 
-  const startCamera = async () => {
+
+  const startCamera = async (facing?: 'user' | 'environment') => {
     try {
       setCameraError(null);
       
@@ -193,21 +205,35 @@ const QuoteCalculator: React.FC = () => {
         return;
       }
 
+      // Stop any existing stream before restarting
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+      }
+
+      const activeFacing = facing || cameraFacingMode;
       let stream: MediaStream;
       try {
-        // Try first with user-facing ideal
         stream = await navigator.mediaDevices.getUserMedia({
-          video: true
+          video: {
+            facingMode: activeFacing,
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
         });
       } catch (firstErr) {
-        console.warn("First camera constraint failed, trying fallback:", firstErr);
+        console.warn("Camera constraint failed, trying fallback:", firstErr);
         try {
-          // If user-facing fails, try simple video without specific facingMode (fits desktop webcams)
           stream = await navigator.mediaDevices.getUserMedia({
-            video: true
+            video: { facingMode: activeFacing }
           });
         } catch (secondErr) {
-          throw secondErr; // Bubble up to main catch to show error message
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: true
+            });
+          } catch (thirdErr) {
+            throw thirdErr; // Bubble up to main catch to show error message
+          }
         }
       }
 
@@ -249,17 +275,56 @@ const QuoteCalculator: React.FC = () => {
     if (videoRef.current) {
       const video = videoRef.current;
       const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        // Mirrored capture mapping (horizontal inversion)
-        ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        setCapturedPhoto(dataUrl);
-        stopCamera();
+      const vw = video.videoWidth || 640;
+      const vh = video.videoHeight || 480;
+
+      if (mouthFocusActive) {
+        // High quality close-up: Crop into the center 60% of the minor dimension
+        const cropSize = Math.min(vw, vh) * 0.60;
+        const cropX = (vw - cropSize) / 2;
+        const cropY = (vh - cropSize) / 2;
+
+        // Perfect high-resolution 1:1 aspect ratio square close-up of the smile
+        canvas.width = 720;
+        canvas.height = 720;
+
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Horizontal mirroring only if we are using user/front camera
+          if (cameraFacingMode === 'user') {
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+          }
+          ctx.drawImage(
+            video,
+            cropX,
+            cropY,
+            cropSize,
+            cropSize,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          setCapturedPhoto(dataUrl);
+          stopCamera();
+        }
+      } else {
+        // Standard view (not cropped to mouth)
+        canvas.width = vw;
+        canvas.height = vh;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          if (cameraFacingMode === 'user') {
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+          }
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          setCapturedPhoto(dataUrl);
+          stopCamera();
+        }
       }
     }
   };
@@ -485,25 +550,25 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
   const header = getHeaderContent();
 
   return (
-    <div className="min-h-screen py-16 px-4 md:px-6 max-w-6xl mx-auto">
-      <div className="text-center mb-12">
+    <div className="min-h-screen py-8 md:py-16 px-3 sm:px-4 md:px-6 max-w-6xl mx-auto">
+      <div className="text-center mb-8 md:mb-12">
         <motion.div 
           key={flowMode}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center justify-center w-20 h-20 bg-clinic-purple/10 rounded-3xl mb-6"
+          className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-clinic-purple/10 rounded-2xl md:rounded-3xl mb-4 md:mb-6"
         >
           {header.icon}
         </motion.div>
-        <h1 className="text-4xl md:text-6xl font-bold text-clinic-blue mb-6 tracking-tight">
+        <h1 className="text-3xl md:text-6xl font-bold text-clinic-blue mb-4 md:mb-6 tracking-tight px-1">
           {header.title}
         </h1>
-        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed">
+        <p className="text-sm md:text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed px-4">
           {header.desc}
         </p>
       </div>
 
-      <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-gray-100 min-h-[600px] flex flex-col relative">
+      <div id="simulator-main-card" className="bg-white rounded-2xl sm:rounded-[2.5rem] md:rounded-[3rem] shadow-xl md:shadow-2xl overflow-hidden border border-gray-100 min-h-[500px] md:min-h-[600px] flex flex-col relative">
         {/* Progress Tracker */}
         {flowMode === 'manual' && (
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-50 flex">
@@ -516,7 +581,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
           </div>
         )}
 
-        <div className="p-8 md:p-16 flex-grow animate-fade-in">
+        <div className="p-4 sm:p-8 md:p-16 flex-grow animate-fade-in">
           <AnimatePresence mode="wait">
             {flowMode === 'selector' && (
               <motion.div
@@ -524,55 +589,58 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                className="space-y-12"
+                className="space-y-8 md:space-y-12 animate-fade-in"
               >
-                <div className="text-center space-y-4 max-w-3xl mx-auto">
-                  <span className="bg-clinic-purple/10 text-clinic-purple px-5 py-1.5 rounded-full font-bold text-xs uppercase tracking-widest">
+                <div className="text-center space-y-3 md:space-y-4 max-w-3xl mx-auto">
+                  <span className="inline-block bg-clinic-purple/10 text-clinic-purple px-4 py-1.5 rounded-full font-bold text-[10px] md:text-xs uppercase tracking-widest">
                     🦷 Avaliação Digital de Sorriso
                   </span>
-                  <h2 className="text-3xl md:text-5xl font-black text-clinic-blue leading-tight">
+                  <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-clinic-blue leading-tight px-2">
                     Como prefere simular o seu investimento?
                   </h2>
-                  <p className="text-gray-500 font-light text-sm md:text-base leading-relaxed">
+                  <p className="text-gray-500 font-light text-xs sm:text-sm md:text-base leading-relaxed px-4">
                     Escolha a opção que melhor se ajusta às suas necessidades. O diagnóstico por foto é validado diretamente por médicos dentistas qualificados de forma 100% gratuita.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch pt-2">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch pt-2">
                   {/* PATH 1: PHOTO DIAGNOSTIC (HERO CARD) */}
-                  <div className="relative rounded-[3rem] p-8 md:p-12 flex flex-col justify-between border-4 border-clinic-purple bg-gradient-to-b from-clinic-purple/[0.03] to-white shadow-2xl transition-all hover:scale-[1.01] hover:shadow-clinic-purple/10 group overflow-hidden">
+                  <div className="relative rounded-2xl sm:rounded-[2.5rem] border-[3px] border-clinic-purple bg-gradient-to-b from-clinic-purple/[0.04] to-white shadow-lg hover:shadow-xl transition-all duration-300 hover:border-clinic-purple group overflow-hidden flex flex-col justify-between p-6 sm:p-8 md:p-10">
                     {/* Glowing highlight effects */}
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-clinic-purple opacity-5 blur-3xl rounded-full"></div>
-                    <div className="absolute -top-3 -right-3 bg-clinic-lime text-clinic-blue font-black text-[11px] px-6 py-2 rounded-full uppercase tracking-wider rotate-3 shadow-md z-10 animate-bounce">
-                      Altamente Recomendado 🚀
-                    </div>
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-clinic-purple/10 opacity-30 blur-3xl rounded-full pointer-events-none"></div>
 
                     <div className="space-y-6 relative z-10">
-                      <div className="inline-flex items-center justify-center p-6 rounded-[2rem] bg-clinic-purple text-white shadow-lg shadow-clinic-purple/20 group-hover:scale-110 transition-transform duration-300">
-                        <Camera className="w-8 h-8" />
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="inline-flex items-center justify-center p-3.5 md:p-4 rounded-xl md:rounded-2xl bg-clinic-purple text-white shadow-md shadow-clinic-purple/20 group-hover:scale-105 transition-transform duration-300 shrink-0">
+                          <Camera className="w-6 h-6 md:w-7 md:h-7" />
+                        </div>
+                        <div className="bg-clinic-blue text-white border border-clinic-purple/30 font-black text-[9px] md:text-xs px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm select-none">
+                          Recomendado <span className="animate-pulse">🚀</span>
+                        </div>
                       </div>
                       
-                      <div className="space-y-3">
-                        <h3 className="text-2xl md:text-3xl font-black text-clinic-blue group-hover:text-clinic-purple transition-all leading-tight">
-                          Diagnóstico por Imagem <span className="text-clinic-purple italic font-serif block mt-1">100% Real & Gratuito</span>
+                      <div className="space-y-2">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-clinic-blue leading-tight">
+                          Diagnóstico por Imagem
+                          <span className="text-clinic-purple italic font-serif block mt-1 text-sm sm:text-base md:text-lg">100% Real & Gratuito</span>
                         </h3>
-                        <p className="text-gray-600 text-sm font-light leading-relaxed">
+                        <p className="text-gray-600 text-xs sm:text-sm font-light leading-relaxed">
                           Tire uma fotografia ao seu sorriso com o seu telemóvel ou computador. Os nossos médicos dentistas vão analisar a anatomia do seu sorriso e fornecer-lhe-ão gratuitamente uma estimativa precisa e personalizada.
                         </p>
                       </div>
 
-                      <ul className="space-y-3 pt-2">
+                      <ul className="space-y-2.5 pt-1">
                         {[
                           'Avaliação clínica real por Médicos Dentistas',
                           'Indicação exata de tratamentos recomendados',
                           'Privacidade total dos seus dados (RGPD)',
                           'Resposta célere em menos de 24 horas úteis'
                         ].map((bullet, idx) => (
-                          <li key={idx} className="flex items-center gap-3 text-xs text-gray-700 font-medium">
+                          <li key={idx} className="flex items-center gap-2.5 text-xs text-gray-700 font-medium">
                             <span className="w-5 h-5 rounded-full bg-clinic-purple/10 flex items-center justify-center text-clinic-purple shrink-0">
-                              <Check size={12} className="stroke-[3]" />
+                              <Check size={11} className="stroke-[3]" />
                             </span>
-                            {bullet}
+                            <span className="text-xs">{bullet}</span>
                           </li>
                         ))}
                       </ul>
@@ -584,40 +652,46 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                         setFlowMode('photo_only');
                         setPhotoOptionConsent('yes');
                       }}
-                      className="mt-8 w-full bg-clinic-purple hover:bg-clinic-blue text-white font-black py-5 px-8 rounded-[2rem] flex items-center justify-center gap-3 shadow-xl shadow-clinic-purple/20 hover:shadow-clinic-blue/20 transition-all text-sm md:text-base cursor-pointer group-hover:scale-[1.02]"
+                      className="mt-6 md:mt-8 w-full bg-clinic-purple hover:bg-clinic-blue text-white font-black py-4 px-6 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2.5 shadow-md shadow-clinic-purple/15 hover:shadow-clinic-blue/15 transition-all text-xs sm:text-sm md:text-base cursor-pointer hover:scale-[1.01]"
                     >
-                      <Camera className="w-5 h-5" /> Iniciar Diagnóstico por Foto 🦷
+                      <Camera className="w-4 h-4 md:w-5 md:h-5" /> Iniciar Diagnóstico por Foto 🦷
                     </button>
                   </div>
 
                   {/* PATH 2: MANUAL ESTIMATION CARD */}
-                  <div className="relative rounded-[3rem] p-8 md:p-12 flex flex-col justify-between border-2 border-gray-100 bg-white transition-all hover:border-gray-300 hover:shadow-lg group">
+                  <div className="relative rounded-2xl sm:rounded-[2.5rem] border border-gray-200/60 bg-white shadow-sm hover:shadow-lg hover:border-clinic-blue/40 transition-all duration-300 flex flex-col justify-between p-6 sm:p-8 md:p-10 group">
                     <div className="space-y-6">
-                      <div className="inline-flex items-center justify-center p-6 rounded-[2rem] bg-gray-100 text-clinic-blue group-hover:bg-clinic-blue group-hover:text-white transition-all duration-300">
-                        <Calculator className="w-8 h-8" />
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="inline-flex items-center justify-center p-3.5 md:p-4 rounded-xl md:rounded-2xl bg-gray-50 text-clinic-blue group-hover:bg-clinic-blue/10 group-hover:text-clinic-blue transition-colors duration-300 shrink-0">
+                          <Calculator className="w-6 h-6 md:w-7 md:h-7" />
+                        </div>
+                        <div className="bg-gray-100/80 text-gray-500 font-bold text-[9px] md:text-xs px-3 py-1.5 rounded-full uppercase tracking-wider select-none">
+                          Preços de Tabela 📋
+                        </div>
                       </div>
 
-                      <div className="space-y-3">
-                        <h3 className="text-2xl md:text-3xl font-black text-clinic-blue leading-tight">
-                          Simulador Manual de <span className="text-gray-500 italic font-serif block mt-1">Tratamentos</span>
+                      <div className="space-y-2">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-clinic-blue leading-tight">
+                          Simulador Manual de
+                          <span className="text-gray-400 italic font-serif block mt-1 text-sm sm:text-base md:text-lg">Tratamentos</span>
                         </h3>
-                        <p className="text-gray-600 text-sm font-light leading-relaxed">
+                        <p className="text-gray-600 text-xs sm:text-sm font-light leading-relaxed">
                           Selecione os tratamentos e especialidades que deseja (implantes, higiene, aparelhos, estética) para consultar os custos de referência aproximados com base na nossa tabela de preços oficial.
                         </p>
                       </div>
 
-                      <ul className="space-y-3 pt-2">
+                      <ul className="space-y-2.5 pt-1">
                         {[
                           'Consulte preços oficiais da tabela clínica',
                           'Simule múltiplas especialidades juntas',
                           'Sem necessidade de partilhar imagens',
                           'Cálculo e estimativa teórica instantânea'
                         ].map((bullet, idx) => (
-                          <li key={idx} className="flex items-center gap-3 text-xs text-gray-700 font-medium">
+                          <li key={idx} className="flex items-center gap-2.5 text-xs text-gray-700 font-medium">
                             <span className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-clinic-blue shrink-0">
-                              <Check size={12} className="stroke-[3]" />
+                              <Check size={11} className="stroke-[3]" />
                             </span>
-                            {bullet}
+                            <span className="text-xs">{bullet}</span>
                           </li>
                         ))}
                       </ul>
@@ -629,9 +703,9 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                         setFlowMode('manual');
                         setStep(1);
                       }}
-                      className="mt-8 w-full bg-white border-2 border-clinic-blue text-clinic-blue hover:bg-clinic-blue hover:text-white font-extrabold py-5 px-8 rounded-[2rem] flex items-center justify-center gap-3 transition-all text-sm md:text-base cursor-pointer"
+                      className="mt-6 md:mt-8 w-full bg-white border border-clinic-blue/20 text-clinic-blue hover:bg-clinic-blue/5 hover:border-clinic-blue font-extrabold py-4 px-6 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2.5 transition-all text-xs sm:text-sm md:text-base cursor-pointer hover:scale-[1.01]"
                     >
-                      <Calculator className="w-5 h-5" /> Simular Manualmente 📋
+                      <Calculator className="w-4 h-4 md:w-5 md:h-5" /> Simular Manualmente 📋
                     </button>
                   </div>
                 </div>
@@ -735,26 +809,60 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                               </button>
                             </div>
 
-                            {/* Camera Viewport (Completely free of buttons overlapping) */}
-                            <div className="relative bg-black aspect-video flex items-center justify-center overflow-hidden">
+                            {/* Camera Viewport with Active Controls */}
+                            <div className="relative bg-[#050505] aspect-video flex items-center justify-center overflow-hidden">
                               <video
                                 ref={videoRef}
-                                className="w-full h-full object-cover absolute top-0 left-0 transform scale-x-[-1]"
+                                className={`w-full h-full object-cover absolute top-0 left-0 transition-transform ${cameraFacingMode === 'user' ? 'scale-x-[-1]' : ''}`}
                                 autoPlay
                                 playsInline
                                 muted
                               />
                               
-                              {/* Extremely subtle teeth guideline overlay without heavy shadows or blocked mouth */}
-                              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                                <div className="w-[75%] h-[60%] border-2 border-dashed border-clinic-lime/40 rounded-[45%] flex items-center justify-center">
-                                  {/* Clean space in the center to clearly see the person's smile */}
+                              {/* Floating Controls Overlay */}
+                              <div className="absolute top-4 inset-x-4 flex justify-between items-center z-20 pointer-events-none">
+                                {/* Zoom Face / Mouth focus button */}
+                                <button
+                                  type="button"
+                                  onClick={() => setMouthFocusActive(!mouthFocusActive)}
+                                  className={`pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-[10px] md:text-[11px] uppercase tracking-wider backdrop-blur-md transition-all active:scale-95 shadow-md cursor-pointer ${
+                                    mouthFocusActive 
+                                      ? 'bg-clinic-lime border-clinic-lime text-clinic-blue shadow-clinic-lime/10' 
+                                      : 'bg-black/60 border-white/10 text-white/80 hover:bg-black/75'
+                                  }`}
+                                >
+                                  <Smile size={12} className={mouthFocusActive ? 'animate-bounce' : ''} />
+                                  <span>{mouthFocusActive ? 'Foco Boca: Ativo ✨' : 'Foco Boca: Desativo 🔍'}</span>
+                                </button>
+
+                                {/* Flip/Rotate Camera button */}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const nextFacing = cameraFacingMode === 'user' ? 'environment' : 'user';
+                                    setCameraFacingMode(nextFacing);
+                                    startCamera(nextFacing);
+                                  }}
+                                  className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-xl text-white font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md border border-white/10 active:scale-95 transition-all cursor-pointer"
+                                >
+                                  <RefreshCw size={12} />
+                                  <span>{cameraFacingMode === 'user' ? 'Traseira 🔄' : 'Frontal 🔄'}</span>
+                                </button>
+                              </div>
+                              
+                              {/* Enhanced smart mouth guidelines for high quality dental scan focus */}
+                              <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10">
+                                <div className={`w-[60%] sm:w-[50%] aspect-[1.3] max-w-[200px] border-4 border-dashed rounded-[45%] flex flex-col items-center justify-center bg-clinic-lime/[0.03] transition-all duration-300 ${mouthFocusActive ? 'border-clinic-lime animate-pulse' : 'border-white/30'}`}>
+                                  <div className={`w-12 h-5 border-b-2 border-dashed rounded-b-full mt-2 ${mouthFocusActive ? 'border-clinic-lime/60' : 'border-white/20'}`}></div>
                                 </div>
+                                <span className="text-[9px] md:text-[10px] text-white bg-clinic-purple/95 px-3.5 py-1.5 rounded-full backdrop-blur-sm shadow-md border border-white/10 mt-4 font-extrabold uppercase tracking-wide select-none drop-shadow">
+                                  {mouthFocusActive ? 'Alinhe a sua BOCA neste guia 👄' : 'Alinhe o seu rosto aqui 👁️'}
+                                </span>
                               </div>
 
-                              {/* Small elegant tag out of the way of the face */}
-                              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 p-1.5 px-4 rounded-full bg-clinic-purple/90 backdrop-blur-md text-white font-black text-[9px] md:text-[10px] uppercase tracking-wider z-10 shadow-md border border-white/10 select-none text-center">
-                                Enquadre o seu sorriso dentro do guia 🦷
+                              {/* Elegant bottom helper badge */}
+                              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-[9px] font-bold text-white/70 bg-black/50 backdrop-blur-sm px-3.5 py-1 rounded-full pointer-events-none text-center select-none border border-white/5 uppercase tracking-wider">
+                                {mouthFocusActive ? 'Modo Ultra-Foco Dental Ativo ✓' : 'Modo Panorâmico'}
                               </div>
                             </div>
 
@@ -1259,19 +1367,60 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
 
                             {/* Camera streaming active */}
                             {isCameraActive && !isCameraModalOpen && (
-                              <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-clinic-purple max-w-md mx-auto aspect-video bg-black flex flex-col justify-end">
+                              <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-clinic-purple max-w-md mx-auto aspect-video bg-[#050505] flex flex-col justify-end">
                                 <video
                                   ref={videoRef}
-                                  className="w-full h-full object-cover absolute top-0 left-0"
+                                  className={`w-full h-full object-cover absolute top-0 left-0 transition-transform ${cameraFacingMode === 'user' ? 'scale-x-[-1]' : ''}`}
                                   autoPlay
                                   playsInline
                                   muted
                                 />
                                 
+                                {/* Floating Overlays / Camera Controls */}
+                                <div className="absolute top-4 inset-x-4 flex justify-between items-center z-20 pointer-events-none">
+                                  {/* Focus toggle button */}
+                                  <button
+                                    type="button"
+                                    onClick={() => setMouthFocusActive(!mouthFocusActive)}
+                                    className={`pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-[10px] md:text-[11px] uppercase tracking-wider backdrop-blur-md transition-all active:scale-95 shadow-md cursor-pointer ${
+                                      mouthFocusActive 
+                                        ? 'bg-clinic-lime border-clinic-lime text-clinic-blue shadow-clinic-lime/10' 
+                                        : 'bg-black/60 border-white/10 text-white/80 hover:bg-black/75'
+                                    }`}
+                                  >
+                                    <Smile size={11} className={mouthFocusActive ? 'animate-bounce' : ''} />
+                                    <span>{mouthFocusActive ? 'Foco Boca ✨' : 'Geral 🔍'}</span>
+                                  </button>
+
+                                  {/* Flip Camera button */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const nextFacing = cameraFacingMode === 'user' ? 'environment' : 'user';
+                                      setCameraFacingMode(nextFacing);
+                                      startCamera(nextFacing);
+                                    }}
+                                    className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-xl text-white font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md border border-white/10 active:scale-95 transition-all cursor-pointer"
+                                  >
+                                    <RefreshCw size={11} />
+                                    <span>{cameraFacingMode === 'user' ? 'Traseira 🔄' : 'Frontal 🔄'}</span>
+                                  </button>
+                                </div>
+
+                                {/* Interactive dynamic watermark guidline */}
+                                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10">
+                                  <div className={`w-[55%] aspect-[1.3] max-w-[180px] border-[3px] border-dashed rounded-[45%] flex flex-col items-center justify-center bg-clinic-lime/[0.02] transition-all duration-300 ${mouthFocusActive ? 'border-clinic-lime animate-pulse' : 'border-white/20'}`}>
+                                    <div className={`w-10 h-4 border-b-2 border-dashed rounded-b-full mt-1.5 ${mouthFocusActive ? 'border-clinic-lime/50' : 'border-white/15'}`}></div>
+                                  </div>
+                                  <span className="text-[8px] md:text-[9px] text-white bg-clinic-purple/95 px-3 py-1 rounded-full backdrop-blur-sm shadow border border-white/10 mt-3 font-extrabold uppercase tracking-wide select-none">
+                                    {mouthFocusActive ? 'Alinhe a sua Boca aqui 👄' : 'Alinhe o seu rosto 👁️'}
+                                  </span>
+                                </div>
+                                
                                 {/* Teeth guidelines overlay */}
                                 <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex items-center justify-center">
-                                  <div className="w-[80%] h-[50%] border-4 border-dashed border-clinic-lime/60 rounded-full flex items-center justify-center shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]">
-                                    <span className="text-[10px] text-white bg-clinic-purple/90 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Molda o Sorriso Aqui</span>
+                                  <div className="hidden">
+
                                   </div>
                                 </div>
 

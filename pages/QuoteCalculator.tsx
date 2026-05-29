@@ -172,7 +172,43 @@ const QuoteCalculator: React.FC = () => {
   const [leadPhone, setLeadPhone] = useState('');
   const [leadEmail, setLeadEmail] = useState('');
   const [leadNotes, setLeadNotes] = useState('');
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [isGlassPocketGuideOpen, setIsGlassPocketGuideOpen] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const TREATMENT_POCKET_GUIDES = [
+    { label: 'Implantes Dentários 🦷', desc: 'Preenchimento e reabilitação de dentes em falta', text: 'Pretendo realizar uma avaliação clínica para colocação de implantes dentários por ausência dentária.' },
+    { label: 'Arcada Completa 👄', desc: 'Reabilitação total fixa de uma ou ambas as arcadas sobre implantes', text: 'Pretendo obter informações e realizar estudo para uma reabilitação de arcada completa fixa sobre implantes.' },
+    { label: 'Facetas Estéticas ✨', desc: 'Melhoria da cor, formato e harmonia do sorriso', text: 'Tenho interesse em realizar facetas estéticas para correção estética de cor, forma ou alinhamento dentário.' },
+    { label: 'Alinhadores / Aparelho 🔍', desc: 'Correção ortodôntica do posicionamento dos dentes', text: 'Pretendo agendar consulta de ortodontia para colocação de alinhadores invisíveis ou aparelho dentário convencional.' },
+    { label: 'Outros / Higiene Oral 🩹', desc: 'Destartarização, dores agudas ou consulta geral de diagnóstico', text: 'Desejo agendar uma consulta de medicina dentária geral para higiene oral, destartarização ou prevenção.' }
+  ];
+
+  const handleObjectiveSelect = (opt: { label: string; desc: string; text: string }) => {
+    setSelectedInterests(prev => {
+      const isSelected = prev.includes(opt.label);
+      let updated: string[];
+      if (isSelected) {
+        updated = prev.filter(item => item !== opt.label);
+        setLeadNotes(current => {
+          let cleaned = current.replace(opt.text, '').trim();
+          cleaned = cleaned.replace(/\s+/g, ' ');
+          return cleaned;
+        });
+      } else {
+        updated = [...prev, opt.label];
+        setLeadNotes(current => {
+          const suffix = opt.text;
+          if (!current.trim()) return suffix;
+          if (current.trim().endsWith('.') || current.trim().endsWith('!') || current.trim().endsWith('?')) {
+            return `${current} ${suffix}`;
+          }
+          return `${current}. ${suffix}`;
+        });
+      }
+      return updated;
+    });
+  };
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -420,6 +456,7 @@ const QuoteCalculator: React.FC = () => {
     const msgText = `Simulador de Sorriso:
 Especialidade: ${selectedSpecialty?.name || 'Não selecionada'}
 Tratamentos Escolhidos: ${treatmentsList.join(', ')}
+Interesses/Objetivos do paciente: ${selectedInterests.length > 0 ? selectedInterests.join(', ') : 'Não selecionado por botões rápidos'}
 Valor Estimado: ${min}€ - ${max}€
 Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
 
@@ -976,6 +1013,34 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                           </div>
                         </div>
 
+                        <div className="space-y-2">
+                          <label className="block text-xs font-bold text-clinic-purple uppercase tracking-wider">
+                            Selecione o seu objetivo clínico (Opcional) 💡
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setIsGlassPocketGuideOpen(true)}
+                            className="w-full flex items-center justify-between p-3.5 bg-clinic-purple/[0.04] border border-clinic-purple/20 hover:border-clinic-purple/40 rounded-xl text-left transition-all active:scale-98 cursor-pointer group"
+                          >
+                            <div className="flex flex-wrap gap-1.5 items-center mr-2">
+                              {selectedInterests.length === 0 ? (
+                                <span className="text-xs text-gray-500 font-medium flex items-center gap-1.5">
+                                  👉 Clique aqui para selecionar os seus objetivos clínicos...
+                                </span>
+                              ) : (
+                                selectedInterests.map(interest => (
+                                  <span key={interest} className="inline-flex items-center gap-1 bg-clinic-purple text-white font-bold text-[10px] px-2.5 py-1 rounded-lg shadow-sm">
+                                    {interest}
+                                  </span>
+                                ))
+                              )}
+                            </div>
+                            <span className="text-xs font-black text-clinic-purple group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0">
+                              Selecionar ⚙️
+                            </span>
+                          </button>
+                        </div>
+
                         <div>
                           <label className="block text-sm font-bold text-clinic-blue mb-1">Diga-nos o que sente ou qual o seu objetivo:</label>
                           <textarea
@@ -1524,6 +1589,34 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                                 </div>
                               </div>
 
+                              <div className="space-y-2">
+                                <label className="block text-xs font-bold text-clinic-purple uppercase tracking-wider">
+                                  Selecione o seu objetivo clínico (Opcional) 💡
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => setIsGlassPocketGuideOpen(true)}
+                                  className="w-full flex items-center justify-between p-3.5 bg-clinic-purple/[0.04] border border-clinic-purple/20 hover:border-clinic-purple/40 rounded-xl text-left transition-all active:scale-98 cursor-pointer group"
+                                >
+                                  <div className="flex flex-wrap gap-1.5 items-center mr-2">
+                                    {selectedInterests.length === 0 ? (
+                                      <span className="text-xs text-gray-500 font-medium flex items-center gap-1.5">
+                                        👉 Clique aqui para selecionar os seus objetivos clínicos...
+                                      </span>
+                                    ) : (
+                                      selectedInterests.map(interest => (
+                                        <span key={interest} className="inline-flex items-center gap-1 bg-clinic-purple text-white font-bold text-[10px] px-2.5 py-1 rounded-lg shadow-sm">
+                                          {interest}
+                                        </span>
+                                      ))
+                                    )}
+                                  </div>
+                                  <span className="text-xs font-black text-clinic-purple group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0">
+                                    Selecionar ⚙️
+                                  </span>
+                                </button>
+                              </div>
+
                               <div>
                                 <label className="block text-sm font-bold text-clinic-blue mb-1">Diga-nos o que sente ou o seu objetivo:</label>
                                 <textarea
@@ -1627,6 +1720,34 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                                   />
                                 </div>
                               </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <label className="block text-xs font-bold text-clinic-purple uppercase tracking-wider">
+                                Selecione o seu objetivo clínico (Opcional) 💡
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setIsGlassPocketGuideOpen(true)}
+                                className="w-full flex items-center justify-between p-3.5 bg-clinic-purple/[0.04] border border-clinic-purple/20 hover:border-clinic-purple/40 rounded-xl text-left transition-all active:scale-98 cursor-pointer group"
+                              >
+                                <div className="flex flex-wrap gap-1.5 items-center mr-2">
+                                  {selectedInterests.length === 0 ? (
+                                    <span className="text-xs text-gray-500 font-medium flex items-center gap-1.5">
+                                      👉 Clique aqui para selecionar os seus objetivos clínicos...
+                                    </span>
+                                  ) : (
+                                    selectedInterests.map(interest => (
+                                      <span key={interest} className="inline-flex items-center gap-1 bg-clinic-purple text-white font-bold text-[10px] px-2.5 py-1 rounded-lg shadow-sm">
+                                        {interest}
+                                      </span>
+                                    ))
+                                  )}
+                                </div>
+                                <span className="text-xs font-black text-clinic-purple group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0">
+                                  Selecionar ⚙️
+                                </span>
+                              </button>
                             </div>
 
                             <div>
@@ -1735,6 +1856,82 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
           </p>
         </div>
       </div>
+
+      {/* Elegant Glassmorphic Overlay for Selecting Treatment Intentions */}
+      {isGlassPocketGuideOpen && (
+        <div className="fixed inset-0 z-[150] bg-clinic-blue/10 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white/30 border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-[2.5rem] p-6 sm:p-8 max-w-md w-full backdrop-blur-2xl animate-in zoom-in-95 duration-200 space-y-5 flex flex-col">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/30">
+              <div>
+                <span className="text-[10px] font-black tracking-wider uppercase text-clinic-purple">Auxílio de Diagnóstico</span>
+                <h3 className="font-extrabold text-clinic-blue text-lg tracking-tight">Objetivo do Tratamento 🦷</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsGlassPocketGuideOpen(false)}
+                className="p-2 hover:bg-white/30 rounded-full text-clinic-blue transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-clinic-blue/85 leading-relaxed font-semibold">
+              Selecione as opções que correspondem ao seu caso. O assistente ajudará a formular a sua mensagem de forma clara e profissional:
+            </p>
+
+            {/* List with Checkmarks */}
+            <div className="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
+              {TREATMENT_POCKET_GUIDES.map((opt) => {
+                const isSelected = selectedInterests.includes(opt.label);
+                return (
+                  <button
+                    key={opt.label}
+                    type="button"
+                    onClick={() => handleObjectiveSelect(opt)}
+                    className={`w-full p-4 rounded-2xl text-left border transition-all flex items-center justify-between gap-4 select-none active:scale-98 cursor-pointer ${
+                      isSelected
+                        ? 'bg-clinic-purple/20 border-clinic-purple/40 text-clinic-blue shadow-md'
+                        : 'bg-white/30 hover:bg-white/50 border-white/30 text-clinic-blue/90'
+                    }`}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs font-black">{opt.label}</span>
+                      <span className={`text-[10px] sm:text-[11px] leading-tight font-medium ${isSelected ? 'text-clinic-purple/90 font-extrabold' : 'text-clinic-blue/60'}`}>
+                        {opt.desc}
+                      </span>
+                    </div>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center border text-xs shrink-0 transition-all ${
+                      isSelected 
+                        ? 'bg-clinic-purple border-clinic-purple text-white font-extrabold scale-110 shadow-sm' 
+                        : 'border-white/40 text-transparent bg-white/20'
+                    }`}>
+                      {isSelected ? '✓' : ''}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Footer with counts and Confirm button */}
+            <div className="pt-2 flex flex-col gap-3">
+              <div className="flex justify-between items-center text-[10px] text-clinic-blue/70 uppercase tracking-wider font-extrabold px-1">
+                <span>Opções Selecionadas</span>
+                <span className="text-clinic-purple font-black">{selectedInterests.length} de {TREATMENT_POCKET_GUIDES.length}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsGlassPocketGuideOpen(false)}
+                className="w-full bg-clinic-purple/90 hover:bg-clinic-purple text-white font-extrabold py-4 rounded-xl shadow-lg transition-all active:scale-95 text-center cursor-pointer uppercase text-xs tracking-wider"
+              >
+                Confirmar Seleção ✓
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };

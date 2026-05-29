@@ -6,6 +6,7 @@ import { useGoogleAds } from '../hooks/useGoogleAds';
 import { services } from '../constants/servicesData';
 import { Search, X } from 'lucide-react';
 import { ContactForm } from './ContactForm';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,6 +14,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isFabHubOpen, setIsFabHubOpen] = useState(false);
+  const [cycleIndex, setCycleIndex] = useState(0);
+
+  useEffect(() => {
+    if (isFabHubOpen) return;
+    const interval = setInterval(() => {
+      setCycleIndex(prev => (prev + 1) % 5);
+    }, 2800); // changes every 2.8 seconds
+    return () => clearInterval(interval);
+  }, [isFabHubOpen]);
   const location = useLocation();
   const navigate = useNavigate();
   const { trackWhatsApp, trackPhone } = useGoogleAds();
@@ -348,79 +359,221 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </footer>
       
-      {/* Custom Calendly Floating Button */}
-      <button 
-        id="btn-calendly-main"
-        onClick={openCalendly}
-        className={`fixed bottom-4 md:bottom-6 right-4 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
-        aria-label="Agende a sua consulta"
-      >
-        <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
-          Agendar Consulta
-        </div>
-        <div className="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300">
-          <span className="absolute inline-flex h-full w-full rounded-full bg-[#2d3277] opacity-30 animate-ping"></span>
-          <span className="absolute inline-flex h-full w-full rounded-full bg-[#2d3277] shadow-[0_10px_30px_rgba(45,50,119,0.4)]"></span>
-          <div className="w-full h-full flex items-center justify-center rounded-full bg-[#2d3277] relative overflow-hidden transition-all duration-300 ring-2 ring-white/20">
-            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            <i className="fas fa-calendar-check text-xl md:text-3xl text-[#d4e157] relative z-10"></i>
-          </div>
-        </div>
-      </button>
+      {/* Backdrop for the FAB Hub */}
+      {isFabHubOpen && (
+        <div 
+          className="fixed inset-0 z-[95] bg-black/5 backdrop-blur-[2px] transition-all duration-300"
+          onClick={() => setIsFabHubOpen(false)}
+        />
+      )}
 
-      <a id="btn-call-direct" href={`tel:${cleanCustomerService}`} onClick={() => {
-        trackPhoneClick(customerService);
-        if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_phone' });
-      }} className={`fixed bottom-[132px] md:bottom-[176px] right-4 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Ligar para agendamento 24h">
-        <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
-          Chamada
-        </div>
-        <div className="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300">
-          <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple opacity-30 animate-ping"></span>
-          <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-purple shadow-[0_10px_30px_rgba(107,70,193,0.4)]"></span>
-          <div className="w-full h-full flex items-center justify-center rounded-full bg-clinic-purple relative overflow-hidden transition-all duration-300 ring-2 ring-white/20">
-            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            <i className="fas fa-phone-alt text-xl md:text-3xl text-white relative z-10"></i>
-          </div>
-        </div>
-      </a>
+      {/* Unified Multi-Action Floating Button Hub */}
+      <div className={`fixed bottom-4 md:bottom-6 right-4 md:right-6 z-[100] ${isMenuOpen ? 'hidden' : ''} flex flex-col items-end`}>
+        <AnimatePresence>
+          {isFabHubOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="mb-4 p-4 md:p-5 rounded-[2.2rem] bg-white/20 backdrop-blur-md border border-white/30 shadow-[0_20px_50px_rgba(0,0,0,0.15)] w-[265px] sm:w-[290px] flex flex-col gap-3 origin-bottom-right"
+            >
+              {/* Header */}
+              <div className="text-center pb-2.5 border-b border-white/20">
+                <span className="text-[9px] font-black tracking-wider uppercase text-clinic-blue/80 block">Atendimento Rápido</span>
+                <span className="text-[11px] font-extrabold text-clinic-purple tracking-tight">Fale Connosco 🦷</span>
+              </div>
 
-      <a id="btn-whatsapp-main" href={global.socials?.whatsapp || "#"} onClick={() => {
-        trackWhatsAppClick();
-        if ((window as any).gtag) (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/click_whatsapp' });
-      }} target="_blank" rel="noreferrer" className={`fixed bottom-[72px] md:bottom-[100px] right-4 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`} aria-label="Contact us on WhatsApp">
-        <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
-          WhatsApp
-        </div>
-        <div className="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300">
-          <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping"></span>
-          <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"></span>
-          <div className="w-full h-full flex items-center justify-center rounded-full bg-[#25D366] relative overflow-hidden transition-all duration-300 ring-2 ring-white/20">
-            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            <i className="fab fa-whatsapp text-2xl md:text-4xl text-white relative z-10"></i>
-          </div>
-        </div>
-      </a>
+              {/* Action List */}
+              <div className="flex flex-col gap-2">
+                {/* WhatsApp */}
+                <a
+                  id="btn-whatsapp-main"
+                  href={global.socials?.whatsapp || "#"}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => {
+                    trackWhatsAppClick();
+                    setIsFabHubOpen(false);
+                  }}
+                  className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-white/30 border border-transparent hover:border-white/30 transition-all group/action"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shadow-lg group-hover/action:scale-105 transition-transform shrink-0">
+                    <i className="fab fa-whatsapp text-xl text-white"></i>
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span className="text-xs font-black text-clinic-blue">WhatsApp</span>
+                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">Resposta célere</span>
+                  </div>
+                </a>
 
-      {/* Floating Contact Form Button */}
-      <button 
-        id="btn-contact-form-trigger"
-        onClick={() => setIsContactModalOpen(true)}
-        className={`fixed bottom-[192px] md:bottom-[252px] right-4 md:right-6 z-[100] group flex items-center gap-3 transition-all hover:scale-110 active:scale-95 ${isMenuOpen ? 'hidden' : ''}`}
-        aria-label="Contactem-me"
-      >
-        <div className="hidden md:block bg-white text-clinic-blue py-2 px-4 rounded-full shadow-xl font-bold text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 border border-clinic-purple/10 uppercase tracking-wider">
-          Contactem-me
+                {/* Calendly */}
+                <button
+                  id="btn-calendly-main"
+                  onClick={(e) => {
+                    openCalendly(e);
+                    setIsFabHubOpen(false);
+                  }}
+                  className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-white/30 border border-transparent hover:border-white/30 transition-all text-left w-full group/action cursor-pointer"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#2d3277] flex items-center justify-center shadow-lg group-hover/action:scale-105 transition-transform shrink-0">
+                    <i className="fas fa-calendar-check text-base text-[#d4e157]"></i>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-black text-clinic-blue">Agendar Consulta</span>
+                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">Reserva imediata</span>
+                  </div>
+                </button>
+
+                {/* Direct Call */}
+                <a
+                  id="btn-call-direct"
+                  href={`tel:${cleanCustomerService}`}
+                  onClick={() => {
+                    trackPhoneClick(customerService);
+                    setIsFabHubOpen(false);
+                  }}
+                  className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-white/30 border border-transparent hover:border-white/30 transition-all group/action"
+                >
+                  <div className="w-10 h-10 rounded-full bg-clinic-purple flex items-center justify-center shadow-lg group-hover/action:scale-105 transition-transform shrink-0">
+                    <i className="fas fa-phone-alt text-base text-white"></i>
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span className="text-xs font-black text-clinic-blue">Chamada Direta</span>
+                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">Linha Grátis 24h</span>
+                  </div>
+                </a>
+
+                {/* Contact Form Inquiry */}
+                <button
+                  id="btn-contact-form-trigger"
+                  onClick={() => {
+                    setIsContactModalOpen(true);
+                    setIsFabHubOpen(false);
+                  }}
+                  className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-white/30 border border-transparent hover:border-white/30 transition-all text-left w-full group/action cursor-pointer"
+                >
+                  <div className="w-10 h-10 rounded-full bg-clinic-blue flex items-center justify-center shadow-lg group-hover/action:scale-105 transition-transform shrink-0">
+                    <i className="fas fa-comment-dots text-base text-clinic-lime"></i>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-black text-clinic-blue">Contactem-me</span>
+                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">Ligamos de volta</span>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* The Trigger Button - Cycles through when closed, morphs to X when open */}
+        <div className="relative">
+          {/* Brand-Colored Pulsing Glow/Aura backdrop */}
+          {!isFabHubOpen && (
+            <>
+              {/* Soft continuous glowing blur */}
+              <div className={`absolute inset-[-3px] rounded-full blur-md opacity-60 animate-pulse transition-colors duration-1000 z-0 ${
+                cycleIndex === 0 ? 'bg-clinic-purple/40 shadow-[0_0_20px_rgba(107,70,193,0.6)]' :
+                cycleIndex === 1 ? 'bg-[#25D366]/40 shadow-[0_0_20px_rgba(37,211,102,0.6)]' :
+                cycleIndex === 2 ? 'bg-[#2d3277]/40 shadow-[0_0_20px_rgba(45,50,119,0.6)]' :
+                cycleIndex === 3 ? 'bg-clinic-purple/40 shadow-[0_0_20px_rgba(107,70,193,0.6)]' :
+                'bg-clinic-blue/40 shadow-[0_0_20px_rgba(45,50,119,0.6)]'
+              }`} />
+              {/* Expanding ping ripple */}
+              <div className={`absolute inset-[-6px] rounded-full opacity-35 animate-ping transition-colors duration-1000 z-0 ${
+                cycleIndex === 0 ? 'bg-clinic-purple' :
+                cycleIndex === 1 ? 'bg-[#25D366]' :
+                cycleIndex === 2 ? 'bg-[#2d3277]' :
+                cycleIndex === 3 ? 'bg-clinic-purple' :
+                'bg-clinic-blue'
+              }`} />
+            </>
+          )}
+
+          <button
+            onClick={() => setIsFabHubOpen(!isFabHubOpen)}
+            className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_30px_rgba(45,50,119,0.3)] transition-all duration-300 hover:scale-105 active:scale-95 group overflow-hidden border border-white/40 bg-white/20 backdrop-blur-md cursor-pointer z-10"
+            aria-label={isFabHubOpen ? "Fechar contactos" : "Ver contactos rápidos"}
+          >
+            <AnimatePresence mode="wait">
+              {isFabHubOpen ? (
+                <motion.div
+                  key="close-icon"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="w-full h-full flex items-center justify-center bg-clinic-blue text-white"
+                >
+                  <X className="w-6 h-6 md:w-8 md:h-8" />
+                </motion.div>
+              ) : (
+                <div className="w-full h-full">
+                  {cycleIndex === 0 && (
+                    <motion.div
+                      key="cycle-logo"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="w-full h-full flex items-center justify-center p-3 bg-white"
+                    >
+                      <img 
+                        src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" 
+                        alt="Logo" 
+                        className="w-full h-full object-contain"
+                      />
+                    </motion.div>
+                  )}
+                  {cycleIndex === 1 && (
+                    <motion.div
+                      key="cycle-whatsapp"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="w-full h-full flex items-center justify-center bg-[#25D366]"
+                    >
+                      <i className="fab fa-whatsapp text-2xl md:text-3xl text-white"></i>
+                    </motion.div>
+                  )}
+                  {cycleIndex === 2 && (
+                    <motion.div
+                      key="cycle-calendly"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="w-full h-full flex items-center justify-center bg-[#2d3277]"
+                    >
+                      <i className="fas fa-calendar-check text-xl md:text-2xl text-[#d4e157]"></i>
+                    </motion.div>
+                  )}
+                  {cycleIndex === 3 && (
+                    <motion.div
+                      key="cycle-phone"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="w-full h-full flex items-center justify-center bg-clinic-purple"
+                    >
+                      <i className="fas fa-phone-alt text-xl md:text-2xl text-white"></i>
+                    </motion.div>
+                  )}
+                  {cycleIndex === 4 && (
+                    <motion.div
+                      key="cycle-form"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="w-full h-full flex items-center justify-center bg-clinic-blue"
+                    >
+                      <i className="fas fa-comment-dots text-xl md:text-2xl text-clinic-lime"></i>
+                    </motion.div>
+                  )}
+                </div>
+              )}
+            </AnimatePresence>
+          </button>
         </div>
-        <div className="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-2xl transition-all duration-300">
-          <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-blue opacity-30 animate-ping"></span>
-          <span className="absolute inline-flex h-full w-full rounded-full bg-clinic-blue shadow-[0_10px_30px_rgba(45,50,119,0.4)]"></span>
-          <div className="w-full h-full flex items-center justify-center rounded-full bg-clinic-blue relative overflow-hidden transition-all duration-300 ring-2 ring-white/20">
-            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            <i className="fas fa-comment-dots text-xl md:text-3xl text-clinic-lime relative z-10"></i>
-          </div>
-        </div>
-      </button>
+      </div>
 
       {/* Contact Modal */}
       {isContactModalOpen && (

@@ -1,8 +1,10 @@
 import React from 'react';
 import { useContent } from '../context/ContentContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const Contact: React.FC = () => {
   const { content } = useContent();
+  const { t } = useLanguage();
   const global = content.global || {};
 
   // Robust email and phone sanitization
@@ -12,7 +14,7 @@ const Contact: React.FC = () => {
   return (
     <div className="animate-fade-in-up max-w-[1400px] mx-auto px-4 py-12">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-serif italic text-clinic-blue border-2 border-clinic-lime inline-block px-8 py-3 rounded-full mb-8 shadow-sm bg-white/20">Contactos</h1>
+        <h1 className="text-4xl font-serif italic text-clinic-blue border-2 border-clinic-lime inline-block px-8 py-3 rounded-full mb-8 shadow-sm bg-white/20">{t("Contactos")}</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
@@ -34,7 +36,7 @@ const Contact: React.FC = () => {
               </a>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-clinic-blue mb-4">Telefone</h3>
+              <h3 className="text-2xl font-bold text-clinic-blue mb-4">{t("Telefone")}</h3>
               {/* Ensure tel link strips spaces for compatibility */}
               <a 
                 href={`tel:${contactPhone}`} 
@@ -46,10 +48,10 @@ const Contact: React.FC = () => {
               >
                 {global.phone}
               </a>
-              <div className="text-sm text-gray-500 mt-1">(Preço de uma chamada de Rede Nacional)</div>
+              <div className="text-sm text-gray-500 mt-1">{t("(Preço de uma chamada de Rede Nacional)")}</div>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-clinic-blue mb-4">Telemóvel / WhatsApp</h3>
+              <h3 className="text-2xl font-bold text-clinic-blue mb-4">{t("Telemóvel / WhatsApp")}</h3>
               {/* Links to WhatsApp as per design, opens in new tab/app */}
               <a 
                 href={global.socials?.whatsapp || "#"} 
@@ -62,7 +64,7 @@ const Contact: React.FC = () => {
               >
                 {global.mobile}
               </a>
-              <div className="text-sm text-gray-500 mt-1">(Preço de uma chamada de Rede Móvel Nacional)</div>
+              <div className="text-sm text-gray-500 mt-1">{t("(Preço de uma chamada de Rede Móvel Nacional)")}</div>
             </div>
             
             <div className="pt-6 flex justify-center md:justify-start gap-4">
@@ -100,7 +102,7 @@ const Contact: React.FC = () => {
             }}
             className="absolute bottom-4 right-4 bg-white text-clinic-blue px-4 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity font-semibold text-sm"
           >
-            Abrir no Google Maps
+            {t("Abrir no Google Maps")}
           </a>
         </div>
       </div>

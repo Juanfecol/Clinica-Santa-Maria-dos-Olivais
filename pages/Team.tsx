@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useContent } from '../context/ContentContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Member {
   name: string;
@@ -56,21 +57,22 @@ const MemberCard: React.FC<{ member: Member }> = ({ member }) => (
 
 const Team: React.FC = () => {
   const { content } = useContent();
-  const medicalTeam: Member[] = content.team?.medical || [];
-  const assistantTeam: Member[] = content.team?.assistants || [];
-  const receptionTeam: Member[] = content.team?.reception || [];
+  const { t, translateObject } = useLanguage();
+  const medicalTeam: Member[] = translateObject(content.team?.medical || []);
+  const assistantTeam: Member[] = translateObject(content.team?.assistants || []);
+  const receptionTeam: Member[] = translateObject(content.team?.reception || []);
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-12 animate-fade-in-up">
       <div className="text-center mb-16">
-        <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif italic text-clinic-blue border-2 border-clinic-lime inline-block px-8 py-3 rounded-full mb-6">A Nossa Equipa Clínica</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif italic text-clinic-blue border-2 border-clinic-lime inline-block px-8 py-3 rounded-full mb-6">{t("A Nossa Equipa Clínica")}</h1>
         <p className="text-base md:text-lg text-gray-700 max-w-3xl mx-auto font-light">
-          Comprometidos com a excelência nos Olivais. Conheça os profissionais dedicados a cuidar do seu sorriso com as mais avançadas técnicas de medicina dentária.
+          {t("Comprometidos com a excelência nos Olivais. Conheça os profissionais dedicados a cuidar do seu sorriso com as mais avançadas técnicas de medicina dentária.")}
         </p>
       </div>
 
       <div className="mb-20">
-        <h2 className="text-2xl md:text-3xl font-serif italic text-center text-clinic-blue mb-12 border-b-2 border-clinic-lime inline-block pb-2 mx-auto block w-fit">Corpo Clínico Especialista</h2>
+        <h2 className="text-2xl md:text-3xl font-serif italic text-center text-clinic-blue mb-12 border-b-2 border-clinic-lime inline-block pb-2 mx-auto block w-fit">{t("Corpo Clínico Especialista")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {medicalTeam.map((member, idx) => <MemberCard key={idx} member={member} />)}
         </div>
@@ -78,7 +80,7 @@ const Team: React.FC = () => {
 
       {(assistantTeam.length > 0 || receptionTeam.length > 0) && (
         <div className="mb-20">
-          <h2 className="text-2xl md:text-3xl font-serif italic text-center text-clinic-blue mb-12 border-b-2 border-clinic-lime inline-block pb-2 mx-auto block w-fit">Apoio e Atendimento</h2>
+          <h2 className="text-2xl md:text-3xl font-serif italic text-center text-clinic-blue mb-12 border-b-2 border-clinic-lime inline-block pb-2 mx-auto block w-fit">{t("Apoio e Atendimento")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {receptionTeam.map((member, idx) => <MemberCard key={`rec-${idx}`} member={member} />)}
             {assistantTeam.map((member, idx) => <MemberCard key={`ast-${idx}`} member={member} />)}

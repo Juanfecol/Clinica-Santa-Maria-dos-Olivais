@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   Calculator, 
   ChevronRight, 
@@ -151,10 +152,19 @@ const specialtiesData: Specialty[] = [
 ];
 
 const QuoteCalculator: React.FC = () => {
+  const { t, translateObject, language } = useLanguage();
   const [flowMode, setFlowMode] = useState<'selector' | 'manual' | 'photo_only'>('selector');
   const [step, setStep] = useState(1);
   const [selectedSpecialty, setSelectedSpecialty] = useState<Specialty | null>(null);
   const [selectedProcedures, setSelectedProcedures] = useState<string[]>([]);
+
+  const translatedSpecialties = React.useMemo(() => {
+    return translateObject(specialtiesData);
+  }, [translateObject, language]);
+
+  const activeSpecialty = selectedSpecialty
+    ? (translatedSpecialties.find(spec => spec.id === selectedSpecialty.id) || selectedSpecialty)
+    : null;
 
   // Camera & Image States
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -175,6 +185,8 @@ const QuoteCalculator: React.FC = () => {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [isGlassPocketGuideOpen, setIsGlassPocketGuideOpen] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [phoneError, setPhoneError] = useState('');
+  const [nameError, setNameError] = useState('');
 
   const TREATMENT_POCKET_GUIDES = [
     { label: 'Implantes Dentários 🦷', desc: 'Preenchimento e reabilitação de dentes em falta', text: 'Pretendo realizar uma avaliação clínica para colocação de implantes dentários por ausência dentária.' },
@@ -191,14 +203,14 @@ const QuoteCalculator: React.FC = () => {
       if (isSelected) {
         updated = prev.filter(item => item !== opt.label);
         setLeadNotes(current => {
-          let cleaned = current.replace(opt.text, '').trim();
+          let cleaned = current.replace(t(opt.text), '').replace(opt.text, '').trim();
           cleaned = cleaned.replace(/\s+/g, ' ');
           return cleaned;
         });
       } else {
         updated = [...prev, opt.label];
         setLeadNotes(current => {
-          const suffix = opt.text;
+          const suffix = t(opt.text);
           if (!current.trim()) return suffix;
           if (current.trim().endsWith('.') || current.trim().endsWith('!') || current.trim().endsWith('?')) {
             return `${current} ${suffix}`;
@@ -237,7 +249,7 @@ const QuoteCalculator: React.FC = () => {
       
       // Check if mediaDevices API is available in the current browser/iframe environment
       if (!navigator?.mediaDevices?.getUserMedia) {
-        setCameraError("De momento, a câmara não é suportada por este navegador ou ambiente (ex: ligação não descodificada ou restrições de iFrame seguro). Por favor, utilize um telemóvel ou carregue uma foto da sua galeria.");
+        setCameraError(t("De momento, a câmara não é suportada por este navegador ou ambiente (ex: ligação não descodificada ou restrições de iFrame seguro). Por favor, utilize um telemóvel ou carregue uma foto da sua galeria."));
         return;
       }
 
@@ -288,13 +300,13 @@ const QuoteCalculator: React.FC = () => {
         errorMessage.toLowerCase().includes('device not found') || 
         errorMessage.toLowerCase().includes('requested device')
       ) {
-        setCameraError("Câmara física não encontrada: Não foi detetada nenhuma câmara ou webcam ativa neste dispositivo. Pode selecionar facilmente uma imagem da galeria utilizando o botão 'Carregar Foto 📁'.");
+        setCameraError(t("Câmara física não encontrada: Não foi detetada nenhuma câmara ou webcam ativa neste dispositivo. Pode selecionar facilmente uma imagem da galeria utilizando o botão 'Carregar Foto 📁'."));
       } else if (errorName === 'NotAllowedError' || errorName === 'PermissionDeniedError' || errorName === 'PermissionDismissedError') {
-        setCameraError("Acesso à câmara recusado: Por favor ative as permissões de câmara no seu navegador ou carregue um ficheiro usando 'Procurar Foto'.");
+        setCameraError(t("Acesso à câmara recusado: Por favor ative as permissões de câmara no seu navegador ou carregue um ficheiro usando 'Procurar Foto'."));
       } else if (errorName === 'OverconstrainedError') {
-        setCameraError("A sua câmara não suporta a resolução solicitada. Por favor, envie uma foto diretamente do seu rolo de câmara.");
+        setCameraError(t("A sua câmara não suporta a resolução solicitada. Por favor, envie uma foto diretamente do seu rolo de câmara."));
       } else {
-        setCameraError(`Não foi possível iniciar a câmara (${errorName || errorMessage || 'Erro técnico'}). Por favor, carregue uma foto utilizando o botão ao lado.`);
+        setCameraError(t("Não foi possível iniciar a câmara") + ` (${errorName || errorMessage || t('Erro técnico')}). ` + t("Por favor, carregue uma foto utilizando o botão ao lado."));
       }
     }
   };
@@ -435,8 +447,21 @@ const QuoteCalculator: React.FC = () => {
 
   const handleCampaignSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!leadName || !leadPhone) {
-      alert("Por favor, preencha o seu nome e telemóvel!");
+    setPhoneError('');
+    setNameError('');
+
+    if (!leadName) {
+      setNameError(t("Por favor, introduza o seu nome."));
+      return;
+    }
+    if (!leadPhone) {
+      setPhoneError(t("Por favor, introduza o seu número de telemóvel."));
+      return;
+    }
+
+    const digits = leadPhone.replace(/\D/g, '');
+    if (digits.length < 9) {
+      setPhoneError(t("O número de telemóvel/WhatsApp deve conter pelo menos 9 dígitos."));
       return;
     }
 
@@ -505,6 +530,8 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
     setLeadEmail('');
     setLeadNotes('');
     setSubmitStatus('idle');
+    setPhoneError('');
+    setNameError('');
     reset();
   };
 
@@ -572,14 +599,14 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
   const getHeaderContent = () => {
     if (flowMode === 'photo_only') {
       return {
-        title: <>Diagnóstico Clínico <span className="text-clinic-purple italic font-serif">por Foto</span></>,
-        desc: "Envie uma foto simples do seu sorriso. Os nossos médicos especialistas vão avaliar a anatomia do seu caso para lhe apresentar um orçamento real com 100% de precisão clínica.",
+        title: <>{t("Diagnóstico Clínico")} <span className="text-clinic-purple italic font-serif">{t("por Foto")}</span></>,
+        desc: t("Envie uma foto simples do seu sorriso. Os nossos médicos especialistas vão avaliar a anatomia do seu caso para lhe apresentar um orçamento real com 100% de precisão clínica."),
         icon: <Camera className="text-clinic-purple w-10 h-10" />
       };
     }
     return {
-      title: <>Simulador de <span className="text-clinic-purple italic font-serif">Investimento</span></>,
-      desc: "Simule o seu orçamento oficial com transparência. Opte pelo diagnóstico clínico inovador orientado por foto ou pelo simulador manual passo a passo.",
+      title: <>{t("Simulador de")} <span className="text-clinic-purple italic font-serif">{t("Investimento")}</span></>,
+      desc: t("Simule o seu orçamento oficial com transparência. Opte pelo diagnóstico clínico inovador orientado por foto ou pelo simulador manual passo a passo."),
       icon: <Calculator className="text-clinic-purple w-10 h-10" />
     };
   };
@@ -630,13 +657,13 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
               >
                 <div className="text-center space-y-3 md:space-y-4 max-w-3xl mx-auto">
                   <span className="inline-block bg-clinic-purple/10 text-clinic-purple px-4 py-1.5 rounded-full font-bold text-[10px] md:text-xs uppercase tracking-widest">
-                    🦷 Avaliação Digital de Sorriso
+                    {t("🦷 Avaliação Digital de Sorriso")}
                   </span>
                   <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-clinic-blue leading-tight px-2">
-                    Como prefere simular o seu investimento?
+                    {t("Como prefere simular o seu investment?") || t("Como prefere simular o seu investimento?")}
                   </h2>
                   <p className="text-gray-500 font-light text-xs sm:text-sm md:text-base leading-relaxed px-4">
-                    Escolha a opção que melhor se ajusta às suas necessidades. O diagnóstico por foto é validado diretamente por médicos dentistas qualificados de forma 100% gratuita.
+                    {t("Escolha a opção que melhor se ajusta às suas necessidades. O diagnóstico por foto é validado diretamente por médicos dentistas qualificados de forma 100% gratuita.")}
                   </p>
                 </div>
 
@@ -652,26 +679,26 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                           <Camera className="w-6 h-6 md:w-7 md:h-7" />
                         </div>
                         <div className="bg-clinic-blue text-white border border-clinic-purple/30 font-black text-[9px] md:text-xs px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm select-none">
-                          Recomendado <span className="animate-pulse">🚀</span>
+                          {t("Recomendado")} <span className="animate-pulse">🚀</span>
                         </div>
                       </div>
                       
                       <div className="space-y-2">
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-clinic-blue leading-tight">
-                          Diagnóstico por Imagem
-                          <span className="text-clinic-purple italic font-serif block mt-1 text-sm sm:text-base md:text-lg">100% Real & Gratuito</span>
+                          {t("Diagnóstico por Imagem")}
+                          <span className="text-clinic-purple italic font-serif block mt-1 text-sm sm:text-base md:text-lg">{t("100% Real & Gratuito")}</span>
                         </h3>
                         <p className="text-gray-600 text-xs sm:text-sm font-light leading-relaxed">
-                          Tire uma fotografia ao seu sorriso com o seu telemóvel ou computador. Os nossos médicos dentistas vão analisar a anatomia do seu sorriso e fornecer-lhe-ão gratuitamente uma estimativa precisa e personalizada.
+                          {t("Tire uma fotografia ao seu sorriso com o seu telemóvel ou computador. Os nossos médicos dentistas vão analisar a anatomia do seu sorriso e fornecer-lhe-ão gratuitamente uma estimativa precisa e personalizada.")}
                         </p>
                       </div>
 
                       <ul className="space-y-2.5 pt-1">
                         {[
-                          'Avaliação clínica real por Médicos Dentistas',
-                          'Indicação exata de tratamentos recomendados',
-                          'Privacidade total dos seus dados (RGPD)',
-                          'Resposta célere em menos de 24 horas úteis'
+                          t('Avaliação clínica real por Médicos Dentistas'),
+                          t('Indicação exata de tratamentos recomendados'),
+                          t('Privacidade total dos seus dados (RGPD)'),
+                          t('Resposta célere em menos de 24 horas úteis')
                         ].map((bullet, idx) => (
                           <li key={idx} className="flex items-center gap-2.5 text-xs text-gray-700 font-medium">
                             <span className="w-5 h-5 rounded-full bg-clinic-purple/10 flex items-center justify-center text-clinic-purple shrink-0">
@@ -691,7 +718,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                       }}
                       className="mt-6 md:mt-8 w-full bg-clinic-purple hover:bg-clinic-blue text-white font-black py-4 px-6 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2.5 shadow-md shadow-clinic-purple/15 hover:shadow-clinic-blue/15 transition-all text-xs sm:text-sm md:text-base cursor-pointer hover:scale-[1.01]"
                     >
-                      <Camera className="w-4 h-4 md:w-5 md:h-5" /> Iniciar Diagnóstico por Foto 🦷
+                      <Camera className="w-4 h-4 md:w-5 md:h-5" /> {t("Iniciar Diagnóstico por Foto 🦷")}
                     </button>
                   </div>
 
@@ -703,26 +730,26 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                           <Calculator className="w-6 h-6 md:w-7 md:h-7" />
                         </div>
                         <div className="bg-gray-100/80 text-gray-500 font-bold text-[9px] md:text-xs px-3 py-1.5 rounded-full uppercase tracking-wider select-none">
-                          Preços de Tabela 📋
+                          {t("Preços de Tabela 📋")}
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-clinic-blue leading-tight">
-                          Simulador Manual de
-                          <span className="text-gray-400 italic font-serif block mt-1 text-sm sm:text-base md:text-lg">Tratamentos</span>
+                          {t("Simulador Manual de")}
+                          <span className="text-gray-400 italic font-serif block mt-1 text-sm sm:text-base md:text-lg">{t("Tratamentos")}</span>
                         </h3>
                         <p className="text-gray-600 text-xs sm:text-sm font-light leading-relaxed">
-                          Selecione os tratamentos e especialidades que deseja (implantes, higiene, aparelhos, estética) para consultar os custos de referência aproximados com base na nossa tabela de preços oficial.
+                          {t("Selecione os tratamentos e especialidades que deseja (implantes, higiene, aparelhos, estética) para consultar os custos de referência aproximados com base na nossa tabela de preços oficial.")}
                         </p>
                       </div>
 
                       <ul className="space-y-2.5 pt-1">
                         {[
-                          'Consulte preços oficiais da tabela clínica',
-                          'Simule múltiplas especialidades juntas',
-                          'Sem necessidade de partilhar imagens',
-                          'Cálculo e estimativa teórica instantânea'
+                          t('Consulte preços oficiais da tabela clínica'),
+                          t('Simule múltiplas especialidades juntas'),
+                          t('Sem necessidade de partilhar imagens'),
+                          t('Cálculo e estimativa teórica instantânea')
                         ].map((bullet, idx) => (
                           <li key={idx} className="flex items-center gap-2.5 text-xs text-gray-700 font-medium">
                             <span className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-clinic-blue shrink-0">
@@ -742,7 +769,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                       }}
                       className="mt-6 md:mt-8 w-full bg-white border border-clinic-blue/20 text-clinic-blue hover:bg-clinic-blue/5 hover:border-clinic-blue font-extrabold py-4 px-6 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2.5 transition-all text-xs sm:text-sm md:text-base cursor-pointer hover:scale-[1.01]"
                     >
-                      <Calculator className="w-4 h-4 md:w-5 md:h-5" /> Simular Manualmente 📋
+                      <Calculator className="w-4 h-4 md:w-5 md:h-5" /> {t("Simular Manualmente 📋")}
                     </button>
                   </div>
                 </div>
@@ -958,11 +985,11 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                     {/* Contact details */}
                     <div className="space-y-4">
                       <div className="border-b border-gray-100 pb-2">
-                        <span className="text-xs font-bold text-clinic-purple uppercase">Dados para Receber o Diagnóstico</span>
+                        <span className="text-xs font-bold text-clinic-purple uppercase">{t("Dados para Receber o Diagnóstico")}</span>
                       </div>
                       <form onSubmit={handleCampaignSubmit} className="space-y-4">
                         <div>
-                          <label className="block text-sm font-bold text-clinic-blue mb-1">O seu Nome Completo *</label>
+                          <label className="block text-sm font-bold text-clinic-blue mb-1">{t("O seu Nome Completo *")}</label>
                           <div className="relative">
                             <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                               <User size={16} />
@@ -971,16 +998,22 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                               type="text"
                               required
                               value={leadName}
-                              onChange={(e) => setLeadName(e.target.value)}
-                              placeholder="ex: João Silva"
-                              className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                              onChange={(e) => {
+                                setLeadName(e.target.value);
+                                if (nameError) setNameError('');
+                              }}
+                              placeholder={t("ex: João Silva")}
+                              className={`w-full pl-10 pr-4 py-3 bg-white rounded-xl border outline-none focus:ring-2 transition-all text-sm ${
+                                nameError ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-clinic-purple/20 focus:border-clinic-purple'
+                              }`}
                             />
                           </div>
+                          {nameError && <p className="text-red-500 text-xs mt-1 font-bold">{nameError}</p>}
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-bold text-clinic-blue mb-1">Telemóvel / WhatsApp *</label>
+                            <label className="block text-sm font-bold text-clinic-blue mb-1">{t("Telemóvel / WhatsApp *")}</label>
                             <div className="relative">
                               <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                                 <Phone size={16} />
@@ -989,15 +1022,21 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                                 type="tel"
                                 required
                                 value={leadPhone}
-                                onChange={(e) => setLeadPhone(e.target.value)}
-                                placeholder="ex: 912 345 678"
-                                className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
+                                onChange={(e) => {
+                                  setLeadPhone(e.target.value);
+                                  if (phoneError) setPhoneError('');
+                                }}
+                                placeholder={t("ex: 912 345 678")}
+                                className={`w-full pl-10 pr-4 py-3 bg-white rounded-xl border outline-none focus:ring-2 transition-all text-sm ${
+                                  phoneError ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-clinic-purple/20 focus:border-clinic-purple'
+                                }`}
                               />
                             </div>
+                            {phoneError && <p className="text-red-500 text-xs mt-1 font-bold">{phoneError}</p>}
                           </div>
 
                           <div>
-                            <label className="block text-sm font-bold text-clinic-blue mb-1">Email (Opcional)</label>
+                            <label className="block text-sm font-bold text-clinic-blue mb-1">{t("Email (Opcional)")}</label>
                             <div className="relative">
                               <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                                 <Mail size={16} />
@@ -1006,7 +1045,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                                 type="email"
                                 value={leadEmail}
                                 onChange={(e) => setLeadEmail(e.target.value)}
-                                placeholder="ex: joao@email.com"
+                                placeholder={t("ex: joao@email.com")}
                                 className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm"
                               />
                             </div>
@@ -1015,7 +1054,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
 
                         <div className="space-y-2">
                           <label className="block text-xs font-bold text-clinic-purple uppercase tracking-wider">
-                            Selecione o seu objetivo clínico (Opcional) 💡
+                            {t("Selecione o seu objetivo clínico (Opcional) 💡")}
                           </label>
                           <button
                             type="button"
@@ -1025,40 +1064,40 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                             <div className="flex flex-wrap gap-1.5 items-center mr-2">
                               {selectedInterests.length === 0 ? (
                                 <span className="text-xs text-gray-500 font-medium flex items-center gap-1.5">
-                                  👉 Clique aqui para selecionar os seus objetivos clínicos...
+                                  {t("👉 Clique aqui para selecionar os seus objetivos clínicos...")}
                                 </span>
                               ) : (
                                 selectedInterests.map(interest => (
                                   <span key={interest} className="inline-flex items-center gap-1 bg-clinic-purple text-white font-bold text-[10px] px-2.5 py-1 rounded-lg shadow-sm">
-                                    {interest}
+                                    {t(interest)}
                                   </span>
                                 ))
                               )}
                             </div>
                             <span className="text-xs font-black text-clinic-purple group-hover:translate-x-0.5 transition-transform flex items-center gap-1 shrink-0">
-                              Selecionar ⚙️
+                              {t("Selecionar ⚙️")}
                             </span>
                           </button>
                         </div>
 
                         <div>
-                          <label className="block text-sm font-bold text-clinic-blue mb-1">Diga-nos o que sente ou qual o seu objetivo:</label>
+                          <label className="block text-sm font-bold text-clinic-blue mb-1">{t("Diga-nos o que sente ou qual o seu objetivo:")}</label>
                           <textarea
                             value={leadNotes}
                             onChange={(e) => setLeadNotes(e.target.value)}
-                            placeholder="ex: Gostava de preencher falta de dentes com implantes / corrigir alinhamento."
+                            placeholder={t("ex: Gostava de preencher falta de dentes com implantes / corrigir alinhamento.")}
                             rows={3}
                             className="w-full p-4 bg-white rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-clinic-purple/20 focus:border-clinic-purple text-clinic-blue font-medium placeholder-gray-400 transition-all text-sm resize-none"
                           />
                         </div>
 
                         {submitStatus === 'error' && (
-                          <p className="text-red-600 text-xs font-bold text-center">Falta de conexão ou erro ao enviar dados. Por favor verifique as informações e o telemóvel.</p>
+                          <p className="text-red-600 text-xs font-bold text-center">{t("Falta de conexão ou erro ao enviar dados. Por favor verifique as informações e o telemóvel.")}</p>
                         )}
 
                         {!capturedPhoto && (
                           <p className="text-amber-600 text-center font-bold text-xs bg-amber-50 rounded-xl p-3 border border-amber-100 flex items-center justify-center gap-2">
-                            <Info size={14} /> Nota: Carregue ou tire uma foto para poder submeter o diagnóstico.
+                            <Info size={14} /> {t("Nota: Carregue ou tire uma foto para poder submeter o diagnóstico.")}
                           </p>
                         )}
 
@@ -1070,11 +1109,11 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                           {submitStatus === 'submitting' ? (
                             <>
                               <Loader2 className="w-5 h-5 animate-spin" />
-                              A Enviar Diagnóstico...
+                              {t("A Enviar Diagnóstico...")}
                             </>
                           ) : (
                             <>
-                              Enviar Foto Diagnóstico Segura 🚀
+                              {t("Enviar Foto Diagnóstico Segura 🚀")}
                             </>
                           )}
                         </button>
@@ -1091,15 +1130,15 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                       <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-2">
                         <CheckCircle size={44} />
                       </div>
-                      <h4 className="text-3xl font-black text-clinic-blue">Foto de Diagnóstico Recebida!</h4>
+                      <h4 className="text-3xl font-black text-clinic-blue">{t("Foto de Diagnóstico Recebida!")}</h4>
                       <div className="text-gray-600 font-light max-w-md leading-relaxed text-sm space-y-4">
-                        <p>Muito obrigado pelas informações de Sorriso, <span className="font-bold text-clinic-blue">{leadName}</span>.</p>
-                        <p className="font-semibold text-clinic-purple text-base">O Diretor Clínico da Clínica Santa Maria vai analisar individualmente a anatomia do seu sorriso.</p>
-                        <p>Entraremos em contacto no prazo máximo de 24 horas úteis, enviando um plano e estimativa adequados ao seu caso via WhatsApp/Telemóvel.</p>
+                        <p>{t("Muito obrigado pelas informações de Sorriso,")} <span className="font-bold text-clinic-blue">{leadName}</span>.</p>
+                        <p className="font-semibold text-clinic-purple text-base">{t("O Diretor Clínico da Clínica Santa Maria vai analisar individualmente a anatomia do seu sorriso.")}</p>
+                        <p>{t("Entraremos em contacto no prazo máximo de 24 horas úteis, enviando um plano e estimativa adequados ao seu caso via WhatsApp/Telemóvel.")}</p>
                       </div>
                       <div className="pt-2">
                         <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-100 uppercase tracking-widest">
-                          ID de Diagnóstico Dental Seguro ✓
+                          {t("ID de Diagnóstico Dental Seguro ✓")}
                         </span>
                       </div>
                     </motion.div>
@@ -1109,7 +1148,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                         onClick={handleReset} 
                         className="w-full bg-clinic-blue text-white font-bold py-4 px-8 rounded-2xl text-center hover:bg-clinic-purple transition-colors shadow-lg cursor-pointer"
                       >
-                        Simular Outro Caso / Recomeçar
+                        {t("Simular Outro Caso / Recomeçar")}
                       </button>
                     </div>
                   </div>
@@ -1130,14 +1169,14 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                     onClick={() => { setFlowMode('selector'); }} 
                     className="flex items-center gap-1.5 text-clinic-purple font-black text-xs uppercase hover:underline mb-2 cursor-pointer transition-all self-start"
                   >
-                     <ChevronLeft size={14} /> Voltar ao Início
+                     <ChevronLeft size={14} /> {t("Voltar ao Início")}
                   </button>
-                  <span className="bg-clinic-purple/10 text-clinic-purple px-4 py-1 rounded-full font-bold text-xs uppercase tracking-widest">Passo 1: Especialidade</span>
-                  <h2 className="text-3xl md:text-4xl font-bold text-clinic-blue text-center md:text-left">O que quer cuidar hoje?</h2>
+                  <span className="bg-clinic-purple/10 text-clinic-purple px-4 py-1 rounded-full font-bold text-xs uppercase tracking-widest">{t("Passo 1: Especialidade")}</span>
+                  <h2 className="text-3xl md:text-4xl font-bold text-clinic-blue text-center md:text-left">{t("O que quer cuidar hoje?")}</h2>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {specialtiesData.map((spec) => (
+                  {translatedSpecialties.map((spec) => (
                     <button
                       key={spec.id}
                       onClick={() => { setSelectedSpecialty(spec); setStep(2); }}
@@ -1147,8 +1186,8 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                         {spec.icon}
                       </div>
                       <div className="text-center md:text-left">
-                        <h3 className="font-bold text-xl text-clinic-blue group-hover:text-clinic-purple transition-colors">{spec.name}</h3>
-                        <p className="text-sm text-gray-500 mt-2 line-clamp-2">Explorar tratamentos e preços.</p>
+                        <h3 className="font-bold text-xl text-clinic-blue group-hover:text-clinic-purple transition-colors">{t(spec.name)}</h3>
+                        <p className="text-sm text-gray-500 mt-2 line-clamp-2">{t("Explorar tratamentos e preços.")}</p>
                       </div>
                       <div className="absolute top-8 right-8 opacity-0 group-hover:opacity-100 transition-opacity">
                          <Plus className="text-clinic-purple" size={20} />
@@ -1159,7 +1198,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
               </motion.div>
             )}
 
-            {flowMode === 'manual' && step === 2 && selectedSpecialty && (
+            {flowMode === 'manual' && step === 2 && activeSpecialty && (
               <motion.div 
                 key="step2"
                 initial={{ opacity: 0, x: 30 }}
@@ -1169,21 +1208,21 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
               >
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                   <div className="flex flex-col gap-2">
-                    <button onClick={() => setStep(1)} className="flex items-center gap-2 text-clinic-purple font-bold text-xs uppercase hover:underline mb-2 transition-all">
-                       <ChevronLeft size={16} /> Voltar às categorias
+                    <button onClick={() => setStep(1)} className="flex items-center gap-2 text-clinic-purple font-bold text-xs uppercase hover:underline mb-2 transition-all cursor-pointer">
+                       <ChevronLeft size={16} /> {t("Voltar às categorias")}
                     </button>
-                    <h2 className="text-3xl md:text-4xl font-bold text-clinic-blue">Tratamentos de {selectedSpecialty.name}</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-clinic-blue">{t("Tratamentos de")} {t(activeSpecialty.name)}</h2>
                   </div>
                   <div className="bg-clinic-bg px-6 py-3 rounded-2xl flex items-center gap-3">
                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-clinic-purple">
-                        {selectedSpecialty.icon}
+                        {activeSpecialty.icon}
                      </div>
-                     <span className="font-bold text-clinic-blue hidden md:block">{selectedSpecialty.name}</span>
+                     <span className="font-bold text-clinic-blue hidden md:block">{t(activeSpecialty.name)}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedSpecialty.procedures.map((proc) => (
+                  {activeSpecialty.procedures.map((proc) => (
                     <button
                       key={proc.id}
                       onClick={() => toggleProcedure(proc.id)}
@@ -1199,7 +1238,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                         </h3>
                         <p className="text-gray-500 text-xs font-light leading-relaxed">{proc.description}</p>
                         <div className="mt-4 flex items-center gap-2">
-                           <span className="text-[10px] font-bold uppercase text-gray-400">Referência:</span>
+                           <span className="text-[10px] font-bold uppercase text-gray-400">{t("Referência:")}</span>
                            <span className="text-sm font-bold text-clinic-blue">
                               {proc.priceMin === proc.priceMax ? `${proc.priceMin}€` : `${proc.priceMin}€ - ${proc.priceMax}€`}
                            </span>
@@ -1218,14 +1257,14 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
 
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-10 border-t border-gray-100">
                   <div className="text-center sm:text-left">
-                     <p className="text-sm text-gray-500">Selecionados: <span className="font-bold text-clinic-purple">{selectedProcedures.length} tratamentos</span></p>
+                     <p className="text-sm text-gray-500">{t("Selecionados:")} <span className="font-bold text-clinic-purple">{selectedProcedures.length} {t("tratamentos")}</span></p>
                   </div>
                   <button 
                     onClick={goToResult}
                     disabled={selectedProcedures.length === 0}
-                    className="w-full sm:w-auto flex items-center justify-center gap-3 bg-clinic-blue text-white font-bold px-12 py-5 rounded-2xl hover:bg-clinic-purple disabled:opacity-50 disabled:grayscale transition-all shadow-xl active:scale-95"
+                    className="w-full sm:w-auto flex items-center justify-center gap-3 bg-clinic-blue text-white font-bold px-12 py-5 rounded-2xl hover:bg-clinic-purple disabled:opacity-50 disabled:grayscale transition-all shadow-xl active:scale-95 cursor-pointer"
                   >
-                    Ver Orçamento <ChevronRight size={20} />
+                    {t("Ver Orçamento")} <ChevronRight size={20} />
                   </button>
                 </div>
               </motion.div>
@@ -1239,8 +1278,8 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                 className="space-y-12 max-w-4xl mx-auto"
               >
                 <div className="text-center space-y-4">
-                  <div className="inline-block bg-clinic-lime/20 text-clinic-blue px-6 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] mb-4">Estimativa Pronto!</div>
-                  <h2 className="text-4xl md:text-5xl font-bold text-clinic-blue">O seu plano de sorriso</h2>
+                  <div className="inline-block bg-clinic-lime/20 text-clinic-blue px-6 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] mb-4">{t("Estimativa Pronto!")}</div>
+                  <h2 className="text-4xl md:text-5xl font-bold text-clinic-blue">{t("O seu plano de sorriso")}</h2>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
@@ -1249,28 +1288,28 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                     <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-clinic-purple opacity-20 blur-3xl rounded-full"></div>
                     <div className="absolute bottom-[-10%] left-[-10%] w-64 h-64 bg-clinic-lime opacity-10 blur-3xl rounded-full"></div>
                     
-                    <span className="relative z-10 text-clinic-purple font-black text-xs uppercase tracking-[0.3em] mb-6 block">Valor Total Estimado</span>
+                    <span className="relative z-10 text-clinic-purple font-black text-xs uppercase tracking-[0.3em] mb-6 block">{t("Valor Total Estimado")}</span>
                     <div className="relative z-10 flex items-center justify-center gap-4">
                        <div className="flex flex-col items-center">
-                          <span className="text-sm font-bold opacity-50 mb-1">Mínimo</span>
+                          <span className="text-sm font-bold opacity-50 mb-1">{t("Mínimo")}</span>
                           <span className="text-5xl md:text-7xl font-black">{min}€</span>
                        </div>
                        <div className="h-16 w-px bg-white/20 mx-4"></div>
                        <div className="flex flex-col items-center">
-                          <span className="text-sm font-bold opacity-50 mb-1">Máximo</span>
+                          <span className="text-sm font-bold opacity-50 mb-1">{t("Máximo")}</span>
                           <span className="text-5xl md:text-7xl font-black">{max}€</span>
                        </div>
                     </div>
                     
                     <div className="relative z-10 mt-10 pt-8 border-t border-white/10 w-full">
                        <p className="text-sm font-light italic opacity-80 flex items-center justify-center gap-2">
-                          <Info size={16} className="text-clinic-lime" /> Inclui diagnóstico e acompanhamento especializado
+                          <Info size={16} className="text-clinic-lime" /> {t("Inclui diagnóstico e acompanhamento especializado")}
                        </p>
                     </div>
                   </div>
 
                   <div className="lg:col-span-2 bg-clinic-bg/50 p-10 rounded-[3.5rem] border-2 border-white flex flex-col justify-center">
-                    <h3 className="font-bold text-clinic-blue text-xl mb-6">Próximos Passos:</h3>
+                    <h3 className="font-bold text-clinic-blue text-xl mb-6">{t("Próximos Passos:")}</h3>
                     <ul className="space-y-5">
                       {[
                         'Confirmação médica do orçamento',
@@ -1281,7 +1320,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                           <div className="shrink-0 w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center">
                              <Check size={18} className="text-clinic-lime" />
                           </div>
-                          <span className="text-sm font-medium leading-snug">{text}</span>
+                          <span className="text-sm font-medium leading-snug">{t(text)}</span>
                         </li>
                       ))}
                     </ul>
@@ -1845,14 +1884,14 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
 
       <div className="bg-clinic-blue/5 p-10 rounded-[3rem] border border-clinic-blue/10">
         <h4 className="font-extrabold text-clinic-blue flex items-center gap-2 mb-4 text-xl">
-          <Info className="w-6 h-6 text-clinic-purple" /> Nota sobre as estimativas
+          <Info className="w-6 h-6 text-clinic-purple" /> {t("Nota sobre as estimativas")}
         </h4>
         <div className="space-y-4 text-gray-600 text-sm leading-relaxed max-w-4xl">
           <p>
-            Os valores apresentados são baseados na tabela de preços em vigor e representam o investimento <strong>mínimo expectável</strong> para situações clínicas padrão.
+            {t("Os valores apresentados são baseados na tabela de preços em vigor e representam o investimento")} <strong>{t("mínimo expectável")}</strong> {t("para situações clínicas padrão.")}
           </p>
           <p>
-            <strong>Importante:</strong> A medicina dentária é personalizada. Fatores como a qualidade óssea, complexidade anatómica e necessidades específicas de higienização podem alterar o plano final. Por isso, <u>nenhuma estimativa online substitui a consulta de avaliação obrigatória</u>.
+            <strong>{t("Importante:")}</strong> {t("A medicina dentária é personalizada. Fatores como a qualidade óssea, complexidade anatómica e necessidades específicas de higienização podem alterar o plano final. Por isso,")} <u>{t("nenhuma estimativa online substitui a consulta de avaliação obrigatória")}</u>.
           </p>
         </div>
       </div>
@@ -1865,8 +1904,8 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-white/30">
               <div>
-                <span className="text-[10px] font-black tracking-wider uppercase text-clinic-purple">Auxílio de Diagnóstico</span>
-                <h3 className="font-extrabold text-clinic-blue text-lg tracking-tight">Objetivo do Tratamento 🦷</h3>
+                <span className="text-[10px] font-black tracking-wider uppercase text-clinic-purple">{t("Auxílio de Diagnóstico")}</span>
+                <h3 className="font-extrabold text-clinic-blue text-lg tracking-tight">{t("Objetivo do Tratamento 🦷")}</h3>
               </div>
               <button
                 type="button"
@@ -1878,7 +1917,7 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
             </div>
 
             <p className="text-xs text-clinic-blue/85 leading-relaxed font-semibold">
-              Selecione as opções que correspondem ao seu caso. O assistente ajudará a formular a sua mensagem de forma clara e profissional:
+              {t("Selecione as opções que correspondem ao seu caso. O assistente ajudará a formular a sua mensagem de forma clara e profissional:")}
             </p>
 
             {/* List with Checkmarks */}
@@ -1897,9 +1936,9 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                     }`}
                   >
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-xs font-black">{opt.label}</span>
+                      <span className="text-xs font-black">{t(opt.label)}</span>
                       <span className={`text-[10px] sm:text-[11px] leading-tight font-medium ${isSelected ? 'text-clinic-purple/90 font-extrabold' : 'text-clinic-blue/60'}`}>
-                        {opt.desc}
+                        {t(opt.desc)}
                       </span>
                     </div>
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center border text-xs shrink-0 transition-all ${
@@ -1917,15 +1956,15 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
             {/* Footer with counts and Confirm button */}
             <div className="pt-2 flex flex-col gap-3">
               <div className="flex justify-between items-center text-[10px] text-clinic-blue/70 uppercase tracking-wider font-extrabold px-1">
-                <span>Opções Selecionadas</span>
-                <span className="text-clinic-purple font-black">{selectedInterests.length} de {TREATMENT_POCKET_GUIDES.length}</span>
+                <span>{t("Opções Selecionadas")}</span>
+                <span className="text-clinic-purple font-black">{selectedInterests.length} {t("de")} {TREATMENT_POCKET_GUIDES.length}</span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsGlassPocketGuideOpen(false)}
                 className="w-full bg-clinic-purple/90 hover:bg-clinic-purple text-white font-extrabold py-4 rounded-xl shadow-lg transition-all active:scale-95 text-center cursor-pointer uppercase text-xs tracking-wider"
               >
-                Confirmar Seleção ✓
+                {t("Confirmar Seleção ✓")}
               </button>
             </div>
 

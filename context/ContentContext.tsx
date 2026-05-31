@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { useLanguage } from './LanguageContext';
 
 // --- INITIAL DEFAULT DATA ---
 const defaultData = {
@@ -169,4 +170,18 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 };
 
-export const useContent = () => useContext(ContentContext);
+export const useContent = () => {
+  const context = useContext(ContentContext);
+  const { language, translateObject } = useLanguage();
+  if (!context) {
+    throw new Error('useContent must be used within a ContentProvider');
+  }
+  const translatedContent = useMemo(() => {
+    return translateObject(context.content);
+  }, [context.content, language, translateObject]);
+
+  return {
+    ...context,
+    content: translatedContent
+  };
+};

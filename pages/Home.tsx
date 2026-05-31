@@ -1,13 +1,17 @@
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const Home: React.FC = () => {
   const { content } = useContent();
+  const { language, t, translateObject } = useLanguage();
   const heroTitle = content?.home?.heroTitle || "Clínica Santa Maria dos Olivais";
   const heroSubtitle = content?.home?.heroSubtitle || "";
-  const stories = content?.stories || [];
+  const stories = useMemo(() => {
+    return translateObject(content?.stories || []);
+  }, [content?.stories, translateObject, language]);
 
   const getFallbackThumbnail = (title: string, originalThumbnail: string) => {
     const key = title.trim().toLowerCase();
@@ -115,6 +119,10 @@ const Home: React.FC = () => {
       buttonText: "Marcar Consulta"
     }
   ];
+
+  const translatedServicesList = useMemo(() => {
+    return translateObject(servicesList);
+  }, [language, translateObject]);
 
   const trackGtagEvent = (name: string, params: any) => {
     if ((window as any).trackEvent) {
@@ -336,7 +344,7 @@ const Home: React.FC = () => {
       {/* Hero Section */}
       <section className="relative z-30 text-center px-4 sm:px-6 lg:px-8 mb-4 md:mb-12" aria-labelledby="main-heading">
         <h1 id="main-heading" className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-semibold text-clinic-blue mb-8 leading-tight break-normal hyphens-none">
-          <span className="font-body text-clinic-purple text-lg md:text-3xl lg:text-4xl font-medium mr-2 block sm:inline">Clínica Dentária</span>
+          <span className="font-body text-clinic-purple text-lg md:text-3xl lg:text-4xl font-medium mr-2 block sm:inline">{t("Clínica Dentária")}</span>
           {heroTitle.replace('Clínica', '')}
         </h1>
         <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-800 max-w-4xl mx-auto font-light px-4 leading-relaxed">{heroSubtitle}</p>
@@ -423,44 +431,48 @@ const Home: React.FC = () => {
       <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 mb-12 bg-white/40 backdrop-blur-md rounded-[40px] md:rounded-[60px] border border-white shadow-2xl overflow-hidden" aria-labelledby="campaign-heading">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           <div className="order-2 lg:order-1 lg:pl-8">
-            <span className="inline-block bg-clinic-purple text-white px-5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">Campanha Exclusiva</span>
-            <h2 id="campaign-heading" className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-bold text-clinic-blue mb-8 leading-tight">Clínica Santa Maria dos Olivais:<br /><span className="text-clinic-purple font-serif italic">Excelência e Proximidade</span></h2>
+            <span className="inline-block bg-clinic-purple text-white px-5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">{t("Campanha Exclusiva")}</span>
+            <h2 id="campaign-heading" className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-bold text-clinic-blue mb-8 leading-tight">
+              {t("Clínica Santa Maria dos Olivais:")}
+              <br />
+              <span className="text-clinic-purple font-serif italic">{t("Excelência e Proximidade")}</span>
+            </h2>
             
             <div className="text-lg text-gray-700 mb-10 leading-relaxed space-y-8 font-light">
               <div>
-                <h3 className="text-2xl font-bold text-clinic-blue mb-3">Uma Década a Criar Sorrisos em Lisboa</h3>
-                <p>Com 10 anos de experiência, a nossa clínica em Olivais é referência em Implantologia e Estética Dentária. Aliamos o rigor técnico à inovação para oferecer tratamentos personalizados, desde Facetas Estéticas a reabilitações complexas, focando sempre na sua saúde e harmonia facial.</p>
+                <h3 className="text-2xl font-bold text-clinic-blue mb-3">{t("Uma Década a Criar Sorrisos em Lisboa")}</h3>
+                <p>{t("Com 10 anos de experiência, a nossa clínica em Olivais é referência em Implantologia e Estética Dentária. Aliamos o rigor técnico à inovação para oferecer tratamentos personalizados, desde Facetas Estéticas a reabilitações complexas, focando sempre na sua saúde e harmonia facial.")}</p>
               </div>
             </div>
             
             <div className="grid grid-cols-1 gap-4 mb-6">
               <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-lime transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
                 <div className="flex flex-col gap-2 w-full mb-3">
-                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-lime transition-colors leading-tight break-normal hyphens-none">Implante Unitário + Coroa</p>
-                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 745 €*</p>
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-lime transition-colors leading-tight break-normal hyphens-none">{t("Implante Unitário + Coroa")}</p>
+                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">{t("Desde 745 €*")}</p>
                 </div>
-                <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">(Inclui fase cirúrgica e coroa metalo-cerâmica)</p>
+                <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">{t("(Inclui fase cirúrgica e coroa metalo-cerâmica)")}</p>
               </Link>
-
+ 
               <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-purple transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
                 <div className="flex flex-col gap-2 w-full mb-3">
-                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-purple transition-colors leading-tight break-normal hyphens-none">Protocolo Superior (Dentes Fixos)</p>
-                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 4.800 €*</p>
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-purple transition-colors leading-tight break-normal hyphens-none">{t("Protocolo Superior (Dentes Fixos)")}</p>
+                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">{t("Desde 4.800 €*")}</p>
                 </div>
-                <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">(Reabilitação total de arcada)</p>
+                <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">{t("(Reabilitação total de arcada)")}</p>
               </Link>
-
+ 
               <Link to="/marcacoes" state={{ service: "Estética Dentária" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-blue transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
                 <div className="flex flex-col gap-2 w-full mb-3">
-                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-blue transition-colors leading-tight break-normal hyphens-none">Facetas Estéticas (Pack 4 dentes)</p>
-                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">Desde 1.800 €*</p>
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-blue transition-colors leading-tight break-normal hyphens-none">{t("Facetas Estéticas (Pack 4 dentes)")}</p>
+                  <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">{t("Desde 1.800 €*")}</p>
                 </div>
-                <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">(Zona estética frontal)</p>
+                <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">{t("(Zona estética frontal)")}</p>
               </Link>
             </div>
             
             <p className="text-[10px] text-gray-400 mb-4 italic leading-tight">
-              *Nota Legal: Valores de referência para casos standard, sujeitos a avaliação médica presencial. Não inclui enxertos ósseos se necessários.
+              {t("*Nota Legal: Valores de referência para casos standard, sujeitos a avaliação médica presencial. Não inclui enxertos ósseos se necessários.")}
             </p>
           </div>
           
@@ -486,7 +498,7 @@ const Home: React.FC = () => {
                 <i className={`fas ${isCampMuted ? 'fa-volume-xmark' : 'fa-volume-high'} text-sm`}></i>
               </button>
             </div>
-            <Link to="/marcacoes" onClick={() => trackGtagEvent('click_agendar_consulta', { 'event_category': 'engagement' })} className="inline-block bg-clinic-blue text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-clinic-purple transition-all transform hover:scale-105 text-center">Marque a Sua Consulta</Link>
+            <Link to="/marcacoes" onClick={() => trackGtagEvent('click_agendar_consulta', { 'event_category': 'engagement' })} className="inline-block bg-clinic-blue text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-clinic-purple transition-all transform hover:scale-105 text-center">{t("Marque a Sua Consulta")}</Link>
           </div>
         </div>
       </section>
@@ -521,8 +533,8 @@ const Home: React.FC = () => {
              <Link to="/campanhas" className="bg-clinic-purple text-white px-8 py-3 rounded-full text-lg font-bold shadow-xl hover:bg-clinic-blue transition-all transform hover:scale-105">Ver Mais <i className="fas fa-arrow-right ml-2 text-sm"></i></Link>
           </div>
           <div className="relative z-30 text-center lg:text-left order-1 lg:order-2">
-            <h2 id="experience-heading" className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-clinic-blue leading-[1.1]"><div className="flex flex-wrap justify-center lg:justify-start items-center gap-2"><span>Com</span><span className="font-serif italic text-clinic-lime text-4xl md:text-6xl lg:text-[10rem]">10</span><span>anos de</span></div><div className="font-serif italic text-clinic-purple">Experiência</div></h2>
-            <div className="mt-8 md:mt-12 space-y-4"><p className="text-xl sm:text-2xl md:text-4xl font-bold text-clinic-blue tracking-tight">Implantes | Estética Dentária | Ortodontia</p><p className="text-lg sm:text-xl md:text-2xl font-serif italic text-clinic-purple">Tratamentos personalizados para toda a família👇</p></div>
+            <h2 id="experience-heading" className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-clinic-blue leading-[1.1]"><div className="flex flex-wrap justify-center lg:justify-start items-center gap-2"><span>{t("Com")}</span><span className="font-serif italic text-clinic-lime text-4xl md:text-6xl lg:text-[10rem]">10</span><span>{t("anos de")}</span></div><div className="font-serif italic text-clinic-purple">{t("Experiência")}</div></h2>
+            <div className="mt-8 md:mt-12 space-y-4"><p className="text-xl sm:text-2xl md:text-4xl font-bold text-clinic-blue tracking-tight">{t("Implantes | Estética Dentária | Ortodontia")}</p><p className="text-lg sm:text-xl md:text-2xl font-serif italic text-clinic-purple">{t("Oferecemos cuidados dentários personalizados com tecnologia de ponta para toda a família.")} 👇</p></div>
           </div>
         </div>
       </section>
@@ -530,10 +542,10 @@ const Home: React.FC = () => {
       {/* Serviços */}
       <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32" aria-labelledby="services-heading">
         <div className="text-center mb-20">
-          <h2 id="services-heading" className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif italic border-b-8 border-clinic-lime inline-block pb-4 leading-tight">Nossos Serviços Dentários</h2>
+          <h2 id="services-heading" className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif italic border-b-8 border-clinic-lime inline-block pb-4 leading-tight">{t("Nossos Serviços Dentários")}</h2>
         </div>
         <div className="grid gap-8">
-          {servicesList.map((service, index) => (
+          {translatedServicesList.map((service, index) => (
             <details key={index} className="group bg-white rounded-3xl border border-clinic-blue/5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.20)] overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.40)] open:border-clinic-lime"
               onToggle={(e) => {
                 if ((e.target as HTMLDetailsElement).open) {
@@ -560,7 +572,7 @@ const Home: React.FC = () => {
                   <div className="p-5 bg-clinic-bg rounded-2xl border-l-4 border-clinic-lime">
                     <p className="font-bold text-clinic-blue mb-4 italic">{service.highlight}</p>
                     <div className="space-y-3">
-                       <p className="text-xs font-bold uppercase tracking-wider text-clinic-purple mb-2">Transparência:</p>
+                       <p className="text-xs font-bold uppercase tracking-wider text-clinic-purple mb-2">{t("Transparência:")}</p>
                         {service.transparency.map((line: string, idx: number) => {
                           const colonIndex = line.lastIndexOf(':');
                           if (colonIndex !== -1 && !line.startsWith('-')) {
@@ -584,10 +596,10 @@ const Home: React.FC = () => {
 
                   <div className="pt-4 flex gap-4">
                     <Link to={`/servicos/${service.slug}`} className="inline-block bg-clinic-purple text-white font-black px-10 py-4 rounded-full shadow-lg hover:bg-clinic-blue transition-all uppercase text-sm md:text-base transform hover:scale-105 active:scale-95">
-                      Ver Detalhes
+                      {t("Ver Detalhes")}
                     </Link>
                     <Link to="/marcacoes" state={{ service: service.category }} onClick={() => trackGtagEvent('click_service_cta', { 'event_category': 'engagement', 'event_label': service.buttonText })} className="inline-block bg-clinic-lime text-clinic-blue font-black px-10 py-4 rounded-full shadow-lg hover:bg-clinic-blue hover:text-white transition-all uppercase text-sm md:text-base transform hover:scale-105 active:scale-95">
-                      {service.buttonText}
+                      {t(service.buttonText)}
                     </Link>
                   </div>
                 </div>
@@ -600,36 +612,36 @@ const Home: React.FC = () => {
       {/* Seção Seguros e Reembolsos */}
       <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 border-t border-clinic-lime/20" aria-labelledby="insurance-heading">
         <div className="text-center mb-16">
-          <h2 id="insurance-heading" className="text-3xl sm:text-5xl md:text-6xl font-bold text-clinic-blue mb-6 leading-tight">Aceitamos o seu Seguro em <br /><span className="text-clinic-purple italic font-serif">Regime de Reembolso</span></h2>
+          <h2 id="insurance-heading" className="text-3xl sm:text-5xl md:text-6xl font-bold text-clinic-blue mb-6 leading-tight">{t("Aceitamos o seu Seguro em")} <br /><span className="text-clinic-purple italic font-serif">{t("Regime de Reembolso")}</span></h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light leading-relaxed">
-            Na Clínica Santa Maria dos Olivais, escolhe o seu médico pela qualidade, não pela lista da seguradora. Atendimento premium e personalizado.
+            {t("Na Clínica Santa Maria dos Olivais, escolhe o seu médico pela qualidade, não pela lista da seguradora. Atendimento premium e personalizado.")}
           </p>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 mb-16">
           <div className="bg-white p-8 rounded-[30px] shadow-xl border-t-4 border-clinic-lime flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-clinic-bg rounded-full flex items-center justify-center text-clinic-blue mb-6 text-2xl"><i className="fas fa-stethoscope"></i></div>
-            <h3 className="text-xl font-bold text-clinic-blue mb-4">1. Tratamento</h3>
-            <p className="text-gray-600 text-sm">Realiza o tratamento com os nossos especialistas com total liberdade de escolha clínica.</p>
+            <h3 className="text-xl font-bold text-clinic-blue mb-4">{t("1. Tratamento")}</h3>
+            <p className="text-gray-600 text-sm">{t("Realiza o tratamento com os nossos especialistas com total liberdade de escolha clínica.")}</p>
           </div>
           <div className="bg-white p-8 rounded-[30px] shadow-xl border-t-4 border-clinic-lime flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-clinic-bg rounded-full flex items-center justify-center text-clinic-blue mb-6 text-2xl"><i className="fas fa-file-invoice-dollar"></i></div>
-            <h3 className="text-xl font-bold text-clinic-blue mb-4">2. Faturação</h3>
-            <p className="text-gray-600 text-sm">Efetuamos a fatura detalhada com todos os códigos OMD exigidos pelas seguradoras como a ADSE, Médis, Allianz ou Multicare.</p>
+            <h3 className="text-xl font-bold text-clinic-blue mb-4">{t("2. Faturação")}</h3>
+            <p className="text-gray-600 text-sm">{t("Efetuamos a fatura detalhada com todos os códigos OMD exigidos pelas seguradoras como a ADSE, Médis, Allianz ou Multicare.")}</p>
           </div>
           <div className="bg-white p-8 rounded-[30px] shadow-xl border-t-4 border-clinic-lime flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-clinic-bg rounded-full flex items-center justify-center text-clinic-blue mb-6 text-2xl"><i className="fas fa-mobile-alt"></i></div>
-            <h3 className="text-xl font-bold text-clinic-blue mb-4">3. Reembolso</h3>
-            <p className="text-gray-600 text-sm">O reembolso é processado pela sua seguradora de acordo com as condições específicas da sua apólice e prazos determinados pela mesma.</p>
+            <h3 className="text-xl font-bold text-clinic-blue mb-4">{t("3. Reembolso")}</h3>
+            <p className="text-gray-600 text-sm">{t("O reembolso é processado pela sua seguradora de acordo com as condições específicas da sua apólice e prazos determinados pela mesma.")}</p>
           </div>
         </div>
 
         <div className="bg-clinic-blue text-white p-8 md:p-12 rounded-[40px] shadow-2xl relative overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="flex-1 text-center md:text-left">
-              <h4 className="text-2xl font-bold mb-4">Nota importante sobre pagamentos</h4>
+              <h4 className="text-2xl font-bold mb-4">{t("Nota importante sobre pagamentos")}</h4>
               <p className="text-white/80 leading-relaxed italic">
-                Não realizamos financiamento bancário direto. O pagamento é feito no ato, garantindo-lhe o melhor preço final sem juros e transparência total sobre o valor investido na sua saúde.
+                {t("Não realizamos financiamento bancário direto. O pagamento é feito no ato, garantindo-lhe o melhor preço final sem juros e transparência total sobre o valor investido na sua saúde.")}
               </p>
             </div>
             <div className="flex flex-wrap gap-8 items-center justify-center md:justify-end md:border-l-2 border-white/20 md:pl-8">
@@ -644,8 +656,8 @@ const Home: React.FC = () => {
 
       <section className="relative z-30 py-16 md:py-24 text-center">
         <div className="max-w-[1100px] mx-auto px-4 flex flex-col items-center">
-          <h2 className="text-2xl sm:text-4xl md:text-6xl font-bold text-clinic-blue mb-12 flex flex-wrap justify-center items-center gap-4"><span>Transforme o seu</span><div className="w-[80px] h-[55px] md:w-[150px] md:h-[100px] rounded-2xl overflow-hidden border-4 border-white shadow-xl flex items-center justify-center bg-white/10"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" className="w-[85%] h-[85%] object-contain animate-float" alt="Smile Logo" loading="lazy" decoding="async" /></div><span className="font-serif italic text-clinic-purple">sorriso</span><span>hoje!</span></h2>
-          <Link to="/marcacoes" className="inline-block bg-clinic-blue text-white px-6 py-4 rounded-full text-base font-bold shadow-2xl hover:bg-clinic-purple transition-all transform hover:-translate-y-2 text-center w-full max-w-[320px] sm:w-auto sm:px-12 sm:py-5 sm:text-xl active:scale-95">Agende Sua Consulta <span className="animate-pulse ml-2 inline-block">♥</span></Link>
+          <h2 className="text-2xl sm:text-4xl md:text-6xl font-bold text-clinic-blue mb-12 flex flex-wrap justify-center items-center gap-4"><span>{t("Transforme o seu")}</span><div className="w-[80px] h-[55px] md:w-[150px] md:h-[100px] rounded-2xl overflow-hidden border-4 border-white shadow-xl flex items-center justify-center bg-white/10"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" className="w-[85%] h-[85%] object-contain animate-float" alt="Smile Logo" loading="lazy" decoding="async" /></div><span className="font-serif italic text-clinic-purple">{t("sorriso")}</span><span>{t("hoje!")}</span></h2>
+          <Link to="/marcacoes" className="inline-block bg-clinic-blue text-white px-6 py-4 rounded-full text-base font-bold shadow-2xl hover:bg-clinic-purple transition-all transform hover:-translate-y-2 text-center w-full max-w-[320px] sm:w-auto sm:px-12 sm:py-5 sm:text-xl active:scale-95">{t("Agende Sua Consulta")} <span className="animate-pulse ml-2 inline-block">♥</span></Link>
         </div>
       </section>
     </div>

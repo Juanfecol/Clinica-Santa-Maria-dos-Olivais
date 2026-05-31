@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
+import { useLanguage } from '../context/LanguageContext';
 
 // CONTROL POINT: LEAD SUBMISSION AND THANK YOU PAGE
 const ThankYou: React.FC = () => {
   const { state } = useLocation();
   const { content } = useContent();
+  const { t } = useLanguage();
   const global = content.global || {};
   
   useEffect(() => {
@@ -57,15 +59,15 @@ const ThankYou: React.FC = () => {
           <i className="fas fa-check text-green-500 text-5xl"></i>
         </div>
 
-        <h1 className="text-3xl md:text-5xl font-bold text-clinic-blue mb-4">Obrigado! Recebemos o seu pedido de marcação.</h1>
+        <h1 className="text-3xl md:text-5xl font-bold text-clinic-blue mb-4">{t("Obrigado! Recebemos o seu pedido de marcação.")}</h1>
         <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-          A nossa equipa entrará em contacto consigo nas próximas 24 horas para confirmar o horário.
+          {t("A nossa equipa entrará em contacto consigo nas próximas 24 horas para confirmar o horário.")}
         </p>
 
         {/* Data Summary Card */}
         <div className="bg-white/60 rounded-2xl p-6 mb-8 text-left border border-gray-100 shadow-sm mx-auto max-w-md">
-          <h3 className="text-sm uppercase tracking-wide text-gray-400 font-bold mb-4 border-b pb-2">Localização da Clínica</h3>
-          <p className="text-clinic-blue font-medium">Estrada de Moscavide n 32 c, 1800-279 Lisboa</p>
+          <h3 className="text-sm uppercase tracking-wide text-gray-400 font-bold mb-4 border-b pb-2">{t("Localização da Clínica")}</h3>
+          <p className="text-clinic-blue font-medium">{t("Estrada de Moscavide n 32 c, 1800-279 Lisboa")}</p>
         </div>
 
         {/* Action Buttons */}
@@ -77,16 +79,16 @@ const ThankYou: React.FC = () => {
             className="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-[#20bd5a] hover:-translate-y-1 transition-all transform"
           >
             <i className="fab fa-whatsapp text-2xl"></i>
-            Falar Agora no WhatsApp
+            {t("Falar Agora no WhatsApp")}
           </a>
           
           <div className="pt-4 border-t border-gray-100 mt-2">
-             <p className="text-gray-600 mb-4 font-medium italic">"Aproveite para conhecer todos os nossos serviços"</p>
+             <p className="text-gray-600 mb-4 font-medium italic">{t("\"Aproveite para conhecer todos os nossos serviços\"")}</p>
              <Link 
               to="/" 
               className="inline-block px-8 py-3 rounded-full bg-clinic-blue text-white hover:bg-clinic-lime hover:text-clinic-blue transition-all font-semibold shadow-md"
             >
-              Voltar à Página Inicial
+              {t("Voltar à Página Inicial")}
             </Link>
           </div>
         </div>

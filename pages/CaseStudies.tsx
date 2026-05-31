@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Volume2, VolumeX } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+
+const getSrcSet = (src: string) => {
+  if (!src) return undefined;
+  if (!src.includes('b-cdn.net') && !src.startsWith('http')) return undefined;
+  const separator = src.includes('?') ? '&' : '?';
+  const widths = [320, 640, 960, 1200, 1600];
+  return widths.map(w => `${src}${separator}width=${w} ${w}w`).join(', ');
+};
 
 const videoTestimonials = [
   "https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_santa_maria_1.mp4",
@@ -33,6 +42,7 @@ const transformationGallery = [
 ];
 
 const CaseStudies: React.FC = () => {
+  const { t } = useLanguage();
   const [centerIndex, setCenterIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -85,7 +95,7 @@ const CaseStudies: React.FC = () => {
           safePlay(video);
         } else {
           video.pause();
-          video.currentTime = 0;
+          video.currentTime = 0.1;
         }
       }
     });
@@ -107,7 +117,7 @@ const CaseStudies: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-20 bg-clinic-bg overflow-hidden">
-      <h1 className="text-5xl font-bold text-clinic-blue text-center mb-20">Casos Clínicos</h1>
+      <h1 className="text-5xl font-bold text-clinic-blue text-center mb-10 md:mb-20">{t("Casos Clínicos")}</h1>
       
       {/* Stories-style Carousel */}
       <section className="h-[500px] md:h-[600px] mb-24 relative flex justify-center items-center">
@@ -128,12 +138,12 @@ const CaseStudies: React.FC = () => {
                 return (
                   <video 
                     ref={(el) => (videoRefs.current[index] = el)}
-                    src={src}
+                    src={`${src}#t=0.1`}
                     className={`w-full h-full object-cover bg-gray-900 transition-all duration-500 ${index === centerIndex ? 'opacity-100' : 'opacity-60'}`}
                     muted={index === centerIndex ? isMuted : true}
                     playsInline
                     autoPlay={index === centerIndex}
-                    preload={isNear ? "auto" : "metadata"}
+                    preload="auto"
                     poster={`${src}#t=0.1`}
                     onEnded={() => {
                         setCenterIndex((prev) => (prev + 1) % videoTestimonials.length);
@@ -159,7 +169,7 @@ const CaseStudies: React.FC = () => {
 
       {/* Before/After Gallery */}
       <section>
-        <h2 className="text-3xl font-bold text-clinic-blue mb-10 text-center">Transformações Reais</h2>
+        <h2 className="text-3xl font-bold text-clinic-blue mb-10 text-center">{t("Transformações Visíveis")}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
            {transformationGallery.map((item, i) => (
              <motion.div 
@@ -167,7 +177,15 @@ const CaseStudies: React.FC = () => {
                className="relative h-96 group cursor-pointer overflow-hidden rounded-3xl border-4 border-white shadow-xl"
                whileHover={{ scale: 1.02 }}
              >
-               <img src={item.src} loading="lazy" className="w-full h-full object-cover group-hover:brightness-100 brightness-50 transition-all duration-500" alt={`Transformação ${i + 1}`} />
+               <img 
+                 src={item.src} 
+                 srcSet={getSrcSet(item.src)}
+                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                 loading="lazy" 
+                 decoding="async"
+                 className="w-full h-full object-cover group-hover:brightness-100 brightness-50 transition-all duration-500" 
+                 alt={`${t("Caso clínico real")} ${i + 1}`} 
+               />
              </motion.div>
            ))}
         </div>

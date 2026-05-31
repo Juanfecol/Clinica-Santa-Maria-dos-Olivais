@@ -1,5 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 
+const getSrcSet = (src: string) => {
+  if (!src) return undefined;
+  if (!src.includes('b-cdn.net') && !src.startsWith('http')) return undefined;
+  const separator = src.includes('?') ? '&' : '?';
+  const widths = [320, 640, 960, 1200, 1600];
+  return widths.map(w => `${src}${separator}width=${w} ${w}w`).join(', ');
+};
+
 interface BeforeAfterSliderProps {
   beforeImage: string;
   afterImage: string;
@@ -36,9 +44,13 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
       {/* After Image (Background) */}
       <img 
         src={afterImage} 
+        srcSet={getSrcSet(afterImage)}
+        sizes="(max-width: 768px) 100vw, 50vw"
         alt="Depois" 
         className="absolute inset-0 w-full h-full object-cover"
         draggable="false"
+        loading="lazy"
+        decoding="async"
       />
       
       {/* Before Image (Clipped) */}
@@ -48,9 +60,13 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
       >
         <img 
           src={beforeImage} 
+          srcSet={getSrcSet(beforeImage)}
+          sizes="(max-width: 768px) 100vw, 50vw"
           alt="Antes" 
           className="absolute inset-0 w-full h-full object-cover"
           draggable="false"
+          loading="lazy"
+          decoding="async"
         />
       </div>
 

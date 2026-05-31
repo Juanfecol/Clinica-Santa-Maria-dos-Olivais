@@ -4,9 +4,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 import { ContactForm } from '../components/ContactForm';
 import { serviceDetails } from '../constants/servicesData';
+import { useLanguage } from '../context/LanguageContext';
 
 export const ServiceTemplate: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { t, translateObject } = useLanguage();
   const [isMuted, setIsMuted] = useState(true);
   const [isAllOpen, setIsAllOpen] = useState(false); // Default closed
   const [openGroups, setOpenGroups] = useState<Record<number, boolean>>({});
@@ -71,7 +73,7 @@ export const ServiceTemplate: React.FC = () => {
     }
   };
 
-  const service = slug ? serviceDetails[slug] : null;
+  const service = slug ? translateObject(serviceDetails[slug]) : null;
 
   useEffect(() => {
     if (!service) return;
@@ -203,8 +205,8 @@ export const ServiceTemplate: React.FC = () => {
               
               {service.doctor && (
                 <div className="bg-clinic-bg p-6 rounded-2xl border border-clinic-lime/30">
-                  <p className="font-bold text-clinic-blue">Especialista: {service.doctor}</p>
-                  <p className="text-gray-600">Horário: {service.schedule}</p>
+                  <p className="font-bold text-clinic-blue">{t("Especialista:")} {service.doctor}</p>
+                  <p className="text-gray-600">{t("Horário:")} {service.schedule}</p>
                 </div>
               )}
             </div>
@@ -222,8 +224,8 @@ export const ServiceTemplate: React.FC = () => {
         <div className="space-y-12 mt-16">
           <div className="flex items-end justify-between border-b-2 border-clinic-purple/10 pb-6">
             <div>
-              <h2 className="text-3xl font-bold text-clinic-blue">Tabela de Preços</h2>
-              <p className="text-sm text-gray-400 mt-2 font-medium font-sans">Soluções de Reabilitação Oral de Alta Precisão (Clique num item para copiar o link da campanha 🔗)</p>
+              <h2 className="text-3xl font-bold text-clinic-blue">{t("Tabela de Preços")}</h2>
+              <p className="text-sm text-gray-400 mt-2 font-medium font-sans">{t("Soluções de Reabilitação Oral de Alta Precisão (Clique num item para copiar o link da campanha 🔗)")}</p>
             </div>
           </div>
           
@@ -299,8 +301,8 @@ export const ServiceTemplate: React.FC = () => {
       {/* Standard Simple Price List */}
       {service.prices && service.prices.length > 0 && !service.priceGroups && (
         <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden mt-16">
-          <h2 className="text-2xl font-bold text-clinic-blue mb-2">Tabela de Preços</h2>
-          <p className="text-sm text-gray-400 mb-6 font-medium font-sans">Clique num tratamento para copiar o link da campanha 🔗</p>
+          <h2 className="text-2xl font-bold text-clinic-blue mb-2">{t("Tabela de Preços")}</h2>
+          <p className="text-sm text-gray-400 mb-6 font-medium font-sans">{t("Clique num tratamento para copiar o link da campanha 🔗")}</p>
           <div className="space-y-1">
             {service.prices.map((p: any, i: number) => {
               const itemSlug = slugify(p.name);

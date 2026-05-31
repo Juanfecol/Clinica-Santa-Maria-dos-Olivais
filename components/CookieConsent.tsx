@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const CookieConsent: React.FC = () => {
+  const { t } = useLanguage();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -76,11 +78,11 @@ export const CookieConsent: React.FC = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg z-[1000] flex flex-col md:flex-row items-center justify-between gap-4">
       <p className="text-sm text-gray-700">
-        Utilizamos cookies para melhorar a sua experiência. Ao continuar a navegar, concorda com a nossa política de cookies.
+        {t("Utilizamos cookies para melhorar a sua experiência. Ao continuar a navegar, concorda com a nossa política de cookies.")}
       </p>
       <div className="flex gap-2">
-        <button onClick={decline} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Recusar</button>
-        <button onClick={accept} className="px-4 py-2 text-sm bg-clinic-purple text-white rounded-lg hover:bg-clinic-blue">Aceitar</button>
+        <button onClick={decline} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">{t("Recusar")}</button>
+        <button onClick={accept} className="px-4 py-2 text-sm bg-clinic-purple text-white rounded-lg hover:bg-clinic-blue">{t("Aceitar")}</button>
       </div>
     </div>
   );

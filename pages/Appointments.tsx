@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useContent } from '../context/ContentContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGoogleAds } from '../hooks/useGoogleAds';
 import { services } from '../constants/servicesData';
 
 const Appointments: React.FC = () => {
   const { content } = useContent();
+  const { t } = useLanguage();
   const { trackForm } = useGoogleAds();
   const appointmentsData = content.appointments || { heroImage: "" };
   
@@ -43,9 +45,9 @@ const Appointments: React.FC = () => {
 
         <div className="bg-white/80 backdrop-blur-2xl p-3 sm:p-10 rounded-[2rem] sm:rounded-[3.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/50 relative overflow-hidden min-h-[750px] ring-1 ring-black/5">
           <div className="mb-10 text-center lg:text-left px-2 sm:px-4">
-            <div className="inline-block px-4 py-1 bg-clinic-purple/10 text-clinic-purple rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">Marcações Online</div>
-            <h1 className="text-4xl md:text-5xl font-bold text-clinic-blue mb-4 leading-tight">Agende a sua <span className="text-clinic-purple italic font-serif">Consulta</span></h1>
-            <p className="text-base sm:text-lg text-gray-600 font-light max-w-md">Escolha o melhor horário para si diretamente no nosso calendário oficial de forma simples e rápida.</p>
+            <div className="inline-block px-4 py-1 bg-clinic-purple/10 text-clinic-purple rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">{t("Marcações Online")}</div>
+            <h1 className="text-4xl md:text-5xl font-bold text-clinic-blue mb-4 leading-tight">{t("Agende a sua")} <span className="text-clinic-purple italic font-serif">{t("Consulta")}</span></h1>
+            <p className="text-base sm:text-lg text-gray-600 font-light max-w-md">{t("Escolha o melhor horário para si diretamente no nosso calendário oficial de forma simples e rápida.")}</p>
           </div>
 
           <div 

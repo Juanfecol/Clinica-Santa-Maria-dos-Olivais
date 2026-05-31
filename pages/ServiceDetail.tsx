@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import { ContactForm } from '../components/ContactForm';
 
 const servicesData: Record<string, any> = {
@@ -54,6 +55,7 @@ const servicesData: Record<string, any> = {
 
 export const ServiceDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { t } = useLanguage();
   
   useEffect(() => {
     if ((window as any).trackEvent) {
@@ -65,32 +67,32 @@ export const ServiceDetail: React.FC = () => {
 
   const service = slug ? servicesData[slug] : null;
 
-  if (!service) return <div className="p-20 text-center text-red-600 font-bold text-2xl">Serviço não encontrado: {slug}</div>;
+  if (!service) return <div className="p-20 text-center text-red-600 font-bold text-2xl">{t("Serviço não encontrado:")} {slug}</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-      <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-clinic-blue mb-10 leading-tight">{service.title}</h1>
+      <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-clinic-blue mb-10 leading-tight">{t(service.title)}</h1>
       
       <div className="bg-clinic-purple text-white p-8 rounded-2xl mb-16 shadow-lg text-center font-bold text-xl md:text-2xl leading-relaxed">
-        Pagamento faseado sem juros diretamente com a clínica. Pague durante o tratamento e finalize no dia da cirurgia.
+        {t("Pagamento faseado sem juros diretamente com a clínica. Pague durante o tratamento e finalize no dia da cirurgia.")}
       </div>
 
       <div className="grid md:grid-cols-2 gap-12">
         <div>
-          <p className="text-xl text-gray-700 mb-6">{service.description}</p>
+          <p className="text-xl text-gray-700 mb-6">{t(service.description)}</p>
           <div className="bg-clinic-bg p-6 rounded-xl border border-clinic-lime mb-8">
-            <p className="font-bold text-clinic-blue">Especialista: {service.doctor}</p>
-            <p className="text-gray-600">Horário: {service.schedule}</p>
+            <p className="font-bold text-clinic-blue">{t("Especialista:")} {t(service.doctor)}</p>
+            <p className="text-gray-600">{t("Horário:")} {t(service.schedule)}</p>
           </div>
           
           {service.prices.length > 0 && (
             <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
-              <h2 className="text-2xl font-bold text-clinic-blue mb-6">Tabela de Preços</h2>
+              <h2 className="text-2xl font-bold text-clinic-blue mb-6">{t("Tabela de Preços")}</h2>
               <div className="space-y-1">
                 {service.prices.map((p: any, i: number) => (
                   <div key={i} className="flex flex-col gap-1 border-b border-gray-100 py-5 last:border-0 w-full group">
-                    <span className="text-base md:text-lg font-semibold text-gray-700 leading-tight break-normal hyphens-none group-hover:text-clinic-purple transition-colors">{p.name}</span>
-                    <span className="text-xl md:text-2xl font-bold text-clinic-purple break-normal hyphens-none">{p.value}</span>
+                    <span className="text-base md:text-lg font-semibold text-gray-700 leading-tight break-normal hyphens-none group-hover:text-clinic-purple transition-colors">{t(p.name)}</span>
+                    <span className="text-xl md:text-2xl font-bold text-clinic-purple break-normal hyphens-none">{t(p.value)}</span>
                   </div>
                 ))}
               </div>

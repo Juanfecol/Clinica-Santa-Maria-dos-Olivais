@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 const educationalVideos = [
   { title: "Educação Infantil", src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_criancas.mp4" },
@@ -25,11 +26,13 @@ const educationalVideos = [
 ];
 
 const Blog: React.FC = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-20 bg-clinic-bg">
       <div className="text-center mb-16">
-        <h1 className="text-5xl font-bold text-clinic-blue mb-4">Blog Educativo</h1>
-        <p className="text-xl text-gray-600">Dicas e conselhos de saúde oral em vídeo.</p>
+        <h1 className="text-5xl font-bold text-clinic-blue mb-4">{t("Blog Educativo")}</h1>
+        <p className="text-xl text-gray-600">{t("Dicas e conselhos de saúde oral em vídeo.")}</p>
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -45,7 +48,7 @@ const Blog: React.FC = () => {
                   poster={`${video.src}#t=0.1`}
                 />
             </div>
-            <h3 className="text-lg font-bold text-clinic-blue text-center px-2">{video.title}</h3>
+            <h3 className="text-lg font-bold text-clinic-blue text-center px-2">{t(video.title)}</h3>
           </div>
         ))}
       </div>

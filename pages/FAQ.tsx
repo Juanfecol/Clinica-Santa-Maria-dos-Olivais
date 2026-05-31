@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { faq } from '../constants/servicesData';
+import { useLanguage } from '../context/LanguageContext';
 
 export const FAQ: React.FC = () => {
+  const { t } = useLanguage();
   const [openIndex, setOpenIndex] = useState<string | null>(null);
 
   useEffect(() => {
@@ -18,7 +20,7 @@ export const FAQ: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-16">
-      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-clinic-blue mb-12 text-center">Perguntas Frequentes</h1>
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-clinic-blue mb-12 text-center">{t("Perguntas Frequentes")}</h1>
       
       <div className="grid md:grid-cols-12 gap-12 items-start">
         {/* Video Slot */}
@@ -41,7 +43,7 @@ export const FAQ: React.FC = () => {
         <div className="md:col-span-8 space-y-8">
           {faq.map((category, catIndex) => (
             <div key={catIndex}>
-              <h2 className="text-2xl font-bold text-clinic-blue mb-4">{category.category}</h2>
+              <h2 className="text-2xl font-bold text-clinic-blue mb-4">{t(category.category)}</h2>
               <div className="space-y-4">
                 {category.items.map((item, itemIndex) => {
                   const id = `${catIndex}-${itemIndex}`;
@@ -52,11 +54,11 @@ export const FAQ: React.FC = () => {
                         onClick={() => toggleItem(id)}
                         className="w-full text-left p-6 flex justify-between items-center font-bold text-clinic-purple hover:bg-gray-50 transition-colors"
                       >
-                        {item.question}
+                        {t(item.question)}
                         <i className={`fas fa-chevron-down transition-transform ${isOpen ? 'rotate-180' : ''}`}></i>
                       </button>
                       <div className={`px-6 transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-[200px] pb-6' : 'max-h-0'}`}>
-                        <p className="text-gray-700">{item.answer}</p>
+                        <p className="text-gray-700">{t(item.answer)}</p>
                       </div>
                     </div>
                   );

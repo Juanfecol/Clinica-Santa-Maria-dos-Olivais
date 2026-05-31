@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-route
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
 import { ContentProvider } from './context/ContentContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { CookieConsent } from './components/CookieConsent';
 
 // Direct imports for primary pages to ensure immediate loading
@@ -91,34 +92,36 @@ const PixelRouteTracker: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ContentProvider>
-      <BrowserRouter>
-        <CookieConsent />
-        <Layout>
-          <ScrollToTop />
-          <PixelRouteTracker />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/admin" element={<Suspense fallback={<PageLoader />}><Admin /></Suspense>} />
-            <Route path="/equipa" element={<Suspense fallback={<PageLoader />}><Team /></Suspense>} />
-            <Route path="/clinica" element={<Suspense fallback={<PageLoader />}><Clinic /></Suspense>} />
-            <Route path="/contactos" element={<Suspense fallback={<PageLoader />}><Contact /></Suspense>} />
-            <Route path="/marcacoes" element={<Appointments />} />
-            <Route path="/campanhas" element={<Suspense fallback={<PageLoader />}><Campaigns /></Suspense>} />
-            <Route path="/cookies" element={<Suspense fallback={<PageLoader />}><CookiesPolicy /></Suspense>} />
-            <Route path="/privacidade" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
-            <Route path="/termos" element={<Suspense fallback={<PageLoader />}><TermsAndConditions /></Suspense>} />
-            <Route path="/obrigado" element={<Suspense fallback={<PageLoader />}><ThankYou /></Suspense>} />
-            <Route path="/blog" element={<Suspense fallback={<PageLoader />}><Blog /></Suspense>} />
-            <Route path="/casos-clinicos" element={<Suspense fallback={<PageLoader />}><CaseStudies /></Suspense>} />
-            <Route path="/cotizador" element={<Suspense fallback={<PageLoader />}><QuoteCalculator /></Suspense>} />
-            <Route path="/faq" element={<Suspense fallback={<PageLoader />}><FAQ /></Suspense>} />
-            <Route path="/servicos/:slug" element={<ServiceTemplate />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </ContentProvider>
+    <LanguageProvider>
+      <ContentProvider>
+        <BrowserRouter>
+          <CookieConsent />
+          <Layout>
+            <ScrollToTop />
+            <PixelRouteTracker />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/admin" element={<Suspense fallback={<PageLoader />}><Admin /></Suspense>} />
+              <Route path="/equipa" element={<Suspense fallback={<PageLoader />}><Team /></Suspense>} />
+              <Route path="/clinica" element={<Suspense fallback={<PageLoader />}><Clinic /></Suspense>} />
+              <Route path="/contactos" element={<Suspense fallback={<PageLoader />}><Contact /></Suspense>} />
+              <Route path="/marcacoes" element={<Appointments />} />
+              <Route path="/campanhas" element={<Suspense fallback={<PageLoader />}><Campaigns /></Suspense>} />
+              <Route path="/cookies" element={<Suspense fallback={<PageLoader />}><CookiesPolicy /></Suspense>} />
+              <Route path="/privacidade" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
+              <Route path="/termos" element={<Suspense fallback={<PageLoader />}><TermsAndConditions /></Suspense>} />
+              <Route path="/obrigado" element={<Suspense fallback={<PageLoader />}><ThankYou /></Suspense>} />
+              <Route path="/blog" element={<Suspense fallback={<PageLoader />}><Blog /></Suspense>} />
+              <Route path="/casos-clinicos" element={<Suspense fallback={<PageLoader />}><CaseStudies /></Suspense>} />
+              <Route path="/cotizador" element={<Suspense fallback={<PageLoader />}><QuoteCalculator /></Suspense>} />
+              <Route path="/faq" element={<Suspense fallback={<PageLoader />}><FAQ /></Suspense>} />
+              <Route path="/servicos/:slug" element={<ServiceTemplate />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </ContentProvider>
+    </LanguageProvider>
   );
 };
 

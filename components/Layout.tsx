@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useGoogleAds } from '../hooks/useGoogleAds';
 import { services } from '../constants/servicesData';
 import { Search, X } from 'lucide-react';
@@ -9,6 +10,7 @@ import { ContactForm } from './ContactForm';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { language, setLanguage, t, translateObject } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -28,8 +30,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const { trackWhatsApp, trackPhone } = useGoogleAds();
 
+  const translatedServices = React.useMemo(() => {
+    return translateObject(services);
+  }, [translateObject, language]);
+
   // Basic search logic
-  const filteredServices = services.filter(s => 
+  const filteredServices = translatedServices.filter(s => 
     s.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -152,13 +158,41 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           />
         </Link>
         
-        <div className="flex items-center gap-4 md:gap-8 z-[110]">
+        <div className="flex items-center gap-2 md:gap-4 z-[110]">
+          {/* Language Selector */}
+          <div className="flex items-center gap-1 bg-white/45 backdrop-blur-md rounded-full p-1 border border-white/50 shadow-sm">
+            <button
+              type="button"
+              onClick={() => setLanguage('pt')}
+              title="Português"
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold font-mono transition-all hover:scale-105 active:scale-95 ${language === 'pt' ? 'bg-clinic-purple text-white shadow-md' : 'text-clinic-blue/60 hover:text-clinic-blue'}`}
+            >
+              PT
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('es')}
+              title="Español"
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold font-mono transition-all hover:scale-105 active:scale-95 ${language === 'es' ? 'bg-clinic-purple text-white shadow-md' : 'text-clinic-blue/60 hover:text-clinic-blue'}`}
+            >
+              ES
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              title="English"
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold font-mono transition-all hover:scale-105 active:scale-95 ${language === 'en' ? 'bg-clinic-purple text-white shadow-md' : 'text-clinic-blue/60 hover:text-clinic-blue'}`}
+            >
+              US
+            </button>
+          </div>
+
           {/* Search Bar */}
-          <div className={`relative flex items-center transition-all duration-500 ${isSearchOpen ? 'w-[180px] sm:w-[250px] md:w-[350px]' : 'w-[40px]'}`}>
+          <div className={`relative flex items-center transition-all duration-500 ${isSearchOpen ? 'w-[150px] sm:w-[220px] md:w-[320px]' : 'w-[40px]'}`}>
             <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center">
               <input
                 type="text"
-                placeholder="Procurar tratamentos..."
+                placeholder={t("Pesquisar especialidade...")}
                 className={`w-full bg-white/40 border border-white/50 backdrop-blur-md rounded-full py-2 pl-10 pr-4 text-clinic-blue placeholder:text-clinic-blue/50 focus:outline-none focus:ring-2 focus:ring-clinic-purple/30 transition-all duration-500 ${isSearchOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -237,17 +271,17 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1 flex items-center justify-center gap-2 w-full"
                 onClick={() => setIsServicesOpen(!isServicesOpen)}
               >
-                Serviços <i className={`fas fa-chevron-down text-sm transition-transform ${isServicesOpen ? 'rotate-180' : ''}`}></i>
+                {t("Serviços")} <i className={`fas fa-chevron-down text-sm transition-transform ${isServicesOpen ? 'rotate-180' : ''}`}></i>
               </button>
               <div className={`grid grid-cols-2 gap-x-4 gap-y-1 text-sm md:text-base overflow-hidden transition-all duration-300 ${isServicesOpen ? 'max-h-[600px] py-2' : 'max-h-0'}`}>
-                {services.map((service) => (
+                {translatedServices.map((service) => (
                   <Link 
                     key={service.slug} 
                     to={`/servicos/${service.slug}`} 
                     className="text-clinic-blue hover:text-clinic-purple py-1 px-1 font-medium" 
                     onClick={() => { setIsMenuOpen(false); setIsServicesOpen(false); }}
                   >
-                    {service.title}
+                    {t(service.title)}
                   </Link>
                 ))}
               </div>
@@ -258,7 +292,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Casos Clínicos
+                {t("Casos Clínicos")}
               </Link>
             </li>
             <li style={{ transitionDelay: `${(navigation.length + 2) * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
@@ -267,7 +301,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Blog
+                {t("Blog")}
               </Link>
             </li>
             <li style={{ transitionDelay: `${(navigation.length + 3) * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
@@ -276,7 +310,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 className="font-sans text-lg sm:text-2xl md:text-3xl font-bold text-clinic-blue hover:text-clinic-purple transition-all inline-block py-1"
                 onClick={() => setIsMenuOpen(false)}
               >
-                FAQ
+                {t("FAQ")}
               </Link>
             </li>
             <li style={{ transitionDelay: `${(navigation.length + 4) * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-30' : 'translate-y-4 opacity-0'}`}>
@@ -303,13 +337,21 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12 md:mb-20">
              <div className="inline-block mb-8"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" alt="Logo Footer" className="max-w-[100px] md:max-w-[180px] mx-auto transition-transform hover:scale-110" loading="lazy" decoding="async" /></div>
-             <h2 className="text-xl sm:text-2xl md:text-5xl font-semibold leading-tight px-4">Criamos <span className="text-clinic-purple font-serif italic">sorrisos</span> perfeitos,<br className="hidden md:block" /> combinando excelência médica<br className="hidden md:block" /> com <span className="text-clinic-purple font-serif italic">conforto</span> absoluto.</h2>
+             <h2 className="text-xl sm:text-2xl md:text-5xl font-semibold leading-tight px-4 font-sans">
+               {language === 'pt' ? (
+                 <>Criamos <span className="text-clinic-purple font-serif italic">sorrisos</span> perfeitos,<br className="hidden md:block" /> combinando excelência médica<br className="hidden md:block" /> com <span className="text-clinic-purple font-serif italic">conforto</span> absoluto.</>
+               ) : language === 'es' ? (
+                 <>Creamos <span className="text-clinic-purple font-serif italic">sonrisas</span> perfectas,<br className="hidden md:block" /> combinando la excelencia médica<br className="hidden md:block" /> con <span className="text-clinic-purple font-serif italic">absoluto</span> confort.</>
+               ) : (
+                 <>We create perfect <span className="text-clinic-purple font-serif italic">smiles</span>,<br className="hidden md:block" /> combining medical excellence<br className="hidden md:block" /> with <span className="text-clinic-purple font-serif italic">absolute</span> comfort.</>
+               )}
+             </h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16 mb-16 text-center md:text-left">
             <div className="flex flex-col gap-8 items-center md:items-start">
               <div>
-                <h4 className="text-lg md:text-xl font-medium text-clinic-purple mb-4 uppercase tracking-wider">Redes sociais</h4>
+                <h4 className="text-lg md:text-xl font-medium text-clinic-purple mb-4 uppercase tracking-wider">{t("Redes sociais")}</h4>
                 <div className="flex gap-4">
                   {global.socials?.instagram && (
                     <a id="btn-social-instagram" href={global.socials.instagram} target="_blank" rel="noreferrer" onClick={() => trackGtagEvent('social_media_click', { 'event_category': 'engagement', 'event_label': 'Instagram' })} className="w-12 h-12 rounded-full bg-clinic-lime flex items-center justify-center text-clinic-blue hover:bg-clinic-purple hover:text-white transition-all transform hover:-translate-y-1 shadow-md"><i className="fab fa-instagram text-xl"></i></a>
@@ -323,38 +365,38 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
             <div className="flex flex-col gap-6 items-center md:items-start">
                <div>
-                <h4 className="text-lg md:text-xl font-medium text-clinic-purple mb-4 uppercase tracking-wider">Localização</h4>
-                <a href={global.mapsLink || "#"} target="_blank" rel="noreferrer" onClick={trackLocationClick} className="text-base md:text-lg text-white font-light hover:text-clinic-lime transition-colors block leading-relaxed">{global.address}</a>
+                <h4 className="text-lg md:text-xl font-medium text-clinic-purple mb-4 uppercase tracking-wider">{t("Localização")}</h4>
+                <a href={global.mapsLink || "#"} target="_blank" rel="noreferrer" onClick={trackLocationClick} className="text-base md:text-lg text-white font-light hover:text-clinic-lime transition-colors block leading-relaxed">{t(global.address)}</a>
               </div>
             </div>
 
             <div className="flex flex-col gap-6 items-center md:items-end md:text-right">
               <div>
-                <h4 className="text-lg md:text-xl font-medium text-clinic-purple mb-2 uppercase tracking-wider">Contactos</h4>
+                <h4 className="text-lg md:text-xl font-medium text-clinic-purple mb-2 uppercase tracking-wider">{t("Contactos")}</h4>
                 <div className="space-y-3">
                   <a href={`mailto:${contactEmail}`} onClick={() => trackEmailClick(contactEmail)} className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold break-normal hyphens-none">{contactEmail}</a>
                   <div className="text-white">
-                    <p className="text-xs text-clinic-purple uppercase font-bold tracking-widest mb-1">Apoio ao Cliente 24h</p>
-                    <a href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className="text-base md:text-lg hover:text-clinic-lime transition-colors block font-bold whitespace-nowrap">{customerService} <span className="text-[10px] font-light block opacity-70">(marcação de consultas - urgências e dúvidas)</span></a>
+                    <p className="text-xs text-clinic-purple uppercase font-bold tracking-widest mb-1">{t("Apoio ao Cliente")}</p>
+                    <a href={`tel:${cleanCustomerService}`} onClick={() => trackPhoneClick(customerService)} className="text-base md:text-lg hover:text-clinic-lime transition-colors block font-bold whitespace-nowrap">{customerService} <span className="text-[10px] font-light block opacity-70">({t("marcação de consultas - urgências e dúvidas")})</span></a>
                   </div>
                   <div className="text-white">
-                    <p className="text-xs text-clinic-purple uppercase font-bold tracking-widest mb-1">Receção</p>
+                    <p className="text-xs text-clinic-purple uppercase font-bold tracking-widest mb-1">{t("Receção")}</p>
                     <a href={`tel:${cleanPhone}`} onClick={() => trackPhoneClick(contactPhone)} className="text-base md:text-lg hover:text-clinic-lime transition-colors block font-bold whitespace-nowrap">{contactPhone}</a>
                   </div>
-                  <a href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold whitespace-nowrap">WhatsApp: {global.mobile}</a>
+                  <a href={global.socials?.whatsapp || "#"} onClick={trackWhatsAppClick} target="_blank" rel="noreferrer" className="text-base md:text-lg text-white hover:text-clinic-lime transition-colors block font-bold whitespace-nowrap">{t("WhatsApp")}: {global.mobile}</a>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="border-t border-clinic-lime/30 pt-10 flex flex-wrap justify-center gap-6 md:gap-12 text-center text-xs md:text-sm font-medium tracking-wide">
-            <Link to="/termos" className="hover:text-clinic-purple transition-colors uppercase">Termos e Condições</Link>
-            <Link to="/cookies" className="hover:text-clinic-purple transition-colors uppercase">Política de Cookies</Link>
-            <Link to="/privacidade" className="hover:text-clinic-purple transition-colors uppercase">Política de Privacidade</Link>
-            <a href="https://www.livroreclamacoes.pt" target="_blank" rel="noreferrer" className="hover:text-clinic-purple transition-colors uppercase">Livro de Reclamações</a>
+            <Link to="/termos" className="hover:text-clinic-purple transition-colors uppercase">{t("Termos e Condições")}</Link>
+            <Link to="/cookies" className="hover:text-clinic-purple transition-colors uppercase">{t("Política de Cookies")}</Link>
+            <Link to="/privacidade" className="hover:text-clinic-purple transition-colors uppercase">{t("Política de Privacidade")}</Link>
+            <a href="https://www.livroreclamacoes.pt" target="_blank" rel="noreferrer" className="hover:text-clinic-purple transition-colors uppercase">{t("Livro de Reclamações")}</a>
           </div>
           <div className="mt-8 text-center text-[10px] text-white/40 uppercase tracking-[0.2em]">
-            Sisos & Sorrisos Lda | Estrada de Moscavide n 32 c, 1800-279 Lisboa | © {new Date().getFullYear()} Clínica Santa Maria dos Olivais
+            {t("Sisos & Sorrisos Lda")} | {t("Estrada de Moscavide n 32 c, 1800-279 Lisboa")} | © {new Date().getFullYear()} {t("Clínica Santa Maria dos Olivais")}
           </div>
         </div>
       </footer>
@@ -380,8 +422,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             >
               {/* Header */}
               <div className="text-center pb-2.5 border-b border-white/20">
-                <span className="text-[9px] font-black tracking-wider uppercase text-clinic-blue/80 block">Atendimento Rápido</span>
-                <span className="text-[11px] font-extrabold text-clinic-purple tracking-tight">Fale Connosco 🦷</span>
+                <span className="text-[9px] font-black tracking-wider uppercase text-clinic-blue/80 block">{t("Atendimento Rápido")}</span>
+                <span className="text-[11px] font-extrabold text-clinic-purple tracking-tight">{t("Fale Connosco 🦷")}</span>
               </div>
 
               {/* Action List */}
@@ -402,8 +444,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     <i className="fab fa-whatsapp text-xl text-white"></i>
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className="text-xs font-black text-clinic-blue">WhatsApp</span>
-                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">Resposta célere</span>
+                    <span className="text-xs font-black text-clinic-blue">{t("WhatsApp")}</span>
+                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">{t("Resposta célere")}</span>
                   </div>
                 </a>
 
@@ -420,8 +462,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     <i className="fas fa-calendar-check text-base text-[#d4e157]"></i>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-black text-clinic-blue">Agendar Consulta</span>
-                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">Reserva imediata</span>
+                    <span className="text-xs font-black text-clinic-blue">{t("Agendar Consulta")}</span>
+                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">{t("Reserva imediata")}</span>
                   </div>
                 </button>
 
@@ -439,8 +481,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     <i className="fas fa-phone-alt text-base text-white"></i>
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className="text-xs font-black text-clinic-blue">Chamada Direta</span>
-                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">Linha Grátis 24h</span>
+                    <span className="text-xs font-black text-clinic-blue">{t("Chamada Direta")}</span>
+                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">{t("Linha Grátis 24h")}</span>
                   </div>
                 </a>
 
@@ -457,8 +499,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     <i className="fas fa-comment-dots text-base text-clinic-lime"></i>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-black text-clinic-blue">Contactem-me</span>
-                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">Ligamos de volta</span>
+                    <span className="text-xs font-black text-clinic-blue">{t("Contactem-me")}</span>
+                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">{t("Ligamos de volta")}</span>
                   </div>
                 </button>
               </div>
@@ -583,8 +625,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <div className="p-6 md:p-8">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-clinic-blue">Contactem-me</h3>
-                  <p className="text-sm text-gray-500">Deixe os seus dados e entraremos em contacto brevemente.</p>
+                  <h3 className="text-2xl font-bold text-clinic-blue">{t("Contactem-me")}</h3>
+                  <p className="text-sm text-gray-500">{t("Deixe os seus dados e entraremos em contacto brevemente.")}</p>
                 </div>
                 <button 
                   onClick={() => setIsContactModalOpen(false)}
@@ -593,7 +635,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   <X size={20} />
                 </button>
               </div>
-              <ContactForm submitButtonText="Contactem-me" />
+              <ContactForm submitButtonText={t("Contactem-me")} />
             </div>
           </div>
         </div>

@@ -5,7 +5,7 @@ import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useGoogleAds } from '../hooks/useGoogleAds';
 import { services } from '../constants/servicesData';
-import { Search, X } from 'lucide-react';
+import { Search, X, Camera, Smile, Check, Upload, ChevronRight } from 'lucide-react';
 import { ContactForm } from './ContactForm';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,6 +15,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isCameraInfoModalOpen, setIsCameraInfoModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isFabHubOpen, setIsFabHubOpen] = useState(false);
   const [cycleIndex, setCycleIndex] = useState(0);
@@ -508,6 +509,34 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           )}
         </AnimatePresence>
 
+        {/* Always Sticky Premium Camera Floating Button */}
+        <div className="relative mb-3.5 group">
+          {/* Brand-Colored Pulsing Glow backdrop */}
+          <div className="absolute inset-[-4px] rounded-full bg-gradient-to-tr from-clinic-purple to-[#2d3277] opacity-60 blur-sm animate-pulse z-0" />
+          <div className="absolute inset-[-6px] rounded-full bg-clinic-purple opacity-25 animate-ping z-0" />
+          
+          <button
+            id="btn-sticky-camera"
+            onClick={() => setIsCameraInfoModalOpen(true)}
+            className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_35px_rgba(107,70,193,0.55)] hover:shadow-[0_15px_40px_rgba(107,70,193,0.7)] transition-all duration-300 hover:scale-110 active:scale-95 border border-white/50 bg-gradient-to-tr from-clinic-purple via-violet-600 to-clinic-blue text-white cursor-pointer z-10"
+            aria-label={t("Diagnóstico por Foto 📸")}
+            title={t("Diagnóstico Gratuito por Foto 🦷")}
+          >
+            <Camera className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            
+            {/* Soft pulsing notification bubble/badge */}
+            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-clinic-lime opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-5 w-5 bg-clinic-lime text-[10px] font-black justify-center items-center text-clinic-blue select-none shadow">✓</span>
+            </span>
+          </button>
+
+          {/* Hover tooltip */}
+          <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-clinic-blue/95 backdrop-blur-sm text-white font-black text-[9px] md:text-[10px] px-3.5 py-2 rounded-full uppercase tracking-widest shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap border border-white/10 shrink-0">
+            {t("Diagnóstico por Foto 🦷")}
+          </div>
+        </div>
+
         {/* The Trigger Button - Cycles through when closed, morphs to X when open */}
         <div className="relative">
           {/* Brand-Colored Pulsing Glow/Aura backdrop */}
@@ -636,6 +665,131 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 </button>
               </div>
               <ContactForm submitButtonText={t("Contactem-me")} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Dynamic Camera Info Modal */}
+      {isCameraInfoModalOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-clinic-blue/60 backdrop-blur-sm transition-opacity duration-300" 
+            onClick={() => setIsCameraInfoModalOpen(false)}
+          />
+          <div className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 animate-fade-in-up md:p-1.5 z-10">
+            <div className="p-6 md:p-8">
+              
+              {/* Header with Icon and Close Button */}
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-clinic-purple/10 flex items-center justify-center text-clinic-purple shrink-0">
+                    <Camera className="w-6 h-6 animate-pulse" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-black text-clinic-blue tracking-tight leading-tight">
+                      {t("Diagnóstico Clínico")} <span className="text-clinic-purple italic font-serif block">{t("por Foto 📸")}</span>
+                    </h3>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsCameraInfoModalOpen(false)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-clinic-purple hover:text-white text-gray-500 transition-all cursor-pointer shadow-sm shrink-0"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Informative Text Block */}
+              <div className="space-y-4 mb-8 text-left">
+                <p className="text-sm text-gray-600 font-light leading-relaxed">
+                  {t("Tire uma fotografia em tempo real ou envie uma imagem simples do seu sorriso. Os nossos médicos dentistas em Lisboa analisarão a anatomia do seu caso para lhe apresentar um orçamento real personalizado e 100% preciso, de forma totalmente gratuita e confidencial.")}
+                </p>
+
+                {/* Key Benefits */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+                  {[
+                    t('Avaliação gratuita de anatomia'),
+                    t('Orçamento com 100% precisão clínica'),
+                    t('Dados 100% seguros (RGPD)'),
+                    t('Resposta rápida em 24h úteis')
+                  ].map((benefit, index) => (
+                    <div key={index} className="flex items-center gap-2 text-xs text-gray-700 font-medium bg-gray-50/70 p-2.5 rounded-xl border border-gray-150">
+                      <span className="w-4.5 h-4.5 rounded-full bg-clinic-purple/10 flex items-center justify-center text-clinic-purple shrink-0">
+                        <Check size={10} className="stroke-[3]" />
+                      </span>
+                      <span className="text-2xs sm:text-xs text-slate-700 leading-tight">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions & Paths Integration */}
+              <div className="space-y-3.5">
+                {/* Path 1: Direct Real-Time Camera Access */}
+                <button
+                  onClick={() => {
+                    setIsCameraInfoModalOpen(false);
+                    navigate('/cotizador?mode=photo&autostart=true');
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-clinic-purple via-purple-600 to-clinic-blue hover:from-clinic-blue hover:to-clinic-blue text-white rounded-2xl transition-all cursor-pointer shadow-md shadow-clinic-purple/15 hover:shadow-clinic-blue/15 hover:scale-[1.01] active:scale-95 group border-0 text-left"
+                >
+                  <div className="flex items-center gap-3.5 text-left">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white shrink-0">
+                      <Camera size={18} />
+                    </div>
+                    <div>
+                      <span className="text-xs font-black tracking-tight block text-white">{t("Ativar Câmara Integrada")}</span>
+                      <span className="text-[10px] text-white/70 font-semibold block uppercase tracking-wider">{t("Tirar foto em tempo real")}</span>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-white/60 group-hover:text-white transition-colors shrink-0" />
+                </button>
+
+                {/* Path 2: Upload File From Device Gallery */}
+                <button
+                  onClick={() => {
+                    setIsCameraInfoModalOpen(false);
+                    navigate('/cotizador?mode=photo');
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-white border border-gray-200 hover:border-clinic-blue/50 hover:bg-gray-50 text-clinic-blue rounded-2xl transition-all cursor-pointer shadow-sm hover:scale-[1.01] active:scale-95 group text-left"
+                >
+                  <div className="flex items-center gap-3.5 text-left">
+                    <div className="w-10 h-10 rounded-xl bg-clinic-purple/10 flex items-center justify-center text-clinic-purple shrink-0">
+                      <Upload size={18} />
+                    </div>
+                    <div>
+                      <span className="text-xs font-black tracking-tight block text-clinic-blue">{t("Carregar da Galeria / Rolo")}</span>
+                      <span className="text-[10px] text-gray-400 font-semibold block uppercase tracking-wider">{t("Carregar ficheiro ou imagem existente")}</span>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-gray-400 group-hover:text-clinic-blue transition-colors shrink-0" />
+                </button>
+
+                {/* Path 3: WhatsApp Inquiry */}
+                <a
+                  href={global.socials?.whatsapp || "#"}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => {
+                    trackWhatsAppClick();
+                    setIsCameraInfoModalOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 hover:border-emerald-200 text-emerald-800 rounded-2xl transition-all cursor-pointer group text-left"
+                >
+                  <div className="flex items-center gap-3.5 text-left">
+                    <div className="w-10 h-10 rounded-xl bg-[#25D366] flex items-center justify-center text-white shrink-0">
+                      <i className="fab fa-whatsapp text-lg"></i>
+                    </div>
+                    <div>
+                      <span className="text-xs font-black tracking-tight block text-emerald-950">{t("Esclarecer Dúvidas via WhatsApp")}</span>
+                      <span className="text-[10px] text-emerald-600 font-bold block uppercase tracking-wider">{t("Resposta imediata por mensagem")}</span>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-emerald-500 group-hover:text-emerald-700 transition-colors shrink-0" />
+                </a>
+              </div>
+
             </div>
           </div>
         </div>

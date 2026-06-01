@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { 
   Calculator, 
@@ -153,6 +154,7 @@ const specialtiesData: Specialty[] = [
 
 const QuoteCalculator: React.FC = () => {
   const { t, translateObject, language } = useLanguage();
+  const location = useLocation();
   const [flowMode, setFlowMode] = useState<'selector' | 'manual' | 'photo_only'>('selector');
   const [step, setStep] = useState(1);
   const [selectedSpecialty, setSelectedSpecialty] = useState<Specialty | null>(null);
@@ -444,6 +446,19 @@ const QuoteCalculator: React.FC = () => {
       processFile(e.target.files[0]);
     }
   };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const mode = searchParams.get('mode') || (location.state as any)?.mode;
+    if (mode === 'photo') {
+      setFlowMode('photo_only');
+      setPhotoOptionConsent('yes');
+      if (searchParams.get('autostart') === 'true') {
+        setIsCameraModalOpen(true);
+        startCamera();
+      }
+    }
+  }, [location.search]);
 
   const handleCampaignSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

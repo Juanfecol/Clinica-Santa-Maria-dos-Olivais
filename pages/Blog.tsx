@@ -28,6 +28,15 @@ const educationalVideos = [
 const Blog: React.FC = () => {
   const { t } = useLanguage();
 
+  React.useEffect(() => {
+    if ((window as any).trackMeta) {
+      (window as any).trackMeta('ViewContent', {
+        content_name: 'Blog Educativo',
+        content_category: 'Blog/Videos'
+      }, true);
+    }
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-20 bg-clinic-bg">
       <div className="text-center mb-16">

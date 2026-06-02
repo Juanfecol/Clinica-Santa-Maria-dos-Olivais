@@ -13,9 +13,12 @@ async function startServer() {
   // API route for Resend
   app.post("/api/send", async (req, res) => {
     try {
-      const { name, email, message, phone, photo } = req.body;
+      const { name, email, message, phone, photo, photos } = req.body;
       
       console.log('Received photo in request:', photo ? `${photo.substring(0, 50)}...` : 'No photo');
+      if (photos && Array.isArray(photos)) {
+        console.log(`Received ${photos.length} photos in request`);
+      }
       
       if (!name || !email || !message) {
         return res.status(400).json({ error: 'Missing required fields: name, email, or message' });
@@ -29,15 +32,15 @@ async function startServer() {
 
       let attachments: any[] = [];
 
+      // Process main photo
       if (photo && typeof photo === 'string' && photo.startsWith('data:')) {
         const match = photo.match(/^data:([^;]+);base64,(.+)$/);
         if (match) {
           const contentType = match[1]; // e.g., 'image/jpeg'
           const base64Data = match[2];
           const extension = contentType.split('/')[1] || 'jpg';
-          const filename = `sorriso_${Date.now()}.${extension}`;
+          const filename = `sorriso_principal_${Date.now()}.${extension}`;
 
-          // Resend SDK only supports 'filename' and 'content' (Buffer or string)
           attachments.push({
             filename: filename,
             content: Buffer.from(base64Data, 'base64')
@@ -45,27 +48,52 @@ async function startServer() {
 
           htmlBody += `
                <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 12px;">
-                 <h4 style="color: #57009C; margin: 0 0 10px 0; font-family: sans-serif;">Foto de Diagnóstico do Sorriso:</h4>
-                 <p style="color: #666; font-size: 13px; margin: 0 0 12px 0; font-family: sans-serif;">
-                   Esta foto foi anexada e pode ser visualizada abaixo:
-                 </p>
-                 <img src="${photo}" alt="Foto do Sorriso" style="max-width: 100%; max-height: 500px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
+                 <h4 style="color: #57009C; margin: 0 0 10px 0; font-family: sans-serif;">Foto de Diagnóstico Principal:</h4>
+                 <img src="${photo}" alt="Foto Principal" style="max-width: 100%; max-height: 400px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
                </div>`;
         } else {
-          // Fallback if formatting doesn't match standard data uri
+          // Fallback
           htmlBody += `
                <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 12px;">
-                 <h4 style="color: #57009C; margin: 0 0 10px 0; font-family: sans-serif;">Foto de Diagnóstico do Sorriso:</h4>
-                 <img src="${photo}" alt="Foto do Sorriso" style="max-width: 100%; max-height: 500px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
+                 <h4 style="color: #57009C; margin: 0 0 10px 0; font-family: sans-serif;">Foto de Diagnóstico Principal:</h4>
+                 <img src="${photo}" alt="Foto" style="max-width: 100%; max-height: 400px; border-radius: 16px; border: 3px solid #57009C; display: block;" />
                </div>`;
         }
-      } else if (photo) {
-        // Fallback or external link
+      }
+
+      // Process multiple photos if present
+      if (photos && Array.isArray(photos) && photos.length > 0) {
         htmlBody += `
-               <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #57009C; background-color: #fcf8ff; border-radius: 12px;">
-                 <h4 style="color: #57009C; margin: 0 0 10px 0; font-family: sans-serif;">Foto de Diagnóstico do Sorriso:</h4>
-                 <img src="${photo}" alt="Foto do Sorriso" style="max-width: 100%; max-height: 500px; border-radius: 16px; border: 3px solid #57009C; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" />
-               </div>`;
+             <div style="margin-top: 25px; border-top: 2px dashed #eee; padding-top: 15px;">
+               <h3 style="color: #2D3277; font-family: sans-serif; margin-bottom: 15px;">Perspetivas e Ângulos de Diagnóstico (Smile Design):</h3>
+               <div style="display: flex; flex-direction: column; gap: 20px;">`;
+
+        photos.forEach((pObj: any, index: number) => {
+          const { label, dataUrl } = pObj;
+          if (dataUrl && typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
+            const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+            if (match) {
+              const contentType = match[1];
+              const base64Data = match[2];
+              const extension = contentType.split('/')[1] || 'jpg';
+              const safeLabel = (label || `foto_${index + 1}`).toLowerCase().replace(/[^a-z0-9]/g, '_');
+              const filename = `${safeLabel}_${Date.now()}.${extension}`;
+
+              attachments.push({
+                filename: filename,
+                content: Buffer.from(base64Data, 'base64')
+              });
+
+              htmlBody += `
+                <div style="padding: 15px; border-left: 4px solid #6B46C1; background-color: #f9f7fc; border-radius: 12px; margin-bottom: 15px;">
+                  <h4 style="color: #6B46C1; margin: 0 0 8px 0; font-family: sans-serif; font-size: 16px; font-weight: bold;">${label || `Foto ${index + 1}`}:</h4>
+                  <img src="${dataUrl}" alt="${label || `Foto ${index + 1}`}" style="max-width: 100%; max-height: 400px; border-radius: 16px; border: 2px solid #6b46c1; display: block; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+                </div>`;
+            }
+          }
+        });
+
+        htmlBody += `</div></div>`;
       }
 
       const emailPayload: any = {

@@ -275,74 +275,6 @@ const translationMap: Record<string, { es: string; en: string }> = {
     es: "ORTODONCIA, ALINEADORES INVISIBLES",
     en: "ORTHODONTICS, INVISIBLE ALIGNERS"
   },
-  "Perspetiva Frontal": {
-    es: "Perspectiva Frontal",
-    en: "Frontal View"
-  },
-  "Sorriso Frontal": {
-    es: "Sonrisa Frontal",
-    en: "Frontal Smile"
-  },
-  "Perfil Esquerdo": {
-    es: "Perfil Izquierdo",
-    en: "Left Profile"
-  },
-  "Perfil Direito": {
-    es: "Perfil Derecho",
-    en: "Right Profile"
-  },
-  "Sorria de frente, mostrando bem os dentes": {
-    es: "Sonría de frente, mostrando bien los dientes",
-    en: "Smile from the front, showing your teeth clearly"
-  },
-  "Vire o rosto ligeiramente para a esquerda": {
-    es: "Gire el rostro ligeramente hacia la izquierda",
-    en: "Turn your face slightly to the left"
-  },
-  "Vire o rosto ligeiramente para a direita": {
-    es: "Gire el rostro ligeramente hacia la derecha",
-    en: "Turn your face slightly to the right"
-  },
-  "Alinhe a sua BOCA neste guia 👄": {
-    es: "Alinee su BOCA en esta guía 👄",
-    en: "Align your MOUTH inside this guide 👄"
-  },
-  "Alinhe o seu perfil ESQUERDO neste guia ◀": {
-    es: "Alinee su perfil IZQUIERDO en esta guía ◀",
-    en: "Align your LEFT profile inside this guide ◀"
-  },
-  "Alinhe o seu perfil DIREITO neste guia ▶": {
-    es: "Alinee su perfil DERECHO en esta guía ▶",
-    en: "Align your RIGHT profile inside this guide ▶"
-  },
-  "(Obrigatório)": {
-    es: "(Obligatorio)",
-    en: "(Required)"
-  },
-  "(Opcional)": {
-    es: "(Opcional)",
-    en: "(Optional)"
-  },
-  "Sem fotos": {
-    es: "Sin fotos",
-    en: "No photos"
-  },
-  "Modo Guia Oral Adaptado": {
-    es: "Modo de Guía Oral Adaptado",
-    en: "Adapted Oral Guide Mode"
-  },
-  "Selecione um ângulo para tirar ou carregar foto:": {
-    es: "Seleccione un ángulo para tomar o cargar foto:",
-    en: "Select an angle to capture or upload photo:"
-  },
-  "Pode carregar até 3 perspetivas do seu sorriso (Frontal, Perfil Esquerdo e Perfil Direito) para obter um Smile Design 100% preciso.": {
-    es: "Puede cargar hasta 3 perspectivas de su sonrisa (Frontal, Perfil Izquierdo y Perfil Derecho) para obtener un Smile Design 100% preciso.",
-    en: "You can upload up to 3 perspectives of your smile (Front, Left Profile, and Right Profile) to obtain a 100% accurate Smile Design."
-  },
-  "Selecione o ângulo acima antes de capturar/carregar a foto correspondente.": {
-    es: "Seleccione el ángulo arriba antes de capturar/cargar la foto correspondiente.",
-    en: "Select the angle above before capturing/uploading the corresponding photo."
-  },
   "MEDICINA DENTÁRIA E DESVITALIZAÇÃO": {
     es: "MEDICINA DENTAL Y ENDODONCIA",
     en: "GENERAL DENTISTRY AND ROOT CANAL"
@@ -1098,6 +1030,7 @@ const translationMap: Record<string, { es: string; en: string }> = {
   "Foco Boca: Desativo 🔍": { es: "Foco Boca: Desactivado 🔍", en: "Mouth Focus: Inactive 🔍" },
   "Traseira 🔄": { es: "Trasera 🔄", en: "Rear 🔄" },
   "Frontal 🔄": { es: "Frontal 🔄", en: "Front 🔄" },
+  "Alinhe a sua BOCA neste guia 👄": { es: "Alinee su BOCA en esta guía 👄", en: "Align your MOUTH inside this guide 👄" },
   "Alinhe o seu rosto aqui 👁️": { es: "Alinee su rostro aquí 👁️", en: "Align your face here 👁️" },
   "Modo Ultra-Foco Dental Ativo ✓": { es: "Modo Ultra-Enfoque Dental Activo ✓", en: "Ultra-Focus Dental Mode Active ✓" },
   "Modo Panorâmico": { es: "Modo Panorámico", en: "Panoramic Mode" },

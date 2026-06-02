@@ -10,15 +10,6 @@ const Campaigns: React.FC = () => {
   const campaigns = content.campaigns || [];
   const global = content.global || {};
 
-  React.useEffect(() => {
-    if ((window as any).trackMeta) {
-      (window as any).trackMeta('ViewContent', {
-        content_name: 'Campanhas e Promoções',
-        content_category: 'Campaigns'
-      }, true);
-    }
-  }, []);
-
   return (
     <div className="animate-fade-in-up max-w-[1400px] mx-auto px-4 py-12 flex flex-col items-center">
       

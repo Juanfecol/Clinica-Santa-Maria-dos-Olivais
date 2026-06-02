@@ -34,42 +34,7 @@ const Appointments: React.FC = () => {
       }
     };
     initCalendly();
-
-    // Capture scheduled appointments inside the Calendly iframe
-    const handleCalendlyEvent = (e: MessageEvent) => {
-      if (e.data && e.data.event === 'calendly.event_scheduled') {
-        // 1. Meta Pixel Standard Event for Scheduling
-        if ((window as any).trackMeta) {
-          (window as any).trackMeta('Schedule', {
-            content_name: 'Calendly Appointment Scheduled',
-            content_category: 'Online Booking',
-            value: 15.0,
-            currency: 'EUR'
-          }, true);
-        }
-
-        // 2. Custom Standard Event tracking
-        if ((window as any).trackEvent) {
-          (window as any).trackEvent('calendly_event_scheduled', {
-            event_category: 'appointment'
-          });
-        }
-
-        // 3. Drive the user to the custom thank you page with context (which fires the Lead event!)
-        navigate('/obrigado', { 
-          state: { 
-            nome: t("Paciente Agendado"), 
-            servico: t("Marcação Online Calendly") 
-          } 
-        });
-      }
-    };
-
-    window.addEventListener('message', handleCalendlyEvent);
-    return () => {
-      window.removeEventListener('message', handleCalendlyEvent);
-    };
-  }, [navigate, t]);
+  }, []);
 
   return (
     <div className="animate-fade-in-up max-w-[1300px] mx-auto px-4 py-8 md:py-16">

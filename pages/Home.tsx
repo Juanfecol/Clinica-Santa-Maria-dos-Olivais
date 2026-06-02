@@ -128,6 +128,27 @@ const Home: React.FC = () => {
     if ((window as any).trackEvent) {
       (window as any).trackEvent(name, params);
     }
+    // Map standard engagement events to Meta Pixel
+    if ((window as any).trackMeta) {
+      if (name === 'click_agendar_consulta') {
+        (window as any).trackMeta('InitiateCheckout', {
+          content_name: 'Marque a sua consulta button',
+          content_category: 'Homepage Hero CTA'
+        }, true);
+      } else if (name === 'view_service_detail') {
+        (window as any).trackMeta('ViewContent', {
+          content_name: params.event_label || 'Service Card',
+          content_category: 'Homepage Card View'
+        }, true);
+      } else if (name === 'click_service_cta') {
+        (window as any).trackMeta('InitiateCheckout', {
+          content_name: params.event_label || 'Marcar Consulta',
+          content_category: 'Homepage Service CTA'
+        }, true);
+      } else {
+        (window as any).trackMeta(name, params, false);
+      }
+    }
   };
 
   const [activeVideoProgress, setActiveVideoProgress] = useState(0);

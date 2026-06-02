@@ -175,13 +175,13 @@
       s.parentNode.insertBefore(t,s)}(window,document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
 
-      // EU GDPR Compliance: Revoke consent by default unless actively given in localStorage
-      var hasGdprConsent = false;
-      try {
-        hasGdprConsent = localStorage.getItem('cookie-consent') === 'granted';
-      } catch (e) {}
+      // Strict EU GDPR & ePrivacy Compliance: Turn off automatic metadata scraping of form inputs & buttons
+      fbq('set', 'autoConfig', false, '1754959305395666');
 
-      if (!hasGdprConsent) {
+      // Honor the user's granular cookie consent choices before sending identifiers
+      if (localStorage.getItem('cookie-consent') === 'granted') {
+        fbq('consent', 'grant');
+      } else {
         fbq('consent', 'revoke');
       }
 
@@ -194,9 +194,10 @@
     <script src="https://mccdn.me/assets/js/widget.js" defer="defer"></script>
   </head>
   <body>
-    <!-- Meta Pixel Code (noscript) - Empty for high EU regulatory compliance on JS-required application -->
+    <!-- Meta Pixel Code (noscript) -->
     <noscript>
-      <!-- Meta Pixel noscript placeholder (not tracked automatically without JavaScript to prevent ePrivacy violations) -->
+      <img height="1" width="1" style="display:none"
+           src="https://www.facebook.com/tr?id=1754959305395666&ev=PageView&noscript=1"/>
     </noscript>
 
     <!-- Calendly badge widget resources -->

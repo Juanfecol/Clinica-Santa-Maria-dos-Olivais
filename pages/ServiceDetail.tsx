@@ -56,7 +56,6 @@ const servicesData: Record<string, any> = {
 export const ServiceDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { t } = useLanguage();
-  const service = slug ? servicesData[slug] : null;
   
   useEffect(() => {
     if ((window as any).trackEvent) {
@@ -64,14 +63,9 @@ export const ServiceDetail: React.FC = () => {
         service: slug
       });
     }
-    if ((window as any).trackMeta) {
-      (window as any).trackMeta('ViewContent', {
-        content_name: service?.title || slug,
-        content_category: 'Service Detail',
-        currency: 'EUR'
-      }, true);
-    }
-  }, [slug, service]);
+  }, [slug]);
+
+  const service = slug ? servicesData[slug] : null;
 
   if (!service) return <div className="p-20 text-center text-red-600 font-bold text-2xl">{t("Serviço não encontrado:")} {slug}</div>;
 

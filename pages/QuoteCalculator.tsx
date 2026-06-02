@@ -172,65 +172,6 @@ const QuoteCalculator: React.FC = () => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
-  
-  // Custom multi-photo slots (Frontal, Left side and Right side)
-  const [photoSlots, setPhotoSlots] = useState<Array<{
-    id: 'frontal' | 'perfil_esquerdo' | 'perfil_direito';
-    label: string;
-    desc: string;
-    dataUrl: string | null;
-  }>>([
-    { id: 'frontal', label: 'Sorriso Frontal', desc: 'Sorria de frente, mostrando bem os dentes', dataUrl: null },
-    { id: 'perfil_esquerdo', label: 'Perfil Esquerdo', desc: 'Vire o rosto ligeiramente para a esquerda', dataUrl: null },
-    { id: 'perfil_direito', label: 'Perfil Direito', desc: 'Vire o rosto ligeiramente para a direita', dataUrl: null }
-  ]);
-  const [activeSlotId, setActiveSlotId] = useState<'frontal' | 'perfil_esquerdo' | 'perfil_direito'>('frontal');
-
-  const savePhotoToSlot = (dataUrl: string) => {
-    setPhotoSlots(prev => prev.map(slot => 
-      slot.id === activeSlotId ? { ...slot, dataUrl } : slot
-    ));
-    if (activeSlotId === 'frontal') {
-      setCapturedPhoto(dataUrl);
-    }
-  };
-
-  const removePhotoFromSlot = (slotId: 'frontal' | 'perfil_esquerdo' | 'perfil_direito') => {
-    setPhotoSlots(prev => prev.map(slot => 
-      slot.id === slotId ? { ...slot, dataUrl: null } : slot
-    ));
-    if (slotId === 'frontal') {
-      setCapturedPhoto(null);
-    }
-  };
-
-  const getCameraGuideline = () => {
-    switch (activeSlotId) {
-      case 'perfil_esquerdo':
-        return {
-          title: t("Alinhe o seu perfil ESQUERDO neste guia ◀"),
-          subtitle: t("Vire o rosto ligeiramente para a esquerda"),
-          overlayClass: "border-clinic-purple animate-pulse",
-          direction: "left"
-        };
-      case 'perfil_direito':
-        return {
-          title: t("Alinhe o seu perfil DIREITO neste guia ▶"),
-          subtitle: t("Vire o rosto ligeiramente para a direita"),
-          overlayClass: "border-clinic-purple animate-pulse",
-          direction: "right"
-        };
-      case 'frontal':
-      default:
-        return {
-          title: t("Alinhe a sua BOCA neste guia 👄"),
-          subtitle: t("Sorria de frente, mostrando bem os dentes"),
-          overlayClass: "border-clinic-lime animate-pulse",
-          direction: "front"
-        };
-    }
-  };
-
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -416,7 +357,7 @@ const QuoteCalculator: React.FC = () => {
             canvas.height
           );
           const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-          savePhotoToSlot(dataUrl);
+          setCapturedPhoto(dataUrl);
           stopCamera();
         }
       } else {
@@ -431,7 +372,7 @@ const QuoteCalculator: React.FC = () => {
           }
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-          savePhotoToSlot(dataUrl);
+          setCapturedPhoto(dataUrl);
           stopCamera();
         }
       }
@@ -470,9 +411,9 @@ const QuoteCalculator: React.FC = () => {
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
             const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-            savePhotoToSlot(dataUrl);
+            setCapturedPhoto(dataUrl);
           } else {
-            savePhotoToSlot(event.target.result as string);
+            setCapturedPhoto(event.target.result as string);
           }
         };
         img.src = event.target.result as string;
@@ -560,14 +501,6 @@ Valor Estimado: ${min}€ - ${max}€
 Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
 
     try {
-      const frontalPhoto = photoSlots.find(s => s.id === 'frontal')?.dataUrl;
-      const validPhotos = photoSlots
-        .filter(s => s.dataUrl !== null)
-        .map(s => ({
-          label: t(s.label),
-          dataUrl: s.dataUrl
-        }));
-
       const response = await fetch('/api/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -576,15 +509,14 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
           email: leadEmail || 'contacto@clinica.pt',
           phone: leadPhone,
           message: msgText,
-          photo: frontalPhoto || undefined,
-          photos: validPhotos
+          photo: capturedPhoto || undefined
         })
       });
 
       if (response.ok) {
         setSubmitStatus('success');
         if ((window as any).trackEvent) {
-          (window as any).trackEvent('quote_submitted_with_photo', { min, max, has_photo: validPhotos.length > 0, photo_count: validPhotos.length });
+          (window as any).trackEvent('quote_submitted_with_photo', { min, max, has_photo: !!capturedPhoto });
         }
         if ((window as any).trackMeta) {
           (window as any).trackMeta('Lead', {
@@ -605,12 +537,6 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
 
   const handleReset = () => {
     stopCamera();
-    setPhotoSlots([
-      { id: 'frontal', label: 'Sorriso Frontal', desc: 'Sorria de frente, mostrando bem os dentes', dataUrl: null },
-      { id: 'perfil_esquerdo', label: 'Perfil Esquerdo', desc: 'Vire o rosto ligeiramente para a esquerda', dataUrl: null },
-      { id: 'perfil_direito', label: 'Perfil Direito', desc: 'Vire o rosto ligeiramente para a direita', dataUrl: null }
-    ]);
-    setActiveSlotId('frontal');
     setCapturedPhoto(null);
     setCameraError(null);
     setPhotoOptionConsent('idle');
@@ -889,168 +815,186 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                 {submitStatus !== 'success' ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                     {/* Camera capture / Image Upload Area */}
-                    <div className="space-y-6">
-                      <div className="space-y-1 bg-clinic-purple/[0.03] p-4 rounded-2xl border border-clinic-purple/10">
-                        <label className="block text-sm font-bold text-clinic-blue">
-                          {t("Fotografias do seu Sorriso/Dentes")}
-                        </label>
-                        <p className="text-xs text-gray-500 font-light">
-                          {t("Pode carregar até 3 perspetivas do seu sorriso (Frontal, Perfil Esquerdo e Perfil Direito) para obter um Smile Design 100% preciso.")}
-                        </p>
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <label className="block text-sm font-bold text-clinic-blue">Fotografia do seu Sorriso/Dentes *</label>
+                        <p className="text-xs text-gray-500 font-light">É necessário carregar ou tirar uma foto para submeter esta consulta.</p>
                       </div>
 
-                      {/* Perspective Slots Selector Checklist */}
-                      <div className="grid grid-cols-3 gap-3">
-                        {photoSlots.map((slot) => {
-                          const isSelected = activeSlotId === slot.id;
-                          const hasImage = !!slot.dataUrl;
-
-                          return (
+                      {!capturedPhoto && !isCameraActive && (
+                        <div 
+                          onDragEnter={handleDrag}
+                          onDragLeave={handleDrag}
+                          onDragOver={handleDrag}
+                          onDrop={handleDrop}
+                          className={`border-2 border-dashed rounded-[2.5rem] p-10 text-center transition-all cursor-pointer flex flex-col items-center justify-center min-h-[300px] ${
+                            dragActive 
+                              ? 'border-clinic-purple bg-clinic-purple/[0.03]' 
+                              : 'border-gray-200 bg-white hover:border-clinic-purple/50'
+                          }`}
+                        >
+                          <Camera className="w-16 h-16 text-clinic-purple/20 mb-4 animate-pulse" />
+                          <p className="font-bold text-clinic-blue text-sm mb-1">Tire uma fotografia ou arraste o ficheiro</p>
+                          <p className="text-xs text-gray-400 font-light mb-6">Suporta formatos JPEG, PNG, WebP do telemóvel ou PC</p>
+                          
+                          <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-xs cursor-pointer">
                             <button
-                              key={slot.id}
                               type="button"
-                              onClick={() => setActiveSlotId(slot.id)}
-                              className={`relative p-3.5 rounded-2xl text-left transition-all duration-300 border flex flex-col justify-between aspect-square select-none overflow-hidden hover:scale-[1.02] cursor-pointer ${
-                                isSelected
-                                  ? 'border-clinic-purple bg-clinic-purple/[0.02] ring-2 ring-clinic-purple/20'
-                                  : 'border-gray-200 bg-white hover:border-clinic-purple/40 shadow-sm'
-                              }`}
+                              onClick={() => {
+                                setIsCameraModalOpen(true);
+                                startCamera();
+                              }}
+                              className="w-full bg-clinic-purple hover:bg-clinic-purple/95 text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-clinic-purple/15 text-center"
                             >
-                              <div className="flex justify-between items-start w-full">
-                                <span className={`text-[10px] font-black uppercase tracking-tight leading-tight ${isSelected ? 'text-clinic-purple' : 'text-clinic-blue'}`}>
-                                  {t(slot.label)}
-                                </span>
-                                {hasImage ? (
-                                  <span className="w-4.5 h-4.5 rounded-full bg-clinic-lime text-clinic-blue flex items-center justify-center text-[9px] font-black shadow-sm shrink-0">
-                                    ✓
-                                  </span>
-                                ) : (
-                                  <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest shrink-0">
-                                    {slot.id === 'frontal' ? '★' : '○'}
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="w-full flex-grow flex items-center justify-center min-h-[40px] mt-2 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden relative">
-                                {hasImage ? (
-                                  <img src={slot.dataUrl!} alt={slot.label} className="w-full h-full object-cover" />
-                                ) : (
-                                  <Camera className="w-6 h-6 text-gray-300 group-hover:text-clinic-purple" />
-                                )}
-                              </div>
-
-                              <div className="text-[8px] text-gray-400 font-bold uppercase mt-1 text-center w-full">
-                                {slot.id === 'frontal' ? t('(Obrigatório)') : t('(Opcional)')}
-                              </div>
+                              <Camera size={14} /> Ativar Câmara 📸
                             </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Active Slot Description / Guidance Helper */}
-                      <div className="p-3 bg-clinic-blue/[0.02] rounded-xl border border-clinic-blue/5 text-[11px] text-slate-600 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-clinic-purple animate-ping" />
-                        <span>
-                          <strong>{t("Ângulo Selecionado")}:</strong> {t(photoSlots.find(s => s.id === activeSlotId)?.label || '')} — <span className="text-gray-500">{t(photoSlots.find(s => s.id === activeSlotId)?.desc || '')}</span>
-                        </span>
-                      </div>
-
-                      {/* Action Box based on whether active slot has image */}
-                      {(() => {
-                        const currentSlot = photoSlots.find(s => s.id === activeSlotId)!;
-                        const hasImage = !!currentSlot.dataUrl;
-
-                        if (hasImage) {
-                          return (
-                            <div className="relative rounded-[2.5rem] border-2 border-clinic-purple overflow-hidden max-w-sm mx-auto shadow-lg bg-white p-3.5 animate-fade-in-up">
-                              <img 
-                                src={currentSlot.dataUrl!} 
-                                alt={t(currentSlot.label)} 
-                                className="w-full rounded-[2rem] aspect-square object-cover" 
-                              />
-                              <button
-                                type="button"
-                                onClick={() => removePhotoFromSlot(currentSlot.id)}
-                                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/90 text-red-600 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center shadow-md border border-gray-100 cursor-pointer duration-200"
-                                title={t("Remover Foto")}
-                              >
-                                <X size={16} />
-                              </button>
-                              <div className="text-center mt-3 pb-1 flex flex-col items-center gap-2">
-                                <span className="text-[10px] text-clinic-purple font-black uppercase tracking-wider">
-                                  {t(currentSlot.label)} - {t("Foto Carregada ✓")}
-                                </span>
-                                <div className="flex gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setIsCameraModalOpen(true);
-                                      startCamera();
-                                    }}
-                                    className="px-3.5 py-1.5 bg-gray-50 text-clinic-blue hover:bg-clinic-purple hover:text-white font-bold text-[10px] uppercase tracking-wider rounded-lg border border-gray-200 transition-colors cursor-pointer"
-                                  >
-                                    {t("Tirar Nova Foto 📸")}
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => removePhotoFromSlot(currentSlot.id)}
-                                    className="px-3.5 py-1.5 bg-red-50 text-red-700 hover:bg-red-600 hover:text-white font-bold text-[10px] uppercase tracking-wider rounded-lg border border-red-100 transition-colors cursor-pointer"
-                                  >
-                                    {t("Eliminar 🗑️")}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        // No image - show big trigger box
-                        return (
-                          <div 
-                            onDragEnter={handleDrag}
-                            onDragLeave={handleDrag}
-                            onDragOver={handleDrag}
-                            onDrop={handleDrop}
-                            className={`border-2 border-dashed rounded-[2.5rem] p-10 text-center transition-all cursor-pointer flex flex-col items-center justify-center min-h-[300px] animate-fade-in ${
-                              dragActive 
-                                ? 'border-clinic-purple bg-clinic-purple/[0.03]' 
-                                : 'border-gray-200 bg-white hover:border-clinic-purple/50'
-                            }`}
-                          >
-                            <Camera className="w-16 h-16 text-clinic-purple/20 mb-4 animate-pulse" />
-                            <p className="font-bold text-clinic-blue text-sm mb-1">{t("Tire uma fotografia ou arraste o ficheiro")}</p>
-                            <p className="text-xs text-gray-400 font-light mb-6">{t("Para")}: <strong>{t(currentSlot.label)}</strong></p>
                             
-                            <div className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-xs cursor-pointer">
+                            <label className="w-full bg-white border border-gray-200 hover:bg-gray-50 text-clinic-blue font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-sm text-center">
+                              <Upload size={14} /> Carregar Foto 📁
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={handleFileChange} 
+                              />
+                            </label>
+                          </div>
+
+                          {cameraError && (
+                            <p className="text-red-500 text-[11px] font-bold mt-4 max-w-xs leading-relaxed bg-red-50 p-2.5 rounded-lg border border-red-100">{cameraError}</p>
+                          )}
+                        </div>
+                      )}
+
+                      {isCameraModalOpen && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-fade-in">
+                          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#121626] to-[#0a0c16] rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl flex flex-col">
+                            
+                            {/* Modal Header */}
+                            <div className="p-5 border-b border-white/5 flex items-center justify-between text-white">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2.5 h-2.5 rounded-full bg-clinic-lime animate-pulse" />
+                                <h3 className="font-bold text-sm md:text-base tracking-tight text-white/90">Diagnóstico de Sorriso - Câmara Ativa</h3>
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setIsCameraModalOpen(true);
-                                  startCamera();
+                                  stopCamera();
+                                  setIsCameraModalOpen(false);
                                 }}
-                                className="w-full bg-clinic-purple hover:bg-clinic-purple/95 text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-clinic-purple/15 text-center"
+                                className="text-gray-400 hover:text-white transition-all p-2 hover:bg-white/5 rounded-full cursor-pointer"
                               >
-                                <Camera size={14} /> {t("Ativar Câmara")} 📸
+                                <X size={18} />
                               </button>
-                              
-                              <label className="w-full bg-white border border-gray-200 hover:bg-gray-50 text-clinic-blue font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 shadow-sm text-center">
-                                <Upload size={14} /> {t("Carregar Foto")} 📁
-                                <input 
-                                  type="file" 
-                                  accept="image/*" 
-                                  className="hidden" 
-                                  onChange={handleFileChange} 
-                                />
-                              </label>
                             </div>
 
-                            {cameraError && (
-                              <p className="text-red-500 text-[11px] font-bold mt-4 max-w-xs leading-relaxed bg-red-50 p-2.5 rounded-lg border border-red-100">{cameraError}</p>
-                            )}
-                          </div>
-                        );
-                      })()}
+                            {/* Camera Viewport with Active Controls */}
+                            <div className="relative bg-[#050505] aspect-video flex items-center justify-center overflow-hidden">
+                              <video
+                                ref={videoRef}
+                                className={`w-full h-full object-cover absolute top-0 left-0 transition-transform ${cameraFacingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+                                autoPlay
+                                playsInline
+                                muted
+                              />
+                              
+                              {/* Floating Controls Overlay */}
+                              <div className="absolute top-4 inset-x-4 flex justify-between items-center z-20 pointer-events-none">
+                                {/* Zoom Face / Mouth focus button */}
+                                <button
+                                  type="button"
+                                  onClick={() => setMouthFocusActive(!mouthFocusActive)}
+                                  className={`pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-[10px] md:text-[11px] uppercase tracking-wider backdrop-blur-md transition-all active:scale-95 shadow-md cursor-pointer ${
+                                    mouthFocusActive 
+                                      ? 'bg-clinic-lime border-clinic-lime text-clinic-blue shadow-clinic-lime/10' 
+                                      : 'bg-black/60 border-white/10 text-white/80 hover:bg-black/75'
+                                  }`}
+                                >
+                                  <Smile size={12} className={mouthFocusActive ? 'animate-bounce' : ''} />
+                                  <span>{mouthFocusActive ? 'Foco Boca: Ativo ✨' : 'Foco Boca: Desativo 🔍'}</span>
+                                </button>
 
+                                {/* Flip/Rotate Camera button */}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const nextFacing = cameraFacingMode === 'user' ? 'environment' : 'user';
+                                    setCameraFacingMode(nextFacing);
+                                    startCamera(nextFacing);
+                                  }}
+                                  className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-xl text-white font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md border border-white/10 active:scale-95 transition-all cursor-pointer"
+                                >
+                                  <RefreshCw size={12} />
+                                  <span>{cameraFacingMode === 'user' ? 'Traseira 🔄' : 'Frontal 🔄'}</span>
+                                </button>
+                              </div>
+                              
+                              {/* Enhanced smart mouth guidelines for high quality dental scan focus */}
+                              <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10">
+                                <div className={`w-[60%] sm:w-[50%] aspect-[1.3] max-w-[200px] border-4 border-dashed rounded-[45%] flex flex-col items-center justify-center bg-clinic-lime/[0.03] transition-all duration-300 ${mouthFocusActive ? 'border-clinic-lime animate-pulse' : 'border-white/30'}`}>
+                                  <div className={`w-12 h-5 border-b-2 border-dashed rounded-b-full mt-2 ${mouthFocusActive ? 'border-clinic-lime/60' : 'border-white/20'}`}></div>
+                                </div>
+                                <span className="text-[9px] md:text-[10px] text-white bg-clinic-purple/95 px-3.5 py-1.5 rounded-full backdrop-blur-sm shadow-md border border-white/10 mt-4 font-extrabold uppercase tracking-wide select-none drop-shadow">
+                                  {mouthFocusActive ? 'Alinhe a sua BOCA neste guia 👄' : 'Alinhe o seu rosto aqui 👁️'}
+                                </span>
+                              </div>
+
+                              {/* Elegant bottom helper badge */}
+                              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-[9px] font-bold text-white/70 bg-black/50 backdrop-blur-sm px-3.5 py-1 rounded-full pointer-events-none text-center select-none border border-white/5 uppercase tracking-wider">
+                                {mouthFocusActive ? 'Modo Ultra-Foco Dental Ativo ✓' : 'Modo Panorâmico'}
+                              </div>
+                            </div>
+
+                            {/* Modal Footer / Control Bar (OUTSIDE the video!) */}
+                            <div className="p-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  stopCamera();
+                                  setIsCameraModalOpen(false);
+                                }}
+                                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-bold text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-white/10 cursor-pointer"
+                              >
+                                Cancelar
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  capturePhoto();
+                                  setIsCameraModalOpen(false);
+                                }}
+                                className="w-full sm:w-auto bg-clinic-lime hover:bg-clinic-lime/90 text-clinic-blue font-black px-8 py-3 rounded-xl text-xs flex items-center justify-center gap-2 hover:scale-[1.03] active:scale-95 transition-all shadow-lg cursor-pointer duration-200"
+                              >
+                                <Camera size={14} /> Capturar Sorriso 📸
+                              </button>
+                            </div>
+
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Captured/Uploaded photo preview */}
+                      {capturedPhoto && (
+                        <div className="relative rounded-[2.5rem] border-2 border-clinic-purple overflow-hidden max-w-sm mx-auto shadow-lg bg-white p-3">
+                          <img 
+                            src={capturedPhoto} 
+                            alt="Foto Dental" 
+                            className="w-full rounded-[2rem] aspect-square object-cover" 
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setCapturedPhoto(null)}
+                            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/90 text-red-600 hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center shadow-md border border-gray-100 cursor-pointer"
+                            title="Remover Foto"
+                          >
+                            <X size={16} />
+                          </button>
+                          <div className="text-center mt-3 pb-1">
+                            <span className="text-[10px] text-clinic-purple font-black uppercase tracking-wider">Foto de Sorriso Pronta 🦷 ✓</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Contact details */}

@@ -23,6 +23,9 @@ export const CookieConsent: React.FC = () => {
   const decline = () => {
     localStorage.setItem('cookie-consent', 'denied');
     setShow(false);
+    if ((window as any).fbq) {
+      (window as any).fbq('consent', 'revoke');
+    }
   };
 
   const loadScripts = () => {

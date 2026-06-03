@@ -1,6 +1,13 @@
 import express from "express";
 import path from "path";
 import { Resend } from 'resend';
+import crypto from 'crypto';
+
+// Hash helper for GDPR compliance: SHA-256 formatting as per Meta Conversions API requirements
+function sha256(text: string): string | null {
+  if (!text) return null;
+  return crypto.createHash('sha256').update(text.trim().toLowerCase()).digest('hex');
+}
 
 async function startServer() {
   const app = express();
@@ -90,6 +97,108 @@ async function startServer() {
     } catch (error: any) {
       console.error('Server Error:', error);
       return res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Meta Conversions API (CAPI) Server-Side Tracking Proxy (GDPR/RGPD compliant & deduplication ready)
+  app.post("/api/meta-capi", async (req, res) => {
+    try {
+      const { eventName, eventId, isStandard, eventSourceUrl, fbp, fbc, customData } = req.body;
+
+      if (!eventName) {
+        return res.status(400).json({ error: 'Missing eventName parameter' });
+      }
+
+      // 1. Resolve client network info securely for attribution matching
+      let clientIp = (req.headers['x-forwarded-for'] as string || '')
+        .split(',')[0]
+        .trim() || req.socket.remoteAddress || '';
+      if (clientIp.startsWith('::ffff:')) {
+        clientIp = clientIp.substring(7);
+      }
+      const clientUserAgent = req.headers['user-agent'] || '';
+
+      // 2. Prepare user matched traits using SHA-256 standard encryption for full RGPD compliance
+      const resolvedUserData: any = {
+        client_ip_address: clientIp,
+        client_user_agent: clientUserAgent
+      };
+
+      if (fbp) resolvedUserData.fbp = fbp;
+      if (fbc) resolvedUserData.fbc = fbc;
+
+      if (req.body.userData) {
+        const { em, ph, fn, ln } = req.body.userData;
+        if (em) {
+          const hashed = sha256(em);
+          if (hashed) resolvedUserData.em = [hashed];
+        }
+        if (ph) {
+          let sanitizedPhone = String(ph).replace(/\D/g, '');
+          if (sanitizedPhone.length === 9 && (sanitizedPhone.startsWith('9') || sanitizedPhone.startsWith('2'))) {
+            sanitizedPhone = '351' + sanitizedPhone;
+          }
+          const hashed = sha256(sanitizedPhone);
+          if (hashed) resolvedUserData.ph = [hashed];
+        }
+        if (fn) {
+          const hashed = sha256(fn);
+          if (hashed) resolvedUserData.fn = [hashed];
+        }
+        if (ln) {
+          const hashed = sha256(ln);
+          if (hashed) resolvedUserData.ln = [hashed];
+        }
+      }
+
+      // 3. Assemble Meta CAPI Standard format payload
+      const unixTimestamp = Math.floor(Date.now() / 1000);
+      const metaPayload = {
+        data: [
+          {
+            event_name: eventName,
+            event_time: unixTimestamp,
+            event_id: eventId,
+            event_source_url: eventSourceUrl || '',
+            action_source: "website",
+            user_data: resolvedUserData,
+            custom_data: customData || {}
+          }
+        ]
+      };
+
+      const pixelId = process.env.META_PIXEL_ID || '1754959305395666';
+      const accessToken = process.env.META_ACCESS_TOKEN;
+
+      if (!accessToken) {
+        console.log(`[Meta CAPI Simulator] Event '${eventName}' (ID: ${eventId}) prepared successfully. No META_ACCESS_TOKEN defined. Data:`, JSON.stringify(resolvedUserData));
+        return res.status(200).json({
+          success: true,
+          simulated: true,
+          message: 'Server-side tracking processed in simulation mode. Define META_ACCESS_TOKEN for live delivery.'
+        });
+      }
+
+      const url = `https://graph.facebook.com/v17.0/${pixelId}/events?access_token=${accessToken}`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(metaPayload)
+      });
+
+      const result = await response.json() as any;
+
+      if (!response.ok) {
+        console.error('[Meta CAPI Outbound Error]', result);
+        return res.status(response.status).json({ success: false, error: result });
+      }
+
+      console.log(`[Meta CAPI Live Success] Forwarded event '${eventName}' with ID '${eventId}' to Meta Servers.`);
+      return res.status(200).json({ success: true, result });
+    } catch (err: any) {
+      console.error('[Meta CAPI Catch Error]', err);
+      return res.status(500).json({ error: err.message });
     }
   });
 

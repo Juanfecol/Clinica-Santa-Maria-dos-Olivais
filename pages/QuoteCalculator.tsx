@@ -523,7 +523,12 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
             content_name: 'Simulador Orçamento com Foto',
             content_category: 'Simulator',
             value: Number(min),
-            currency: 'EUR'
+            currency: 'EUR',
+            _userData: {
+              fn: leadName,
+              em: leadEmail,
+              ph: leadPhone
+            }
           });
         }
       } else {

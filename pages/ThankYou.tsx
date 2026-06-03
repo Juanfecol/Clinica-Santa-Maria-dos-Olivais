@@ -22,7 +22,12 @@ const ThankYou: React.FC = () => {
         content_name: state?.servico || 'Consulta Geral',
         content_category: 'Agendamento Finalizado',
         value: 10.0,
-        currency: 'EUR'
+        currency: 'EUR',
+        _userData: {
+          fn: state?.nome,
+          em: state?.email,
+          ph: state?.telemovel
+        }
       });
     }
     // Google Ads Conversion Tracking

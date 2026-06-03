@@ -155,12 +155,56 @@
       };
 
       window.trackMeta = function(event, data, isStandard = true) {
+        // Generate a unique event ID for deduplication
+        const eventId = 'evt_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+
+        // Extract optional user data if present
+        let userData = null;
+        const cleanData = data ? Object.assign({}, data) : {};
+        if (cleanData._userData) {
+          userData = cleanData._userData;
+          delete cleanData._userData;
+        }
+
+        // 1. Send via Browser Pixel
         if (typeof fbq === 'function') {
           if (isStandard) {
-            fbq('track', event, data);
+            fbq('track', event, cleanData, { eventID: eventId });
           } else {
-            fbq('trackCustom', event, data);
+            fbq('trackCustom', event, cleanData, { eventID: eventId });
           }
+        }
+
+        // 2. Send via Server-Side Conversions API (if consent is granted)
+        const hasConsent = localStorage.getItem('cookie-consent') === 'granted';
+        if (hasConsent) {
+          const getCookie = function(name) {
+            const val = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+            return val ? val.pop() : null;
+          };
+          const fbp = getCookie('_fbp');
+          const fbc = getCookie('_fbc');
+
+          const payload = {
+            eventName: event,
+            eventId: eventId,
+            isStandard: isStandard,
+            eventSourceUrl: window.location.href,
+            fbp: fbp,
+            fbc: fbc,
+            customData: cleanData,
+            userData: userData
+          };
+
+          fetch('/api/meta-capi', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          }).catch(function(err) {
+            console.warn('[Meta CAPI Client Error]', err);
+          });
         }
       };
     </script>

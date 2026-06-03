@@ -66,7 +66,11 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             content_name: data.especialidade || 'Contacto Geral',
             content_category: 'Formulário Rodapé / Laterial',
             value: 5.0,
-            currency: 'EUR'
+            currency: 'EUR',
+            _userData: {
+              fn: data.nome,
+              ph: data.telefone
+            }
           });
         }
         // Google Ads Conversion Tracking

@@ -18,6 +18,11 @@ export const CookieConsent: React.FC = () => {
     localStorage.setItem('cookie-consent', 'granted');
     setShow(false);
     loadScripts();
+    
+    // Trigger ConsentUpdated custom event on acceptance (CAPI will be active immediately)
+    if ((window as any).trackMeta) {
+      (window as any).trackMeta('ConsentUpdated', { consentStatus: 'granted' }, false);
+    }
   };
 
   const decline = () => {
@@ -25,6 +30,11 @@ export const CookieConsent: React.FC = () => {
     setShow(false);
     if ((window as any).fbq) {
       (window as any).fbq('consent', 'revoke');
+    }
+    
+    // Trigger ConsentUpdated custom event on decline (CAPI will deactivate immediately after this check)
+    if ((window as any).trackMeta) {
+      (window as any).trackMeta('ConsentUpdated', { consentStatus: 'denied' }, false);
     }
   };
 
@@ -65,15 +75,18 @@ export const CookieConsent: React.FC = () => {
         }
     };
     
-    (window as any).trackMeta = function(eventName: string, params: object = {}, isStandard: boolean = true) {
-        if ((window as any).fbq) {
-          if (isStandard) {
-            (window as any).fbq('track', eventName, params);
-          } else {
-            (window as any).fbq('trackCustom', eventName, params);
+    // Safeguard the sophisticated trackMeta function from index.html (which handles Server-Side CAPI and Event ID deduplication)
+    if (!(window as any).trackMeta) {
+      (window as any).trackMeta = function(eventName: string, params: object = {}, isStandard: boolean = true) {
+          if ((window as any).fbq) {
+            if (isStandard) {
+              (window as any).fbq('track', eventName, params);
+            } else {
+              (window as any).fbq('trackCustom', eventName, params);
+            }
           }
-        }
-    };
+      };
+    }
   };
 
   if (!show) return null;

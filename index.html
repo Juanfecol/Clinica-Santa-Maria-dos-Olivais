@@ -154,24 +154,71 @@
         }
       };
 
+      window.sanitizeHealthPayload = function(obj, hasUserData) {
+        if (!obj || typeof obj !== 'object') return obj;
+        var copy = JSON.parse(JSON.stringify(obj));
+        
+        var healthRules = [
+          { pattern: /invisalign|aparelho|ortodontia/i, replacement: 'Alinhadores e Alinhamento' },
+          { pattern: /implante|implantologia|reabilitação/i, replacement: 'Reabilitação e Prótese' },
+          { pattern: /facetas|branqueamento|estética|coroa|cosmética|estética dentária/i, replacement: 'Estética Dentária' },
+          { pattern: /odontopediatria|infantil|crianças/i, replacement: 'Odontopediatria Preventiva' },
+          { pattern: /endodontia|periodontia|destartarização|limpeza|cárie|canal/i, replacement: 'Higiene e Diagnóstico' },
+          { pattern: /urgência|extração|cirurgia|dor/i, replacement: 'Consulta de Apoio Clínico' }
+        ];
+
+        for (var key in copy) {
+          if (Object.prototype.hasOwnProperty.call(copy, key)) {
+            var val = copy[key];
+            if (typeof val === 'string') {
+              if (hasUserData && (key === 'content_name' || key === 'content_category' || key === 'search_string')) {
+                copy[key] = 'Consulta Clínica Realizada';
+                continue;
+              }
+              for (var i = 0; i < healthRules.length; i++) {
+                if (healthRules[i].pattern.test(val)) {
+                  val = healthRules[i].replacement;
+                  break;
+                }
+              }
+              copy[key] = val;
+            } else if (typeof val === 'object' && val !== null) {
+              copy[key] = window.sanitizeHealthPayload(val, hasUserData);
+            }
+          }
+        }
+        return copy;
+      };
+
       window.trackMeta = function(event, data, isStandard = true) {
         // Generate a unique event ID for deduplication
         const eventId = 'evt_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
 
         // Extract optional user data if present
         let userData = null;
-        const cleanData = data ? Object.assign({}, data) : {};
-        if (cleanData._userData) {
-          userData = cleanData._userData;
-          delete cleanData._userData;
+        let hasUserData = false;
+        const rawData = data ? Object.assign({}, data) : {};
+        if (rawData._userData) {
+          userData = rawData._userData;
+          hasUserData = true;
+          delete rawData._userData;
+        }
+
+        // Apply strict EU health sector compliance sanitization to remove specific medical diagnoses during tracking
+        const cleanData = window.sanitizeHealthPayload(rawData, hasUserData);
+
+        // Sanitize event name itself if it contains diagnostic terms
+        let sanitizedEventName = event;
+        if (hasUserData && /invisalign|implante|ortodontia|facetas|extração|siso/i.test(sanitizedEventName)) {
+          sanitizedEventName = 'Lead';
         }
 
         // 1. Send via Browser Pixel
         if (typeof fbq === 'function') {
           if (isStandard) {
-            fbq('track', event, cleanData, { eventID: eventId });
+            fbq('track', sanitizedEventName, cleanData, { eventID: eventId });
           } else {
-            fbq('trackCustom', event, cleanData, { eventID: eventId });
+            fbq('trackCustom', sanitizedEventName, cleanData, { eventID: eventId });
           }
         }
 
@@ -186,7 +233,7 @@
           const fbc = getCookie('_fbc');
 
           const payload = {
-            eventName: event,
+            eventName: sanitizedEventName,
             eventId: eventId,
             isStandard: isStandard,
             eventSourceUrl: window.location.href,

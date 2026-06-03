@@ -471,7 +471,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       )}
 
       {/* Unified Multi-Action Floating Button Hub */}
-      <div className={`fixed bottom-4 md:bottom-6 right-4 md:right-6 z-[100] ${isMenuOpen ? 'hidden' : ''} flex flex-col items-end`}>
+      <div id="fixed-fab-hub" className={`fixed bottom-4 md:bottom-6 right-4 md:right-6 z-[100] ${isMenuOpen ? 'hidden' : ''} flex flex-col items-end`}>
         <AnimatePresence>
           {isFabHubOpen && (
             <motion.div

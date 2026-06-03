@@ -234,6 +234,17 @@ const QuoteCalculator: React.FC = () => {
     }
   }, [videoStream, isCameraModalOpen]); 
 
+  // Sync body class to hide floating widgets from general layout to avoid overlap / misclicks
+  useEffect(() => {
+    if (isCameraActive || isCameraModalOpen) {
+      document.body.classList.add('camera-active');
+    } else {
+      document.body.classList.remove('camera-active');
+    }
+    return () => {
+      document.body.classList.remove('camera-active');
+    };
+  }, [isCameraActive, isCameraModalOpen]);
   // UX Improvement: Smoothly scroll to the main card when content options change or load
   useEffect(() => {
     const cardEl = document.getElementById('simulator-main-card');
@@ -289,19 +300,6 @@ const QuoteCalculator: React.FC = () => {
 
       setVideoStream(stream);
       setIsCameraActive(true);
-
-      // Track Meta Pixel Event for Camera Activation in QuoteCalculator (Photo Assessment Campaign)
-      if ((window as any).trackMeta) {
-        const searchParams = new URLSearchParams(location.search);
-        const auto = searchParams.get('autostart') === 'true';
-        (window as any).trackMeta('IniciouDiagnosticoFoto', {
-          tipo_entrada: auto ? 'url_campanha' : 'clique_manual',
-          utm_source: searchParams.get('utm_source') || 'organic',
-          utm_medium: searchParams.get('utm_medium') || 'none',
-          utm_campaign: searchParams.get('utm_campaign') || 'diagnostico_foto',
-          origem: 'cotizador_camara'
-        }, false);
-      }
     } catch (err: any) {
       console.error("Camera error:", err);
       
@@ -372,12 +370,6 @@ const QuoteCalculator: React.FC = () => {
           const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
           setCapturedPhoto(dataUrl);
           stopCamera();
-          if ((window as any).trackMeta) {
-            (window as any).trackMeta('CapturouFotoSorriso', {
-              enquadramento: 'aproximado_boca',
-              origem: 'cotizador_camara'
-            }, false);
-          }
         }
       } else {
         // Standard view (not cropped to mouth)
@@ -393,12 +385,6 @@ const QuoteCalculator: React.FC = () => {
           const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
           setCapturedPhoto(dataUrl);
           stopCamera();
-          if ((window as any).trackMeta) {
-            (window as any).trackMeta('CapturouFotoSorriso', {
-              enquadramento: 'plano_geral',
-              origem: 'cotizador_camara'
-            }, false);
-          }
         }
       }
     }
@@ -439,12 +425,6 @@ const QuoteCalculator: React.FC = () => {
             setCapturedPhoto(dataUrl);
           } else {
             setCapturedPhoto(event.target.result as string);
-          }
-          if ((window as any).trackMeta) {
-            (window as any).trackMeta('CapturouFotoSorriso', {
-              enquadramento: 'upload_galeria',
-              origem: 'cotizador_arquivo'
-            }, false);
           }
         };
         img.src = event.target.result as string;
@@ -924,8 +904,8 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                               </button>
                             </div>
 
-                            {/* Camera Viewport with Active Controls */}
-                            <div className="relative bg-[#050505] aspect-video flex items-center justify-center overflow-hidden">
+                            {/* Camera Viewport with Active Controls (Taller aspect ratio for optimal focus!) */}
+                            <div className="relative bg-[#050505] aspect-[4/3] max-h-[380px] sm:max-h-[440px] flex items-center justify-center overflow-hidden">
                               <video
                                 ref={videoRef}
                                 className={`w-full h-full object-cover absolute top-0 left-0 transition-transform ${cameraFacingMode === 'user' ? 'scale-x-[-1]' : ''}`}
@@ -934,23 +914,26 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                                 muted
                               />
                               
-                              {/* Floating Controls Overlay */}
-                              <div className="absolute top-4 inset-x-4 flex justify-between items-center z-20 pointer-events-none">
-                                {/* Zoom Face / Mouth focus button */}
-                                <button
-                                  type="button"
-                                  onClick={() => setMouthFocusActive(!mouthFocusActive)}
-                                  className={`pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-[10px] md:text-[11px] uppercase tracking-wider backdrop-blur-md transition-all active:scale-95 shadow-md cursor-pointer ${
-                                    mouthFocusActive 
-                                      ? 'bg-clinic-lime border-clinic-lime text-clinic-blue shadow-clinic-lime/10' 
-                                      : 'bg-black/60 border-white/10 text-white/80 hover:bg-black/75'
-                                  }`}
-                                >
-                                  <Smile size={12} className={mouthFocusActive ? 'animate-bounce' : ''} />
-                                  <span>{mouthFocusActive ? 'Foco Boca: Ativo ✨' : 'Foco Boca: Desativo 🔍'}</span>
-                                </button>
+                              {/* Perfectly centered guideline circle with independent text overlay to prevent top clipping */}
+                              <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 pb-12">
+                                <div className={`w-[58%] sm:w-[50%] aspect-[1.3] max-w-[190px] border-4 border-dashed rounded-[45%] flex flex-col items-center justify-center bg-clinic-lime/[0.02] transition-all duration-300 relative ${mouthFocusActive ? 'border-clinic-lime animate-pulse' : 'border-white/30'}`}>
+                                  <div className={`w-12 h-5 border-b-2 border-dashed rounded-b-full mt-2 ${mouthFocusActive ? 'border-clinic-lime/60' : 'border-white/20'}`}></div>
+                                  
+                                  <span className="absolute top-[103%] left-1/2 -translate-x-1/2 text-[9px] text-white bg-clinic-purple/95 px-3.5 py-1.5 rounded-full backdrop-blur-sm shadow-md border border-white/10 font-extrabold uppercase tracking-widest select-none whitespace-nowrap">
+                                    Alinhe a sua BOCA neste guia 👄
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
 
-                                {/* Flip/Rotate Camera button */}
+                            {/* Settings Overlay Controls - OUTSIDE the video viewport */}
+                            <div className="px-6 py-4 bg-white/[0.03] border-t border-white/5 flex flex-col items-center justify-center gap-2.5 text-center text-white">
+                              <div className="flex items-center justify-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-clinic-lime animate-pulse"></span>
+                                <span className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider">Ajustes da Imagem:</span>
+                              </div>
+                              <div className="flex items-center justify-center w-full">
+                                {/* Flip/Rotate Camera button (Centered) */}
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -958,51 +941,36 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                                     setCameraFacingMode(nextFacing);
                                     startCamera(nextFacing);
                                   }}
-                                  className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-xl text-white font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md border border-white/10 active:scale-95 transition-all cursor-pointer"
+                                  className="flex items-center gap-1.5 px-6 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md border border-white/10 active:scale-95 transition-all cursor-pointer"
                                 >
                                   <RefreshCw size={12} />
                                   <span>{cameraFacingMode === 'user' ? 'Traseira 🔄' : 'Frontal 🔄'}</span>
                                 </button>
                               </div>
-                              
-                              {/* Enhanced smart mouth guidelines for high quality dental scan focus */}
-                              <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10">
-                                <div className={`w-[60%] sm:w-[50%] aspect-[1.3] max-w-[200px] border-4 border-dashed rounded-[45%] flex flex-col items-center justify-center bg-clinic-lime/[0.03] transition-all duration-300 ${mouthFocusActive ? 'border-clinic-lime animate-pulse' : 'border-white/30'}`}>
-                                  <div className={`w-12 h-5 border-b-2 border-dashed rounded-b-full mt-2 ${mouthFocusActive ? 'border-clinic-lime/60' : 'border-white/20'}`}></div>
-                                </div>
-                                <span className="text-[9px] md:text-[10px] text-white bg-clinic-purple/95 px-3.5 py-1.5 rounded-full backdrop-blur-sm shadow-md border border-white/10 mt-4 font-extrabold uppercase tracking-wide select-none drop-shadow">
-                                  {mouthFocusActive ? 'Alinhe a sua BOCA neste guia 👄' : 'Alinhe o seu rosto aqui 👁️'}
-                                </span>
-                              </div>
-
-                              {/* Elegant bottom helper badge */}
-                              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-[9px] font-bold text-white/70 bg-black/50 backdrop-blur-sm px-3.5 py-1 rounded-full pointer-events-none text-center select-none border border-white/5 uppercase tracking-wider">
-                                {mouthFocusActive ? 'Modo Ultra-Foco Dental Ativo ✓' : 'Modo Panorâmico'}
-                              </div>
                             </div>
 
-                            {/* Modal Footer / Control Bar (OUTSIDE the video!) */}
-                            <div className="p-6 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  stopCamera();
-                                  setIsCameraModalOpen(false);
-                                }}
-                                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-bold text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-white/10 cursor-pointer"
-                              >
-                                Cancelar
-                              </button>
-
+                            {/* Modal Footer / Control Bar (OUTSIDE the video, stacked with Capturar Sorriso on top of Cancelar) */}
+                            <div className="p-6 bg-white/5 border-t border-white/5 flex flex-col gap-2.5">
                               <button
                                 type="button"
                                 onClick={() => {
                                   capturePhoto();
                                   setIsCameraModalOpen(false);
                                 }}
-                                className="w-full sm:w-auto bg-clinic-lime hover:bg-clinic-lime/90 text-clinic-blue font-black px-8 py-3 rounded-xl text-xs flex items-center justify-center gap-2 hover:scale-[1.03] active:scale-95 transition-all shadow-lg cursor-pointer duration-200"
+                                className="w-full bg-clinic-lime hover:bg-clinic-lime/95 text-clinic-blue font-black py-4 rounded-xl text-xs flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-95 transition-all shadow-lg cursor-pointer duration-200 animate-pulse"
                               >
                                 <Camera size={14} /> Capturar Sorriso 📸
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  stopCamera();
+                                  setIsCameraModalOpen(false);
+                                }}
+                                className="w-full py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-white/10 cursor-pointer"
+                              >
+                                Cancelar
                               </button>
                             </div>
 
@@ -1520,34 +1488,38 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                               </div>
                             )}
 
-                            {/* Camera streaming active */}
+                            {/* Camera streaming active (Taller aspect-[4/3] video and perfectly centered guidelines) */}
                             {isCameraActive && !isCameraModalOpen && (
-                              <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-clinic-purple max-w-md mx-auto aspect-video bg-[#050505] flex flex-col justify-end">
-                                <video
-                                  ref={videoRef}
-                                  className={`w-full h-full object-cover absolute top-0 left-0 transition-transform ${cameraFacingMode === 'user' ? 'scale-x-[-1]' : ''}`}
-                                  autoPlay
-                                  playsInline
-                                  muted
-                                />
-                                
-                                {/* Floating Overlays / Camera Controls */}
-                                <div className="absolute top-4 inset-x-4 flex justify-between items-center z-20 pointer-events-none">
-                                  {/* Focus toggle button */}
-                                  <button
-                                    type="button"
-                                    onClick={() => setMouthFocusActive(!mouthFocusActive)}
-                                    className={`pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-[10px] md:text-[11px] uppercase tracking-wider backdrop-blur-md transition-all active:scale-95 shadow-md cursor-pointer ${
-                                      mouthFocusActive 
-                                        ? 'bg-clinic-lime border-clinic-lime text-clinic-blue shadow-clinic-lime/10' 
-                                        : 'bg-black/60 border-white/10 text-white/80 hover:bg-black/75'
-                                    }`}
-                                  >
-                                    <Smile size={11} className={mouthFocusActive ? 'animate-bounce' : ''} />
-                                    <span>{mouthFocusActive ? 'Foco Boca ✨' : 'Geral 🔍'}</span>
-                                  </button>
+                              <div className="max-w-md mx-auto space-y-3.5 animate-fade-in">
+                                {/* Pure viewport with camera stream and centered mouth guidlines */}
+                                <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-clinic-purple aspect-[4/3] max-h-[300px] sm:max-h-[340px] bg-[#050505]">
+                                  <video
+                                    ref={videoRef}
+                                    className={`w-full h-full object-cover absolute top-0 left-0 transition-transform ${cameraFacingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+                                    autoPlay
+                                    playsInline
+                                    muted
+                                  />
 
-                                  {/* Flip Camera button */}
+                                  {/* Perfectly centered guideline circle with independent text overlay to prevent top clipping */}
+                                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10 pb-10">
+                                    <div className={`w-[55%] aspect-[1.3] max-w-[180px] border-[3px] border-dashed rounded-[45%] flex flex-col items-center justify-center bg-clinic-lime/[0.02] transition-all duration-300 relative ${mouthFocusActive ? 'border-clinic-lime animate-pulse' : 'border-white/20'}`}>
+                                      <div className={`w-10 h-4 border-b-2 border-dashed rounded-b-full mt-1.5 ${mouthFocusActive ? 'border-clinic-lime/50' : 'border-white/15'}`}></div>
+                                      
+                                      <span className="absolute top-[103%] left-1/2 -translate-x-1/2 text-[8px] md:text-[9px] text-white bg-clinic-purple/95 px-3 py-1 rounded-full backdrop-blur-sm shadow border border-white/10 font-extrabold uppercase tracking-wide select-none whitespace-nowrap">
+                                        Alinhe a sua Boca aqui 👄
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* External settings toolbar (Centered, only flip camera) */}
+                                <div className="flex flex-col items-center justify-center gap-2 bg-gray-50 dark:bg-white/[0.02] p-3 rounded-2xl border border-gray-200/55 dark:border-white/5 shadow-sm">
+                                  <div className="flex items-center justify-center gap-1.5 cursor-default">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-clinic-purple/60 dark:bg-clinic-lime animate-pulse"></span>
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Opções de Câmara:</span>
+                                  </div>
+                                  {/* Centered Flip Button */}
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -1555,44 +1527,29 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
                                       setCameraFacingMode(nextFacing);
                                       startCamera(nextFacing);
                                     }}
-                                    className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-xl text-white font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md border border-white/10 active:scale-95 transition-all cursor-pointer"
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-white font-bold text-[10px] uppercase rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
                                   >
                                     <RefreshCw size={11} />
                                     <span>{cameraFacingMode === 'user' ? 'Traseira 🔄' : 'Frontal 🔄'}</span>
                                   </button>
                                 </div>
 
-                                {/* Interactive dynamic watermark guidline */}
-                                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10">
-                                  <div className={`w-[55%] aspect-[1.3] max-w-[180px] border-[3px] border-dashed rounded-[45%] flex flex-col items-center justify-center bg-clinic-lime/[0.02] transition-all duration-300 ${mouthFocusActive ? 'border-clinic-lime animate-pulse' : 'border-white/20'}`}>
-                                    <div className={`w-10 h-4 border-b-2 border-dashed rounded-b-full mt-1.5 ${mouthFocusActive ? 'border-clinic-lime/50' : 'border-white/15'}`}></div>
-                                  </div>
-                                  <span className="text-[8px] md:text-[9px] text-white bg-clinic-purple/95 px-3 py-1 rounded-full backdrop-blur-sm shadow border border-white/10 mt-3 font-extrabold uppercase tracking-wide select-none">
-                                    {mouthFocusActive ? 'Alinhe a sua Boca aqui 👄' : 'Alinhe o seu rosto 👁️'}
-                                  </span>
-                                </div>
-                                
-                                {/* Teeth guidelines overlay */}
-                                <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex items-center justify-center">
-                                  <div className="hidden">
-
-                                  </div>
-                                </div>
-
-                                <div className="relative z-10 p-4 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between gap-4">
-                                  <button
-                                    type="button"
-                                    onClick={stopCamera}
-                                    className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-xs"
-                                  >
-                                    Cancelar
-                                  </button>
+                                {/* Action buttons outside of the frame (Stacked: Capturar on top of Cancelar) */}
+                                <div className="flex flex-col gap-2.5 pt-1">
                                   <button
                                     type="button"
                                     onClick={capturePhoto}
-                                    className="bg-clinic-lime text-clinic-blue font-black px-6 py-2.5 rounded-lg text-xs flex items-center gap-2 hover:scale-[1.02] transition-transform shadow-lg cursor-pointer animate-pulse"
+                                    className="w-full bg-clinic-lime text-clinic-blue font-black py-4 px-4 rounded-xl text-xs flex items-center justify-center gap-2 hover:scale-[1.01] transition-all shadow-lg cursor-pointer shadow-clinic-lime/10 animate-pulse duration-1000"
                                   >
-                                    <Camera size={14} /> Capturar Foto
+                                    <Camera size={14} /> Capturar Sorriso 📸
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={stopCamera}
+                                    className="w-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+                                  >
+                                    Cancelar
                                   </button>
                                 </div>
                               </div>

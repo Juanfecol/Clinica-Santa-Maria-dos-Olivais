@@ -83,3 +83,10 @@ body {
   margin: 0 auto;
   padding: 20px;
 }
+
+/* Hide floating components while camera is active to avoid accidental clicks */
+body.camera-active #fixed-fab-hub {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

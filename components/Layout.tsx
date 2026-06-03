@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -38,6 +38,39 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       setIsCameraInfoModalOpen(true);
     }
   }, [location.search]);
+
+  const trackedModalOpen = useRef(false);
+
+  // Track Meta Pixel events for the Foto-Diagnosis Campaign complying with GDPR/Meta guidelines
+  useEffect(() => {
+    if (isCameraInfoModalOpen) {
+      if (!trackedModalOpen.current) {
+        trackedModalOpen.current = true;
+        const searchParams = new URLSearchParams(location.search);
+        
+        if ((window as any).trackMeta) {
+          // Standard Meta Pixel Event for general algorithm matching
+          (window as any).trackMeta('ViewContent', {
+            content_name: 'Modal Diagnóstico Clínico por Foto',
+            content_category: 'Campanha de Marketing Diagnóstico',
+            utm_source: searchParams.get('utm_source') || 'organic',
+            utm_medium: searchParams.get('utm_medium') || 'none',
+            utm_campaign: searchParams.get('utm_campaign') || 'diagnostico_foto'
+          }, true);
+          
+          // Custom Meta Pixel Event for laser-focused ad optimization & custom conversions
+          (window as any).trackMeta('IniciouDiagnosticoFoto', {
+            tipo_entrada: searchParams.get('diagnostico') === 'foto' ? 'url_campanha' : 'clique_manual',
+            utm_source: searchParams.get('utm_source') || 'organic',
+            utm_medium: searchParams.get('utm_medium') || 'none',
+            utm_campaign: searchParams.get('utm_campaign') || 'diagnostico_foto'
+          }, false);
+        }
+      }
+    } else {
+      trackedModalOpen.current = false;
+    }
+  }, [isCameraInfoModalOpen, location.search]);
 
   const openCameraModal = () => {
     setIsCameraInfoModalOpen(true);

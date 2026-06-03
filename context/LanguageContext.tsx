@@ -744,6 +744,14 @@ const translationMap: Record<string, { es: string; en: string }> = {
   },
   // Quote Calculator additional static texts
   "Tratamentos de ": { es: "Tratamientos de ", en: "Treatments for " },
+  "Foto e simulação enviadas com sucesso! Entraremos em contacto em breve.": {
+    es: "¡Foto y simulación enviadas con éxito! Nos pondremos en contacto pronto.",
+    en: "Photo and simulation sent successfully! We will contact you soon."
+  },
+  "Foto Enviada! 📸": {
+    es: "¡Foto Enviada! 📸",
+    en: "Photo Sent! 📸"
+  },
   "Não foi possível iniciar a câmara": { es: "No fue posible encender la cámara", en: "Could not activate the camera device" },
   "Antes e Depois": { es: "Antes y Después", en: "Before & After" },
   "Apenas mais um passo...": { es: "Solo un paso más...", en: "Almost there..." },

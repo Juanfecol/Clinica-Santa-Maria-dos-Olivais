@@ -190,6 +190,17 @@ const QuoteCalculator: React.FC = () => {
   const [phoneError, setPhoneError] = useState('');
   const [nameError, setNameError] = useState('');
 
+  // Toast Notification State
+  const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'error' | 'info' }>({
+    show: false,
+    message: '',
+    type: 'success',
+  });
+
+  const showToastNotification = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ show: true, message, type });
+  };
+
   const TREATMENT_POCKET_GUIDES = [
     { label: 'Implantes Dentários 🦷', desc: 'Preenchimento e reabilitação de dentes em falta', text: 'Pretendo realizar uma avaliação clínica para colocação de implantes dentários por ausência dentária.' },
     { label: 'Arcada Completa 👄', desc: 'Reabilitação total fixa de uma ou ambas as arcadas sobre implantes', text: 'Pretendo obter informações e realizar estudo para uma reabilitação de arcada completa fixa sobre implantes.' },
@@ -245,6 +256,17 @@ const QuoteCalculator: React.FC = () => {
       document.body.classList.remove('camera-active');
     };
   }, [isCameraActive, isCameraModalOpen]);
+
+  // Auto-dismiss Toast notifications
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast(prev => ({ ...prev, show: false }));
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show]);
+
   // UX Improvement: Smoothly scroll to the main card when content options change or load
   useEffect(() => {
     const cardEl = document.getElementById('simulator-main-card');
@@ -526,6 +548,10 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
 
       if (response.ok) {
         setSubmitStatus('success');
+        showToastNotification(
+          t("Foto e simulação enviadas com sucesso! Entraremos em contacto em breve."),
+          'success'
+        );
         if ((window as any).trackEvent) {
           (window as any).trackEvent('quote_submitted_with_photo', { min, max, has_photo: !!capturedPhoto });
         }
@@ -1979,6 +2005,40 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
           </div>
         </div>
       )}
+
+      {/* Elegant Floating Toast Notification */}
+      <AnimatePresence>
+        {toast.show && (
+          <motion.div
+            initial={{ opacity: 0, y: -40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-sm px-4"
+          >
+            <div className="bg-white/95 dark:bg-clinic-blue/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-clinic-lime/40 dark:border-white/10 flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-clinic-lime/10 dark:bg-clinic-lime/20 flex items-center justify-center shrink-0 text-clinic-lime border border-clinic-lime/30">
+                <CheckCircle size={20} className="animate-pulse" />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <h4 className="text-xs font-black text-clinic-blue dark:text-white uppercase tracking-wider">
+                  {t("Foto Enviada! 📸")}
+                </h4>
+                <p className="text-[11px] text-gray-500 dark:text-gray-300 font-medium leading-relaxed mt-1">
+                  {toast.message}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setToast(prev => ({ ...prev, show: false }))}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

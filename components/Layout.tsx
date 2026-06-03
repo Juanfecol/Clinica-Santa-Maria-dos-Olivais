@@ -31,6 +31,33 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const { trackWhatsApp, trackPhone } = useGoogleAds();
 
+  // Synchronize state with "diagnostico=foto" query parameter
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('diagnostico') === 'foto') {
+      setIsCameraInfoModalOpen(true);
+    }
+  }, [location.search]);
+
+  const openCameraModal = () => {
+    setIsCameraInfoModalOpen(true);
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('diagnostico') !== 'foto') {
+      searchParams.set('diagnostico', 'foto');
+      navigate({ search: searchParams.toString() }, { replace: true });
+    }
+  };
+
+  const closeCameraModal = () => {
+    setIsCameraInfoModalOpen(false);
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.has('diagnostico')) {
+      searchParams.delete('diagnostico');
+      const newSearch = searchParams.toString();
+      navigate({ search: newSearch ? `?${newSearch}` : '' }, { replace: true });
+    }
+  };
+
   const translatedServices = React.useMemo(() => {
     return translateObject(services);
   }, [translateObject, language]);
@@ -517,7 +544,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           
           <button
             id="btn-sticky-camera"
-            onClick={() => setIsCameraInfoModalOpen(true)}
+            onClick={openCameraModal}
             className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_35px_rgba(107,70,193,0.55)] hover:shadow-[0_15px_40px_rgba(107,70,193,0.7)] transition-all duration-300 hover:scale-110 active:scale-95 border border-white/50 bg-gradient-to-tr from-clinic-purple via-violet-600 to-clinic-blue text-white cursor-pointer z-10"
             aria-label={t("Diagnóstico por Foto 📸")}
             title={t("Diagnóstico Gratuito por Foto 🦷")}
@@ -675,7 +702,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-clinic-blue/60 backdrop-blur-sm transition-opacity duration-300" 
-            onClick={() => setIsCameraInfoModalOpen(false)}
+            onClick={closeCameraModal}
           />
           <div className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 animate-fade-in-up md:p-1.5 z-10">
             <div className="p-6 md:p-8">
@@ -693,7 +720,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   </div>
                 </div>
                 <button 
-                  onClick={() => setIsCameraInfoModalOpen(false)}
+                  onClick={closeCameraModal}
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-clinic-purple hover:text-white text-gray-500 transition-all cursor-pointer shadow-sm shrink-0"
                 >
                   <X size={18} />
@@ -729,7 +756,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 {/* Path 1: Direct Real-Time Camera Access */}
                 <button
                   onClick={() => {
-                    setIsCameraInfoModalOpen(false);
+                    closeCameraModal();
                     navigate('/cotizador?mode=photo&autostart=true');
                   }}
                   className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-clinic-purple via-purple-600 to-clinic-blue hover:from-clinic-blue hover:to-clinic-blue text-white rounded-2xl transition-all cursor-pointer shadow-md shadow-clinic-purple/15 hover:shadow-clinic-blue/15 hover:scale-[1.01] active:scale-95 group border-0 text-left"
@@ -749,7 +776,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 {/* Path 2: Upload File From Device Gallery */}
                 <button
                   onClick={() => {
-                    setIsCameraInfoModalOpen(false);
+                    closeCameraModal();
                     navigate('/cotizador?mode=photo');
                   }}
                   className="w-full flex items-center justify-between p-4 bg-white border border-gray-200 hover:border-clinic-blue/50 hover:bg-gray-50 text-clinic-blue rounded-2xl transition-all cursor-pointer shadow-sm hover:scale-[1.01] active:scale-95 group text-left"
@@ -773,7 +800,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   rel="noreferrer"
                   onClick={() => {
                     trackWhatsAppClick();
-                    setIsCameraInfoModalOpen(false);
+                    closeCameraModal();
                   }}
                   className="w-full flex items-center justify-between p-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 hover:border-emerald-200 text-emerald-800 rounded-2xl transition-all cursor-pointer group text-left"
                 >

@@ -289,6 +289,19 @@ const QuoteCalculator: React.FC = () => {
 
       setVideoStream(stream);
       setIsCameraActive(true);
+
+      // Track Meta Pixel Event for Camera Activation in QuoteCalculator (Photo Assessment Campaign)
+      if ((window as any).trackMeta) {
+        const searchParams = new URLSearchParams(location.search);
+        const auto = searchParams.get('autostart') === 'true';
+        (window as any).trackMeta('IniciouDiagnosticoFoto', {
+          tipo_entrada: auto ? 'url_campanha' : 'clique_manual',
+          utm_source: searchParams.get('utm_source') || 'organic',
+          utm_medium: searchParams.get('utm_medium') || 'none',
+          utm_campaign: searchParams.get('utm_campaign') || 'diagnostico_foto',
+          origem: 'cotizador_camara'
+        }, false);
+      }
     } catch (err: any) {
       console.error("Camera error:", err);
       
@@ -359,6 +372,12 @@ const QuoteCalculator: React.FC = () => {
           const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
           setCapturedPhoto(dataUrl);
           stopCamera();
+          if ((window as any).trackMeta) {
+            (window as any).trackMeta('CapturouFotoSorriso', {
+              enquadramento: 'aproximado_boca',
+              origem: 'cotizador_camara'
+            }, false);
+          }
         }
       } else {
         // Standard view (not cropped to mouth)
@@ -374,6 +393,12 @@ const QuoteCalculator: React.FC = () => {
           const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
           setCapturedPhoto(dataUrl);
           stopCamera();
+          if ((window as any).trackMeta) {
+            (window as any).trackMeta('CapturouFotoSorriso', {
+              enquadramento: 'plano_geral',
+              origem: 'cotizador_camara'
+            }, false);
+          }
         }
       }
     }
@@ -414,6 +439,12 @@ const QuoteCalculator: React.FC = () => {
             setCapturedPhoto(dataUrl);
           } else {
             setCapturedPhoto(event.target.result as string);
+          }
+          if ((window as any).trackMeta) {
+            (window as any).trackMeta('CapturouFotoSorriso', {
+              enquadramento: 'upload_galeria',
+              origem: 'cotizador_arquivo'
+            }, false);
           }
         };
         img.src = event.target.result as string;

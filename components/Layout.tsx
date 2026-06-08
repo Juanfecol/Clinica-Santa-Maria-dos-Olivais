@@ -4,8 +4,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useGoogleAds } from '../hooks/useGoogleAds';
-import { services } from '../constants/servicesData';
-import { Search, X, Camera, Smile, Check, Upload, ChevronRight } from 'lucide-react';
+import { services, serviceDetails, faq } from '../constants/servicesData';
+import { 
+  Search, X, Camera, Smile, Check, Upload, ChevronRight,
+  Stethoscope, User, HelpCircle, Phone, Calendar, Sparkles, 
+  MapPin, Video, DollarSign 
+} from 'lucide-react';
 import { ContactForm } from './ContactForm';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -91,33 +95,357 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   };
 
+  const { content } = useContent();
+  const navigation = content.navigation || [];
+  const global = content.global || {};
+
+  const contactEmail = global.email || "clinicasmod@gmail.com";
+  const contactPhone = global.phone || "211 350 066";
+
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  // Dynamic Icon Renderer inside Layout
+  const IconRenderer = ({ name, className = "", size = 18 }: { name: string; className?: string; size?: number }) => {
+    switch (name) {
+      case 'Stethoscope': return <Stethoscope className={className} size={size} />;
+      case 'User': return <User className={className} size={size} />;
+      case 'HelpCircle': return <HelpCircle className={className} size={size} />;
+      case 'Phone': return <Phone className={className} size={size} />;
+      case 'Calendar': return <Calendar className={className} size={size} />;
+      case 'Sparkles': return <Sparkles className={className} size={size} />;
+      case 'MapPin': return <MapPin className={className} size={size} />;
+      case 'Video': return <Video className={className} size={size} />;
+      case 'DollarSign': return <DollarSign className={className} size={size} />;
+      case 'Smile': return <Smile className={className} size={size} />;
+      default: return <Search className={className} size={size} />;
+    }
+  };
+
   const translatedServices = React.useMemo(() => {
     return translateObject(services);
   }, [translateObject, language]);
 
-  // Basic search logic
-  const filteredServices = translatedServices.filter(s => 
-    s.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Comprehensive indexing database (all pages, detailed treatments, pricing, team bios, and FAQs)
+  const searchItems = React.useMemo(() => {
+    const items: Array<{
+      id: string;
+      title: string;
+      snippet: string;
+      url: string;
+      category: 'Tratamentos' | 'Equipa' | 'FAQ' | 'Páginas';
+      icon: string;
+      keywords: string[];
+    }> = [];
+
+    // --- 1. SERVICES & TREATMENTS ---
+    translatedServices.forEach((service: any) => {
+      const details = serviceDetails[service.slug] || {};
+      const trTitle = t(service.title) || service.title;
+      const trDesc = t(details.description) || details.description || '';
+      
+      items.push({
+        id: `service-${service.slug}`,
+        title: trTitle,
+        snippet: trDesc,
+        url: `/servicos/${service.slug}`,
+        category: 'Tratamentos',
+        icon: 'Stethoscope',
+        keywords: [
+          service.slug,
+          service.category?.toLowerCase() || '',
+          trTitle.toLowerCase(),
+          trDesc.toLowerCase()
+        ]
+      });
+
+      // Index specific sub-items and lists from priceGroups
+      if (details.priceGroups) {
+        details.priceGroups.forEach((group: any, gi: number) => {
+          const groupTitle = t(group.title) || group.title || '';
+          const groupCategory = t(group.category) || group.category || '';
+          
+          if (group.items) {
+            group.items.forEach((subItem: any, si: number) => {
+              const trName = t(subItem.name) || subItem.name || '';
+              const trVal = subItem.value || '';
+              const trSubDesc = t(subItem.description) || subItem.description || '';
+              
+              items.push({
+                id: `service-sub-${service.slug}-${gi}-${si}`,
+                title: `${trName} — ${trTitle}`,
+                snippet: `${t("Tratamento de")} ${groupTitle} (${groupCategory}). ${t("Preço:")} ${trVal}. ${trSubDesc}`,
+                url: `/servicos/${service.slug}`,
+                category: 'Tratamentos',
+                icon: 'DollarSign',
+                keywords: [
+                  trName.toLowerCase(),
+                  trVal.toLowerCase(),
+                  trSubDesc.toLowerCase(),
+                  groupTitle.toLowerCase(),
+                  service.slug
+                ]
+              });
+            });
+          }
+        });
+      }
+    });
+
+    // --- 2. TEAM MEMBERS ---
+    const medicalTeam = content?.team?.medical || [];
+    const assistantTeam = content?.team?.assistants || [];
+    const receptionTeam = content?.team?.reception || [];
+
+    const addTeamItem = (member: any, roleKey: string) => {
+      const trName = member.name || '';
+      const trTitle = t(member.title) || member.title || '';
+      const trBio = t(member.bio) || member.bio || '';
+      items.push({
+        id: `team-${roleKey}-${trName.replace(/\s+/g, '-').toLowerCase()}`,
+        title: trName,
+        snippet: `${trTitle} — ${trBio}`,
+        url: '/equipa',
+        category: 'Equipa',
+        icon: 'User',
+        keywords: [
+          trName.toLowerCase(),
+          trTitle.toLowerCase(),
+          trBio.toLowerCase(),
+          'médico',
+          'doctor',
+          'dentista',
+          'equipa',
+          'equipo'
+        ]
+      });
+    };
+
+    medicalTeam.forEach((member: any) => addTeamItem(member, 'med'));
+    assistantTeam.forEach((member: any) => addTeamItem(member, 'ast'));
+    receptionTeam.forEach((member: any) => addTeamItem(member, 'rec'));
+
+    // --- 3. FAQs (FAQ) ---
+    faq.forEach((category: any, catIndex: number) => {
+      const catTitle = t(category.category) || category.category || '';
+      category.items.forEach((faqItem: any, itemIndex: number) => {
+        const qText = t(faqItem.question) || faqItem.question || '';
+        const aText = t(faqItem.answer) || faqItem.answer || '';
+        items.push({
+          id: `faq-${catIndex}-${itemIndex}`,
+          title: qText,
+          snippet: aText,
+          url: '/faq',
+          category: 'FAQ',
+          icon: 'HelpCircle',
+          keywords: [
+            qText.toLowerCase(),
+            aText.toLowerCase(),
+            catTitle.toLowerCase(),
+            'pergunta',
+            'faq',
+            'dúvida',
+            'preço',
+            'seguro',
+            'acordo'
+          ]
+        });
+      });
+    });
+
+    // --- 4. GENERAL SECTIONS / ACTIONS / PAGES ---
+    const pageItems = [
+      {
+        id: 'page-home',
+        title: t("Início / Home"),
+        snippet: t("Página principal com o diagnóstico estético por foto gratuito, tratamento de implantes, ortodontia invisível Invisalign e o simulador de orçamento."),
+        url: '/',
+        icon: 'Smile',
+        keywords: ['inicio', 'home', 'principal', 'clínica', 'diagnóstico', 'sorriso', 'foto']
+      },
+      {
+        id: 'page-calc',
+        title: t("Calculadora de Orçamento Gratuita"),
+        snippet: t("Simule e calcule os custos dos seus tratamentos dentários de forma instantânea e personalizada."),
+        url: '/cotizador',
+        icon: 'DollarSign',
+        keywords: ['calculadora', 'orçamento', 'preço', 'simular', 'cotizador', 'simulador', 'grátis', 'custo']
+      },
+      {
+        id: 'page-booking',
+        title: t("Marcação de Consulta Online"),
+        snippet: t("Reserve a sua consulta de avaliação diretamente no nosso calendário online Calendly ou preencha o formulário."),
+        url: '/marcacoes',
+        icon: 'Calendar',
+        keywords: ['marcar', 'marcação', 'consulta', 'calendário', 'agendar', 'calendly', 'cita', 'reservar']
+      },
+      {
+        id: 'page-campaigns',
+        title: t("Campanhas e Promoções Especiais"),
+        snippet: t("Descubra as nossas campanhas especiais e oportunidades ativas de tratamento (Implantes, Invisalign, Facetas, Odontopediatria)."),
+        url: '/campanhas',
+        icon: 'Sparkles',
+        keywords: ['campanhas', 'promoções', 'ofertas', 'descontos', 'kids', 'implante', 'facetas']
+      },
+      {
+        id: 'page-contact',
+        title: t("Contactos e Localização"),
+        snippet: `${t("Ligue ou envie mensagem. Morada:")} Estrada de Moscavide N 32C. Telefones: ${contactPhone} / ${global.mobile || ""}.`,
+        url: '/contactos',
+        icon: 'Phone',
+        keywords: ['contacto', 'morada', 'telefone', 'whatsapp', 'email', 'mapa', 'lisboa', 'moscavide', 'onde fica', 'chegar', 'ajuda']
+      },
+      {
+        id: 'page-clinica',
+        title: t("A Clínica & Instalações"),
+        snippet: t("Conheça as nossas instalações modernas em Moscavide, Lisboa. Fotos exclusivas da recepção e consultórios."),
+        url: '/clinica',
+        icon: 'MapPin',
+        keywords: ['clinica', 'instalações', 'fotos', 'galeria', 'receção', 'consultório', 'lisboa']
+      },
+      {
+        id: 'page-blog',
+        title: t("Blog Educativo (Dicas de Saúde Oral)"),
+        snippet: t("Assista a dicas e explicações em vídeo dos nossos dentistas sobre Invisalign, implantes, endodontia, e higiene oral GBT."),
+        url: '/blog',
+        icon: 'Video',
+        keywords: ['blog', 'vídeo', 'dicas', 'educativo', 'prevenção', 'saúde', 'gbt', 'limpeza']
+      }
+    ];
+
+    pageItems.forEach(pi => {
+      items.push({
+        id: pi.id,
+        title: pi.title,
+        snippet: pi.snippet,
+        url: pi.url,
+        category: 'Páginas',
+        icon: pi.icon,
+        keywords: pi.keywords
+      });
+    });
+
+    return items;
+  }, [language, content, t, translatedServices, contactPhone, global.mobile]);
+
+  // Accent-insensitive and diacritic-insensitive normalization
+  const normalizeText = (text: string): string => {
+    if (!text) return '';
+    return text
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+  };
+
+  // Advanced search scorer & filter
+  const searchResults = React.useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    
+    const queryNormalized = normalizeText(searchQuery);
+    const queryTerms = queryNormalized.split(/\s+/).filter(Boolean);
+    
+    if (queryTerms.length === 0) return [];
+
+    const scored = searchItems
+      .map(item => {
+        const itemTitleNorm = normalizeText(item.title);
+        const itemSnippetNorm = normalizeText(item.snippet);
+        const itemKeywordsNorm = item.keywords.map(normalizeText);
+
+        let score = 0;
+        let matchesAllTerms = true;
+
+        for (const term of queryTerms) {
+          let termMatch = false;
+          
+          if (itemTitleNorm === term) {
+            score += 150;
+            termMatch = true;
+          } else if (itemTitleNorm.includes(term)) {
+            score += 80;
+            if (itemTitleNorm.indexOf(term) === 0) {
+              score += 30;
+            }
+            termMatch = true;
+          }
+
+          if (itemKeywordsNorm.some(kw => kw === term)) {
+            score += 50;
+            termMatch = true;
+          } else if (itemKeywordsNorm.some(kw => kw.includes(term))) {
+            score += 20;
+            termMatch = true;
+          }
+
+          if (itemSnippetNorm.includes(term)) {
+            score += 30;
+            termMatch = true;
+          }
+
+          if (!termMatch) {
+            matchesAllTerms = false;
+          }
+        }
+
+        return { item, score, matchesAllTerms };
+      })
+      .filter(res => res.score > 0)
+      .sort((a, b) => {
+        if (a.matchesAllTerms && !b.matchesAllTerms) return -1;
+        if (!a.matchesAllTerms && b.matchesAllTerms) return 1;
+        return b.score - a.score;
+      });
+
+    return scored.map(res => res.item);
+  }, [searchQuery, searchItems]);
+
+  // Reset keyboard active option when query changes
+  useEffect(() => {
+    setActiveIndex(-1);
+  }, [searchQuery]);
+
+  const handleNavigateResult = (item: any) => {
+    if ((window as any).trackMeta) {
+      (window as any).trackMeta('Search', { 
+        search_string: searchQuery,
+        content_category: item.category,
+        destination: item.url
+      }, true);
+    }
+    navigate(item.url);
+    setIsSearchOpen(false);
+    setSearchQuery('');
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (filteredServices.length > 0) {
-      if ((window as any).trackMeta) {
-        (window as any).trackMeta('Search', { 
-          search_string: searchQuery,
-          content_category: 'Services'
-        }, true);
+    if (activeIndex >= 0 && activeIndex < searchResults.length) {
+      handleNavigateResult(searchResults[activeIndex]);
+    } else if (searchResults.length > 0) {
+      handleNavigateResult(searchResults[0]);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isSearchOpen) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev + 1) % Math.max(1, searchResults.length));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev - 1 + searchResults.length) % Math.max(1, searchResults.length));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIndex >= 0 && activeIndex < searchResults.length) {
+        handleNavigateResult(searchResults[activeIndex]);
+      } else if (searchResults.length > 0) {
+        handleNavigateResult(searchResults[0]);
       }
-      navigate(`/servicos/${filteredServices[0].slug}`);
+    } else if (e.key === 'Escape') {
       setIsSearchOpen(false);
       setSearchQuery('');
     }
   };
-  
-  const { content } = useContent();
-  const navigation = content.navigation || [];
-  const global = content.global || {};
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -133,8 +461,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return () => { document.body.style.overflow = 'unset'; };
   }, [isMenuOpen]);
 
-  const contactEmail = global.email || "clinicasmod@gmail.com";
-  const contactPhone = global.phone || "211 350 066";
   const customerService = global.customerService || "300 601 645";
   const cleanPhone = contactPhone.replace(/\s+/g, '');
   const cleanCustomerService = customerService.replace(/\s+/g, '');
@@ -249,14 +575,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
 
           {/* Search Bar */}
-          <div className={`relative flex items-center transition-all duration-500 ${isSearchOpen ? 'w-[150px] sm:w-[220px] md:w-[320px]' : 'w-[40px]'}`}>
+          <div className={`relative flex items-center transition-all duration-500 ${isSearchOpen ? 'w-[180px] sm:w-[260px] md:w-[380px]' : 'w-[40px]'}`}>
             <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center">
               <input
                 type="text"
-                placeholder={t("Pesquisar especialidade...")}
-                className={`w-full bg-white/40 border border-white/50 backdrop-blur-md rounded-full py-2 pl-10 pr-4 text-clinic-blue placeholder:text-clinic-blue/50 focus:outline-none focus:ring-2 focus:ring-clinic-purple/30 transition-all duration-500 ${isSearchOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                placeholder={t("Pesquisar na página...")}
+                className={`w-full bg-white/40 border border-white/50 backdrop-blur-md rounded-full py-2.5 pl-10 pr-4 text-clinic-blue placeholder:text-clinic-blue/50 focus:outline-none focus:ring-2 focus:ring-clinic-purple/40 transition-all duration-500 text-xs sm:text-sm ${isSearchOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 value={searchQuery}
+                onKeyDown={handleKeyDown}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                autoComplete="off"
               />
               <button
                 type="button"
@@ -274,30 +602,113 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               </button>
             </form>
 
-            {/* Simple Search Results Dropdown */}
-            {isSearchOpen && searchQuery && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white/90 backdrop-blur-xl border border-white/50 rounded-2xl shadow-2xl overflow-hidden max-h-[300px] overflow-y-auto">
-                {filteredServices.length > 0 ? (
-                  <ul className="py-2">
-                    {filteredServices.map((service) => (
-                      <li key={service.slug}>
-                        <Link
-                          to={`/servicos/${service.slug}`}
-                          className="block px-6 py-3 text-clinic-blue hover:bg-clinic-purple hover:text-white transition-colors text-sm font-medium"
-                          onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
-                        >
-                          {service.title}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="p-6 text-center text-clinic-blue/50 text-sm italic">
-                    Sem resultados para "{searchQuery}"
-                  </div>
-                )}
-              </div>
-            )}
+            <AnimatePresence>
+              {isSearchOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 15 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full right-0 mt-3 w-[260px] sm:w-[340px] md:w-[480px] bg-white/95 backdrop-blur-2xl border border-gray-100 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col max-h-[460px]"
+                >
+                  {/* Popular suggestions when query is empty */}
+                  {!searchQuery.trim() ? (
+                    <div className="p-5">
+                      <div className="text-xs font-black tracking-wider text-clinic-purple uppercase mb-3 flex items-center gap-1.5 opacity-85">
+                        <Sparkles size={14} className="text-clinic-purple" />
+                        {t("Pesquisas Sugeridas")}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { text: "Invisalign", val: "Invisalign" },
+                          { text: "Implantes", val: "Implantes" },
+                          { text: "Preços", val: "Preços" },
+                          { text: "Dra. Ana Mata", val: "Ana Mata" },
+                          { text: "Seguros", val: "Seguros" },
+                          { text: "Horário", val: "Horário" },
+                          { text: "Moscavide", val: "Moscavide" },
+                          { text: "Campanhas", val: "Campanhas" }
+                        ].map((sug) => (
+                          <button
+                            key={sug.text}
+                            type="button"
+                            onClick={() => setSearchQuery(sug.val)}
+                            className="bg-clinic-blue/5 hover:bg-clinic-purple hover:text-white text-clinic-blue text-xs font-semibold py-1.5 px-3 rounded-full transition-all duration-200 border border-clinic-blue/5 cursor-pointer"
+                          >
+                            {sug.text}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <>
+                      {/* Results Header */}
+                      <div className="px-5 py-2.5 bg-gray-50/80 border-b border-gray-100/50 flex justify-between items-center text-[10px] sm:text-xs font-bold text-gray-400">
+                        <span>{t("Resultados Encontrados")} ({searchResults.length})</span>
+                        <span className="hidden sm:inline font-normal opacity-80">{t("Suba/Desça com as setas e prima Enter")}</span>
+                      </div>
+                      
+                      {/* Scrollable List */}
+                      <div className="overflow-y-auto max-h-[380px] py-1 divide-y divide-gray-50">
+                        {searchResults.map((item, index) => {
+                          const isActive = index === activeIndex;
+                          return (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() => handleNavigateResult(item)}
+                              onMouseEnter={() => setActiveIndex(index)}
+                              className={`w-full text-left px-5 py-3.5 transition-all duration-150 flex gap-3 text-sm relative border-l-4 ${
+                                isActive 
+                                  ? 'bg-clinic-purple/5 border-clinic-purple' 
+                                  : 'border-transparent bg-transparent hover:bg-gray-50/50'
+                              }`}
+                            >
+                              <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center transition-all ${
+                                isActive ? 'bg-clinic-purple text-white' : 'bg-clinic-purple/10 text-clinic-purple'
+                              }`}>
+                                <IconRenderer name={item.icon} size={15} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-start gap-1 mb-0.5">
+                                  <h4 className={`font-bold transition-colors truncate ${isActive ? 'text-clinic-purple' : 'text-clinic-blue'}`}>
+                                    {item.title}
+                                  </h4>
+                                  <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 ${
+                                    item.category === 'Tratamentos' 
+                                      ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
+                                      : item.category === 'Equipa'
+                                        ? 'bg-sky-50 text-sky-600 border border-sky-100'
+                                        : item.category === 'FAQ'
+                                          ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                                          : 'bg-amber-50 text-amber-600 border border-amber-100'
+                                  }`}>
+                                    {t(item.category)}
+                                  </span>
+                                </div>
+                                <p className="text-gray-500 font-normal text-xs leading-relaxed line-clamp-2">
+                                  {item.snippet}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-8 text-center flex flex-col items-center justify-center">
+                      <HelpCircle size={36} className="text-gray-300 mb-3 animate-pulse" />
+                      <p className="text-clinic-blue font-bold text-sm mb-1">
+                        {t("Sem resultados para")} "{searchQuery}"
+                      </p>
+                      <p className="text-gray-400 text-xs font-normal max-w-[280px]">
+                        {t("Tente pesquisar termos alternativos como 'Invisalign', 'Implante', 'Preços' ou 'Dra. Ana'.")}
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <button 

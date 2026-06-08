@@ -481,6 +481,8 @@ const translationMap: Record<string, { es: string; en: string }> = {
     en: "Choose the option that best fits your needs. The photographic diagnosis is validated directly by qualified dentists, 100% free of charge."
   },
   "Passo 1: Especialidade": { es: "Paso 1: Especialidad", en: "Step 1: Specialty" },
+  "Passo 2: Tratamentos": { es: "Paso 2: Tratamientos", en: "Step 2: Treatments" },
+  "Passo 3: Orçamento": { es: "Paso 3: Presupuesto", en: "Step 3: Quote" },
   "O que quer cuidar hoje?": { es: "¿Qué desea cuidar hoy?", en: "What do you want to take care of today?" },
   "Explorar tratamentos e preços.": { es: "Explorar tratamientos y precios.", en: "Explore treatments and prices." },
   "Tratamentos de": { es: "Tratamientos de", en: "Treatments for" },

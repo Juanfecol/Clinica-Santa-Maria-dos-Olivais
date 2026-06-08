@@ -690,7 +690,99 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
       </div>
 
       <div id="simulator-main-card" className="bg-white rounded-2xl sm:rounded-[2.5rem] md:rounded-[3rem] shadow-xl md:shadow-2xl overflow-hidden border border-gray-100 min-h-[500px] md:min-h-[600px] flex flex-col relative">
-        {/* Progress Tracker */}
+        {/* Visual Progress Tracker & Stepper */}
+        {flowMode === 'manual' && (
+          <div className="w-full bg-gradient-to-b from-gray-50/60 to-transparent border-b border-gray-100/50 pt-8 pb-6 px-4 sm:px-8">
+            <div className="max-w-2xl mx-auto flex items-center justify-between relative animate-fade-in-up">
+              {/* Connection Line */}
+              <div className="absolute top-[20px] left-[10%] right-[10%] h-[3px] bg-gray-200/55 z-0 rounded-full overflow-hidden">
+                <motion.div 
+                  className="h-full bg-clinic-purple"
+                  initial={{ width: "0%" }}
+                  animate={{ width: step === 1 ? "0%" : step === 2 ? "50%" : "100%" }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
+              </div>
+
+              {/* Step 1 */}
+              <div className="flex flex-col items-center z-10 w-1/3">
+                <button
+                  type="button"
+                  onClick={() => step > 1 && setStep(1)}
+                  disabled={step === 1}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs shadow-md transition-all duration-300 relative border ${
+                    step >= 1 
+                      ? step > 1 
+                        ? 'bg-clinic-lime border-clinic-lime text-clinic-blue hover:scale-105 cursor-pointer shadow-clinic-lime/20' 
+                        : 'bg-clinic-purple border-clinic-purple text-white ring-4 ring-clinic-purple/10 scale-110'
+                      : 'bg-white border-gray-200 text-gray-400'
+                  }`}
+                >
+                  {step > 1 ? (
+                    <Check size={16} className="stroke-[3]" />
+                  ) : (
+                    <span>1</span>
+                  )}
+                </button>
+                <span className={`text-[10px] md:text-sm font-black tracking-wider uppercase mt-2.5 text-center transition-colors duration-300 pointer-events-none px-1 ${
+                  step === 1 ? 'text-clinic-purple font-black' : step > 1 ? 'text-clinic-blue font-bold' : 'text-gray-400 font-medium'
+                }`}>
+                  {t("Passo 2: Tratamentos") ? t("Passo 1: Especialidade") : "Passo 1"}
+                </span>
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex flex-col items-center z-10 w-1/3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (step === 3 && activeSpecialty) {
+                      setStep(2);
+                    }
+                  }}
+                  disabled={step === 2 || !activeSpecialty}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs shadow-md transition-all duration-300 relative border ${
+                    step >= 2 
+                      ? step > 2 
+                        ? 'bg-clinic-lime border-clinic-lime text-clinic-blue hover:scale-105 cursor-pointer shadow-clinic-lime/20' 
+                        : 'bg-clinic-purple border-clinic-purple text-white ring-4 ring-clinic-purple/10 scale-110'
+                      : 'bg-white border-gray-200 text-gray-400'
+                  }`}
+                >
+                  {step > 2 ? (
+                    <Check size={16} className="stroke-[3]" />
+                  ) : (
+                    <span>2</span>
+                  )}
+                </button>
+                <span className={`text-[10px] md:text-sm font-black tracking-wider uppercase mt-2.5 text-center transition-colors duration-300 pointer-events-none px-1 ${
+                  step === 2 ? 'text-clinic-purple font-black' : step > 2 ? 'text-clinic-blue font-bold' : 'text-gray-400 font-medium'
+                }`}>
+                  {t("Passo 2: Tratamentos")}
+                </span>
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex flex-col items-center z-10 w-1/3">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs shadow-md transition-all duration-300 relative border ${
+                    step === 3 
+                      ? 'bg-clinic-purple border-clinic-purple text-white ring-4 ring-clinic-purple/10 scale-110'
+                      : 'bg-white border-gray-200 text-gray-400'
+                  }`}
+                >
+                  <span>3</span>
+                </div>
+                <span className={`text-[10px] md:text-sm font-black tracking-wider uppercase mt-2.5 text-center transition-colors duration-300 pointer-events-none px-1 ${
+                  step === 3 ? 'text-clinic-purple font-black' : 'text-gray-400 font-medium'
+                }`}>
+                  {t("Passo 3: Orçamento")}
+                </span>
+              </div>
+
+            </div>
+          </div>
+        )}
         {flowMode === 'manual' && (
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-50 flex">
              <motion.div 

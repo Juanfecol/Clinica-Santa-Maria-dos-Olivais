@@ -20,9 +20,6 @@ export const CookieConsent: React.FC = () => {
     loadScripts();
     
     // Trigger ConsentUpdated custom event on acceptance (CAPI will be active immediately)
-    if ((window as any).trackMeta) {
-      (window as any).trackMeta('ConsentUpdated', { consentStatus: 'granted' }, false);
-    }
   };
 
   const decline = () => {
@@ -33,9 +30,6 @@ export const CookieConsent: React.FC = () => {
     }
     
     // Trigger ConsentUpdated custom event on decline (CAPI will deactivate immediately after this check)
-    if ((window as any).trackMeta) {
-      (window as any).trackMeta('ConsentUpdated', { consentStatus: 'denied' }, false);
-    }
   };
 
   const loadScripts = () => {

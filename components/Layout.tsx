@@ -62,14 +62,6 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
             utm_medium: searchParams.get('utm_medium') || 'none',
             utm_campaign: searchParams.get('utm_campaign') || 'diagnostico_foto'
           }, true);
-          
-          // Custom Meta Pixel Event for laser-focused ad optimization & custom conversions
-          (window as any).trackMeta('IniciouDiagnosticoFoto', {
-            tipo_entrada: searchParams.get('diagnostico') === 'foto' ? 'url_campanha' : 'clique_manual',
-            utm_source: searchParams.get('utm_source') || 'organic',
-            utm_medium: searchParams.get('utm_medium') || 'none',
-            utm_campaign: searchParams.get('utm_campaign') || 'diagnostico_foto'
-          }, false);
         }
       }
     } else {
@@ -503,10 +495,6 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
   };
 
   const trackLocationClick = () => {
-    if ((window as any).trackMeta) {
-      (window as any).trackMeta('FindLocation', { content_name: 'Clinic Address' }, true);
-    }
-    trackGtagEvent('location_click', { 'event_category': 'contact', 'event_label': 'Maps' });
   };
 
 

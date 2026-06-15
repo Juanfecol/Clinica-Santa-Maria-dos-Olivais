@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Volume2, VolumeX } from 'lucide-react';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -52,6 +53,7 @@ const Home: React.FC = () => {
 
   const [centerIndex, setCenterIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [activeStoryMuted, setActiveStoryMuted] = useState(true);
   const touchStartX = useRef<number | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   
@@ -61,6 +63,23 @@ const Home: React.FC = () => {
   const campVideoRef = useRef<HTMLVideoElement>(null);
   const [isExpMuted, setIsExpMuted] = useState(true); 
   const [isCampMuted, setIsCampMuted] = useState(true);
+
+  // Reset mute when changing story
+  useEffect(() => {
+    setActiveStoryMuted(true);
+    videoRefs.current.forEach(v => {
+      if (v) v.muted = true;
+    });
+  }, [centerIndex]);
+
+  const toggleStoryMute = () => {
+    const video = videoRefs.current[centerIndex];
+    if (video) {
+        const newMuted = !activeStoryMuted;
+        video.muted = newMuted;
+        setActiveStoryMuted(newMuted);
+    }
+  };
 
   const servicesList = [
     {
@@ -263,7 +282,7 @@ const Home: React.FC = () => {
         if (i === centerIndex) {
           // Center video: ensure attributes and play
           v.preload = "auto";
-          safePlay(v, !hasInteracted);
+          safePlay(v, activeStoryMuted);
         } else {
           // Other videos: pause and reduce resource usage
           if (!v.paused) v.pause();
@@ -407,7 +426,7 @@ const Home: React.FC = () => {
                         className={`absolute inset-0 w-full h-full object-cover scale-[1.05] transition-all duration-500 bg-black/40 ${isCenter ? 'opacity-100 pointer-events-auto' : 'opacity-80 pointer-events-none'}`}
                         style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
                         playsInline 
-                        muted={true}
+                        muted={index === centerIndex ? activeStoryMuted : true}
                         autoPlay={isCenter}
                         preload="auto"
                         onCanPlay={(e) => {
@@ -434,7 +453,13 @@ const Home: React.FC = () => {
                         />
                       </div>
                       
-                      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-black/95 to-transparent z-10 flex justify-center items-center">
+                      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-black/95 to-transparent z-10 flex flex-col justify-center items-center">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); toggleStoryMute(); }}
+                          className="mb-2 p-2 rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
+                        >
+                          {activeStoryMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                        </button>
                         <p className="text-white text-[9px] md:text-xs font-bold uppercase tracking-widest text-center drop-shadow-md">
                           {story.title}
                         </p>

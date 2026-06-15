@@ -6,6 +6,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { ContentProvider } from './context/ContentContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { CookieConsent } from './components/CookieConsent';
+import Chatbot, { ChatbotLauncher } from './src/components/Chatbot';
 
 // Direct imports for primary pages to ensure immediate loading
 import Home from './pages/Home';
@@ -91,12 +92,13 @@ const PixelRouteTracker: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const [isChatbotOpen, setIsChatbotOpen] = React.useState(false);
   return (
     <LanguageProvider>
       <ContentProvider>
         <BrowserRouter>
           <CookieConsent />
-          <Layout>
+          <Layout isChatbotOpen={isChatbotOpen} setIsChatbotOpen={setIsChatbotOpen}>
             <ScrollToTop />
             <PixelRouteTracker />
             <Routes>
@@ -119,6 +121,7 @@ const App: React.FC = () => {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>
+          <Chatbot isOpen={isChatbotOpen} setIsOpen={setIsChatbotOpen} />
         </BrowserRouter>
       </ContentProvider>
     </LanguageProvider>

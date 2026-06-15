@@ -8,12 +8,13 @@ import { services, serviceDetails, faq } from '../constants/servicesData';
 import { 
   Search, X, Camera, Smile, Check, Upload, ChevronRight,
   Stethoscope, User, HelpCircle, Phone, Calendar, Sparkles, 
-  MapPin, Video, DollarSign 
+  MapPin, Video, DollarSign, Bot 
 } from 'lucide-react';
 import { ContactForm } from './ContactForm';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChatbotLauncher } from '../src/components/Chatbot';
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setIsChatbotOpen: (open: boolean) => void }> = ({ children, isChatbotOpen, setIsChatbotOpen }) => {
   const { language, setLanguage, t, translateObject } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
@@ -981,14 +982,19 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </AnimatePresence>
 
         {/* Always Sticky Premium Camera Floating Button */}
-        <div className="relative mb-3.5 group">
-          {/* Brand-Colored Pulsing Glow backdrop */}
-          <div className="absolute inset-[-4px] rounded-full bg-gradient-to-tr from-clinic-purple to-[#2d3277] opacity-60 blur-sm animate-pulse z-0" />
-          <div className="absolute inset-[-6px] rounded-full bg-clinic-purple opacity-25 animate-ping z-0" />
-          
+        <div className="relative mb-3.5 flex flex-col items-center gap-3">
           <button
-            id="btn-sticky-camera"
-            onClick={openCameraModal}
+            id="btn-sticky-chatbot"
+            onClick={() => setIsChatbotOpen(true)}
+            className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_35px_rgba(29,78,216,0.55)] hover:shadow-[0_15px_40px_rgba(29,78,216,0.7)] transition-all duration-300 hover:scale-110 active:scale-95 border border-white/50 bg-gradient-to-tr from-clinic-blue via-blue-600 to-clinic-purple text-white cursor-pointer z-10"
+            aria-label={t("Chatbot")}
+            title={t("Chatbot")}
+          >
+            <Bot className="w-5 h-5 md:w-6 md:h-6 text-white" />
+          </button>
+            <button
+              id="btn-sticky-camera"
+              onClick={openCameraModal}
             className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_35px_rgba(107,70,193,0.55)] hover:shadow-[0_15px_40px_rgba(107,70,193,0.7)] transition-all duration-300 hover:scale-110 active:scale-95 border border-white/50 bg-gradient-to-tr from-clinic-purple via-violet-600 to-clinic-blue text-white cursor-pointer z-10"
             aria-label={t("Diagnóstico por Foto 📸")}
             title={t("Diagnóstico Gratuito por Foto 🦷")}

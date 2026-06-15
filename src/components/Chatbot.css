@@ -1,0 +1,203 @@
+/* Botón lanzador flotante */
+.chatbot-launcher-custom {
+  background: var(--color-clinic-blue);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(43, 51, 126, 0.4);
+  transition: transform 0.2s;
+}
+
+.chatbot-launcher-custom:hover {
+  transform: scale(1.05);
+}
+
+
+/* Contenedor principal de la ventana */
+.chatbot-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 380px;
+  height: 600px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+  z-index: 10000;
+  border: 1px solid var(--color-clinic-blue);
+}
+
+/* Cabecera del chatbot */
+.chatbot-header {
+  background: var(--color-clinic-blue);
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chatbot-header strong {
+  display: block;
+  font-size: 1.1rem;
+}
+
+.chatbot-header p {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Área de mensajes */
+.chat-window {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: var(--color-clinic-bg);
+}
+
+.message {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.message.bot {
+  justify-content: flex-start;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.message.bot .message-content {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 14px 18px;
+  border-radius: 14px 14px 14px 4px;
+  color: #1f2937;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  margin-left: 8px;
+  max-width: 85%;
+}
+
+.message.user .message-content {
+  background: var(--color-clinic-purple);
+  color: #ffffff;
+  padding: 14px 18px;
+  border-radius: 14px 14px 4px 14px;
+  font-size: 0.95rem;
+  max-width: 85%;
+}
+
+/* Botones de navegación */
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  align-self: flex-start;
+  width: 90%;
+}
+
+.btn-option {
+  background: #ffffff;
+  border: 1.5px solid var(--color-clinic-purple);
+  color: var(--color-clinic-blue);
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+  text-align: left;
+}
+
+.btn-option:hover {
+  background: var(--color-clinic-purple);
+  color: #ffffff;
+}
+
+
+/* Enlace a WhatsApp */
+.btn-whatsapp {
+  display: block;
+  background: #25D366;
+  color: #ffffff;
+  text-align: center;
+  padding: 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 16px;
+  transition: transform 0.2s;
+  align-self: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.btn-whatsapp:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+}
+
+/* Área inferior de texto */
+.chat-input-area {
+  display: flex;
+  padding: 16px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  gap: 10px;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.chat-input-area input:focus {
+  border-color: #1d4ed8;
+}
+
+.chat-input-area button {
+  background: #1d4ed8;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.chat-input-area button:hover {
+  background: #1e40af;
+}

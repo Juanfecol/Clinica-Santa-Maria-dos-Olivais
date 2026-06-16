@@ -65,7 +65,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
   ]);
   
   const [formStage, setFormStage] = useState('NOME'); 
-  const [leadData, setLeadData] = useState({ nome: '', telefone: '' });
+  const [leadData, setLeadData] = useState({ nome: '', telefone: '', treatment: '' });
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -120,8 +120,14 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
   const handleOptionClick = (option: any) => {
     setMessages(prev => [...prev, { sender: 'user', text: option.label }]);
 
+    // Persist treatment if present in the option
+    if (option.treatment) {
+      setLeadData(prev => ({ ...prev, treatment: option.treatment }));
+    }
+
     if (option.next === 'FINALIZAR_AGENDAMENTO') {
-      const treatmentName = option.treatment || option.label;
+      const treatmentName = option.treatment || leadData.treatment || option.label;
+      
       const waMessage = `Olá equipa! Quero agendar uma consulta.%0A%0A*Nome:* ${leadData.nome}%0A*Telemóvel:* ${leadData.telefone}%0A*Tratamento:* ${treatmentName}`;
       // Usando el WhatsApp oficial de la clínica
       const waLink = `https://wa.me/351919861310?text=${waMessage}`; 
@@ -178,7 +184,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
                     <div className="options-container">
                       {msg.options.map((opt: any, i: number) => (
                         <button key={i} className="btn-option" onClick={() => handleOptionClick(opt)}>
-                          {opt.label}
+                          {msg.options.length > 1 ? `• ${opt.label}` : opt.label}
                         </button>
                       ))}
                     </div>

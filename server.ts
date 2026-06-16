@@ -3,6 +3,7 @@ import path from "path";
 import { Resend } from 'resend';
 import crypto from 'crypto';
 
+
 // Hash helper for GDPR compliance: SHA-256 formatting as per Meta Conversions API requirements
 function sha256(text: string): string | null {
   if (!text) return null;

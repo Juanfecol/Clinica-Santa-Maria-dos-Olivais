@@ -121,7 +121,8 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     setMessages(prev => [...prev, { sender: 'user', text: option.label }]);
 
     if (option.next === 'FINALIZAR_AGENDAMENTO') {
-      const waMessage = `Olá equipa! Quero agendar uma consulta.%0A%0A*Nome:* ${leadData.nome}%0A*Telemóvel:* ${leadData.telefone}%0A*Tratamento:* ${option.label}`;
+      const treatmentName = option.treatment || option.label;
+      const waMessage = `Olá equipa! Quero agendar uma consulta.%0A%0A*Nome:* ${leadData.nome}%0A*Telemóvel:* ${leadData.telefone}%0A*Tratamento:* ${treatmentName}`;
       // Usando el WhatsApp oficial de la clínica
       const waLink = `https://wa.me/351919861310?text=${waMessage}`; 
 

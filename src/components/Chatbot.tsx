@@ -68,12 +68,76 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
   const [leadData, setLeadData] = useState({ nome: '', telefone: '', treatment: '' });
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [viewportStyle, setViewportStyle] = useState<React.CSSProperties>({});
 
   const handleInputFocus = () => {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
   };
+
+  // Dynamic visual viewport calculations to achieve BlackBerry split-screen layout
+  useEffect(() => {
+    const updateViewport = () => {
+      if (window.visualViewport && window.innerWidth <= 640) {
+        const height = window.visualViewport.height;
+        const top = window.visualViewport.offsetTop;
+        const left = window.visualViewport.offsetLeft;
+        const width = window.visualViewport.width;
+        
+        setViewportStyle({
+          position: 'fixed',
+          top: `${top}px`,
+          left: `${left}px`,
+          height: `${height}px`,
+          maxHeight: `${height}px`,
+          width: `${width}px`,
+          bottom: 'auto',
+          borderRadius: '0px',
+          transform: 'none',
+          zIndex: 10000,
+          display: 'flex',
+          flexDirection: 'column'
+        });
+        
+        // Ensure newest messages scroll beautifully into view inside the remaining upper space
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+      } else {
+        setViewportStyle({});
+      }
+    };
+
+    if (isOpen) {
+      updateViewport();
+      
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', updateViewport);
+        window.visualViewport.addEventListener('scroll', updateViewport);
+      }
+      window.addEventListener('resize', updateViewport);
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', updateViewport);
+        window.visualViewport.removeEventListener('scroll', updateViewport);
+      }
+      window.removeEventListener('resize', updateViewport);
+    };
+  }, [isOpen, messages]);
+
+  // Keep the mobile virtual keyboard focused and active
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, messages]);
 
   // When language changes, update the initial message (if still at start)
   useEffect(() => {
@@ -94,6 +158,11 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
       const userMsg = input;
       setMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
       setInput('');
+
+      // Auto-refocus keyboard immediately after sending
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
 
       if (formStage === 'NOME') {
         setLeadData(prev => ({ ...prev, nome: userMsg }));
@@ -119,11 +188,35 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
         }, 600);
         return;
       }
+
+      // If user typing custom message during menu stages
+      const currentPhone = leadData.telefone || '';
+      const currentNome = leadData.nome || 'Cliente';
+      const waMessage = `Olá! Quero tirar uma dúvida.%0A%0A*Nome:* ${currentNome}%0A*Telemóvel:* ${currentPhone}%0A*Mensagem:* ${userMsg}`;
+      const waLink = `https://wa.me/351919861310?text=${waMessage}`;
+
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          sender: 'bot',
+          text: language === 'pt' 
+            ? 'Prefere falar diretamente com um assistente? Toque no botão abaixo para nos enviar a sua mensagem por WhatsApp:' 
+            : language === 'es' 
+            ? '¿Prefiere hablar directamente con un asistente? Toque el botón de abajo para enviarnos su mensaje por WhatsApp:' 
+            : 'Would you prefer to speak directly with an assistant? Tap the button below to send your message via WhatsApp:',
+          isLink: true,
+          linkUrl: waLink
+        }]);
+      }, 600);
     }
   };
 
   const handleOptionClick = (option: any) => {
     setMessages(prev => [...prev, { sender: 'user', text: option.label }]);
+
+    // Auto-refocus keyboard immediately when option clicked
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
 
     // Persist treatment if present in the option
     if (option.treatment) {
@@ -156,13 +249,13 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     }, 600);
   };
 
-  const isFormActive = formStage === 'NOME' || formStage === 'TELEFONE';
+  const isFormActive = true; // Always active to allow BlackBerry style typing at any point
 
   return (
     <>
       {/* Ventana principal del chatbot */}
       {isOpen && (
-        <div className="chatbot-container">
+        <div className="chatbot-container" style={viewportStyle}>
           <div className="chatbot-header">
             <div className="chatbot-header-info">
               <div className="chatbot-header-logo">
@@ -213,11 +306,18 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
           {isFormActive && (
             <div className="chat-input-area">
               <input 
+                ref={inputRef}
                 value={input} 
                 onChange={(e) => setInput(e.target.value)} 
                 onKeyPress={(e) => e.key === 'Enter' && handleSendText()}
                 onFocus={handleInputFocus}
-                placeholder={formStage === 'NOME' ? t.inputPlaceholderName : t.inputPlaceholderPhone} 
+                placeholder={
+                  formStage === 'NOME' 
+                    ? t.inputPlaceholderName 
+                    : formStage === 'TELEFONE' 
+                      ? t.inputPlaceholderPhone 
+                      : (language === 'pt' ? 'Escreva uma mensagem ou dúvida...' : language === 'es' ? 'Escriba un mensaje o consulta...' : 'Type your message or question...')
+                } 
                 autoFocus
               />
               <button onClick={handleSendText}>{t.send}</button>

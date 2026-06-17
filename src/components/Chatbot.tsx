@@ -68,78 +68,12 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
   const [leadData, setLeadData] = useState({ nome: '', telefone: '', treatment: '' });
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [viewportStyle, setViewportStyle] = useState<React.CSSProperties>({});
 
-  // Dynamic visual viewport positioning to handle active keyboards gracefully on mobile devices
-  useEffect(() => {
-    const updateViewport = () => {
-      if (window.visualViewport && window.innerWidth <= 640) {
-        const height = window.visualViewport.height;
-        const top = window.visualViewport.offsetTop;
-        const left = window.visualViewport.offsetLeft;
-        const width = window.visualViewport.width;
-        
-        // Detect if keyboard is open (remaining viewport is significantly smaller than the window)
-        const isKeyboard = window.innerHeight - height > 150;
-        
-        if (isKeyboard) {
-          // Fill 100% of the active visual viewport space above the keyboard
-          setViewportStyle({
-            position: 'fixed',
-            top: `${top}px`,
-            left: `${left}px`,
-            height: `${height}px`,
-            maxHeight: `${height}px`,
-            width: `${width}px`,
-            bottom: 'auto',
-            borderRadius: '0px',
-            transform: 'none',
-            zIndex: 10000
-          });
-          
-          // Scroll automatically on keyboard expand to keep output visible
-          setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        } else {
-          // Open as an elegant half-screen Bottom Sheet (55% height) when keyboard is closed
-          const sheetHeight = height * 0.55;
-          setViewportStyle({
-            position: 'fixed',
-            top: 'auto',
-            bottom: '0px',
-            left: '0px',
-            height: `${sheetHeight}px`,
-            maxHeight: `${sheetHeight}px`,
-            width: '100%',
-            borderRadius: '16px 16px 0px 0px',
-            transform: 'translateY(0)',
-            zIndex: 10000
-          });
-        }
-      } else {
-        setViewportStyle({});
-      }
-    };
-
-    if (isOpen) {
-      updateViewport();
-      
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', updateViewport);
-        window.visualViewport.addEventListener('scroll', updateViewport);
-      }
-      window.addEventListener('resize', updateViewport);
-    }
-
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', updateViewport);
-        window.visualViewport.removeEventListener('scroll', updateViewport);
-      }
-      window.removeEventListener('resize', updateViewport);
-    };
-  }, [isOpen, messages]);
+  const handleInputFocus = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  };
 
   // When language changes, update the initial message (if still at start)
   useEffect(() => {
@@ -154,13 +88,6 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
-
-  const handleInputFocus = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
-  };
-
 
   const handleSendText = () => {
     if (input.trim().length > 0) {
@@ -235,7 +162,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     <>
       {/* Ventana principal del chatbot */}
       {isOpen && (
-        <div className="chatbot-container" style={viewportStyle}>
+        <div className="chatbot-container">
           <div className="chatbot-header">
             <div className="chatbot-header-info">
               <div className="chatbot-header-logo">

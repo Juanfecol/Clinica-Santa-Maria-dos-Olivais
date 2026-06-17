@@ -86,12 +86,15 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
         const left = window.visualViewport.offsetLeft;
         const width = window.visualViewport.width;
         
+        const isForm = formStage === 'NOME' || formStage === 'TELEFONE';
+        const containerHeight = isForm ? height : height * 0.9;
+        
         setViewportStyle({
           position: 'fixed',
           top: `${top}px`,
           left: `${left}px`,
-          height: `${height}px`,
-          maxHeight: `${height}px`,
+          height: `${containerHeight}px`,
+          maxHeight: `${containerHeight}px`,
           width: `${width}px`,
           bottom: 'auto',
           borderRadius: '0px',
@@ -127,7 +130,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
       }
       window.removeEventListener('resize', updateViewport);
     };
-  }, [isOpen, messages]);
+  }, [isOpen, messages, formStage]);
 
   // Focus only once when the chatbot is opened
   useEffect(() => {

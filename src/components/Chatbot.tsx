@@ -129,7 +129,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     };
   }, [isOpen, messages]);
 
-  // Keep the mobile virtual keyboard focused and active
+  // Focus only once when the chatbot is opened
   useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
@@ -137,7 +137,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
       }, 350);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, messages]);
+  }, [isOpen]);
 
   // When language changes, update the initial message (if still at start)
   useEffect(() => {
@@ -159,10 +159,8 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
       setMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
       setInput('');
 
-      // Auto-refocus keyboard immediately after sending
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 50);
+      // Auto-refocus keyboard synchronously after sending
+      inputRef.current?.focus();
 
       if (formStage === 'NOME') {
         setLeadData(prev => ({ ...prev, nome: userMsg }));
@@ -213,10 +211,8 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
   const handleOptionClick = (option: any) => {
     setMessages(prev => [...prev, { sender: 'user', text: option.label }]);
 
-    // Auto-refocus keyboard immediately when option clicked
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 50);
+    // Auto-refocus keyboard synchronously when option is clicked
+    inputRef.current?.focus();
 
     // Persist treatment if present in the option
     if (option.treatment) {

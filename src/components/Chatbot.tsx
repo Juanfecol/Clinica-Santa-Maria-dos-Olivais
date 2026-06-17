@@ -177,6 +177,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
 
       if (formStage === 'TELEFONE') {
         setLeadData(prev => ({ ...prev, telefone: userMsg }));
+        inputRef.current?.blur();
         setFormStage('MENU');
         
         setTimeout(() => {

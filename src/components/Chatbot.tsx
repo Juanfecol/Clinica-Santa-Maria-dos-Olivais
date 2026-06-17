@@ -134,13 +134,13 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
 
   // Focus only once when the chatbot is opened
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && (formStage === 'NOME' || formStage === 'TELEFONE')) {
       const timer = setTimeout(() => {
         inputRef.current?.focus();
       }, 350);
       return () => clearTimeout(timer);
     }
-  }, [isOpen]);
+  }, [isOpen, formStage]);
 
   // When language changes, update the initial message (if still at start)
   useEffect(() => {
@@ -249,7 +249,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     }, 600);
   };
 
-  const isFormActive = true; // Always active to allow BlackBerry style typing at any point
+  const isFormActive = formStage === 'NOME' || formStage === 'TELEFONE';
 
   return (
     <>

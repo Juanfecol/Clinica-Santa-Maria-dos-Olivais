@@ -83,6 +83,12 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     }
   }, [messages, isOpen]);
 
+  const handleInputFocus = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  };
+
 
   const handleSendText = () => {
     if (input.trim().length > 0) {
@@ -159,43 +165,47 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
       {isOpen && (
         <div className="chatbot-container">
           <div className="chatbot-header">
-            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
-              <img src={CLINIC_LOGO} alt="Logo" className="w-[80%] h-[80%] object-contain" />
-            </div>
-            <div>
-              <strong>{t.headerTitle}</strong>
-              <p>{t.headerSubtitle}</p>
+            <div className="chatbot-header-info">
+              <div className="chatbot-header-logo">
+                <img src={CLINIC_LOGO} alt="Logo" className="w-[80%] h-[80%] object-contain" />
+              </div>
+              <div className="chatbot-header-text">
+                <strong>{t.headerTitle}</strong>
+                <p>{t.headerSubtitle}</p>
+              </div>
             </div>
             <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
           </div>
 
           <div className="chat-window">
             {messages.map((msg: any, idx: number) => (
-              <div key={idx} className={`message ${msg.sender}`}>
-                {msg.sender === 'bot' && (
-                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-2 flex-shrink-0 overflow-hidden">
-                    <img src={CLINIC_LOGO} alt="Logo" className="w-[80%] h-[80%] object-contain" />
-                  </div>
-                )}
-                <div className="message-content">
-                  <p style={{ whiteSpace: 'pre-line' }}>{msg.text}</p>
-                
-                  {msg.options && (
-                    <div className="options-container">
-                      {msg.options.map((opt: any, i: number) => (
-                        <button key={i} className="btn-option" onClick={() => handleOptionClick(opt)}>
-                          {msg.options.length > 1 ? `• ${opt.label}` : opt.label}
-                        </button>
-                      ))}
+              <div key={idx} className={`message-wrapper ${msg.sender}`}>
+                <div className={`message ${msg.sender}`}>
+                  {msg.sender === 'bot' && (
+                    <div className="bot-avatar-container">
+                      <img src={CLINIC_LOGO} alt="Logo" className="w-[80%] h-[80%] object-contain" />
                     </div>
                   )}
-
-                  {msg.isLink && (
-                    <a href={msg.linkUrl} target="_blank" rel="noopener noreferrer" className="btn-whatsapp">
-                      {t.waButton}
-                    </a>
-                  )}
+                  <div className="message-content">
+                    <p style={{ whiteSpace: 'pre-line' }}>{msg.text}</p>
+                    
+                    {msg.isLink && (
+                      <a href={msg.linkUrl} target="_blank" rel="noopener noreferrer" className="btn-whatsapp">
+                        {t.waButton}
+                      </a>
+                    )}
+                  </div>
                 </div>
+
+                {msg.options && (
+                  <div className="options-container">
+                    {msg.options.map((opt: any, i: number) => (
+                      <button key={i} className="btn-option" onClick={() => handleOptionClick(opt)}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             <div ref={messagesEndRef} />
@@ -207,6 +217,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
                 value={input} 
                 onChange={(e) => setInput(e.target.value)} 
                 onKeyPress={(e) => e.key === 'Enter' && handleSendText()}
+                onFocus={handleInputFocus}
                 placeholder={formStage === 'NOME' ? t.inputPlaceholderName : t.inputPlaceholderPhone} 
                 autoFocus
               />

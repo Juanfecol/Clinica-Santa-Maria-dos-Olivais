@@ -60,6 +60,7 @@ export default async function handler(req, res) {
     const emailPayload = {
       from: 'Clinica Santa Maria <onboarding@resend.dev>',
       to: ['clinicasmod@gmail.com'],
+      reply_to: email,
       subject: `Novo contacto de: ${name}`,
       html: htmlBody
     };

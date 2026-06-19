@@ -323,7 +323,7 @@ const QuoteCalculator: React.FC = () => {
       setVideoStream(stream);
       setIsCameraActive(true);
     } catch (err: any) {
-      console.error("Camera error:", err);
+      console.error("Camera error details:", err);
       
       const errorName = err?.name || '';
       const errorMessage = err?.message || '';

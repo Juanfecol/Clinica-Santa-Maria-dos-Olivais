@@ -43,11 +43,11 @@ const Campaigns: React.FC = () => {
             key={index} 
             to="/marcacoes" 
             state={{ service: camp.targetService }}
-            className="group overflow-hidden rounded-[2rem] shadow-2xl border border-white/50 bg-white aspect-[4/5] relative block"
+            className="group overflow-hidden rounded-[2rem] shadow-2xl border border-white/50 bg-white aspect-square relative block"
            >
             <img 
               src={camp.src} 
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+              className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110" 
               alt={t(camp.title)} 
               loading="lazy"
             />

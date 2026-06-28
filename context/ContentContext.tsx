@@ -117,8 +117,8 @@ const defaultData = {
   },
   campaigns: [
     { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/kids%20clinica%20dentaria%20santa%20maria%20dos%20olivais%20.jpg", title: "Campanha 1", targetService: "Odontopediatria" },
-    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_6570.jpg", title: "Campanha 2", targetService: "Implantologia" },
-    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_6567%202.jpg", title: "Campanha 3", targetService: "Facetas" }
+    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/implantes_smo_junio_julio_2.jpeg", title: "Campanha Implantes", targetService: "Implantologia" },
+    { src: "https://clinica-santa-maria-dos-olivais.b-cdn.net/arcada_completa_smo_2.jpeg", title: "Campanha Arcada", targetService: "Implantologia" }
   ],
   appointments: {
     heroImage: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Carrusel%201-06%20(1).png",

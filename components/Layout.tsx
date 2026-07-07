@@ -971,15 +971,19 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
 
         {/* Always Sticky Premium Camera Floating Button */}
         <div className="relative mb-3.5 flex flex-col items-center gap-3">
-          <button
-            id="btn-sticky-chatbot"
-            onClick={() => setIsChatbotOpen(true)}
-            className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_35px_rgba(29,78,216,0.55)] hover:shadow-[0_15px_40px_rgba(29,78,216,0.7)] transition-all duration-300 hover:scale-110 active:scale-95 border border-white/50 bg-gradient-to-tr from-clinic-blue via-blue-600 to-clinic-purple text-white cursor-pointer z-10"
-            aria-label={t("Chatbot")}
-            title={t("Chatbot")}
-          >
-            <Bot className="w-5 h-5 md:w-6 md:h-6 text-white" />
-          </button>
+          <div className="chatbot-glow-ring-container w-14 h-14 md:w-16 md:h-16 z-10">
+            <div className="chatbot-glow-ring-blur"></div>
+            <div className="chatbot-glow-ring-sharp"></div>
+            <button
+              id="btn-sticky-chatbot"
+              onClick={() => setIsChatbotOpen(true)}
+              className="absolute inset-0 w-full h-full flex items-center justify-center rounded-full border border-white/50 bg-gradient-to-tr from-clinic-blue via-blue-600 to-clinic-purple text-white cursor-pointer z-10"
+              aria-label={t("Chatbot")}
+              title={t("Chatbot")}
+            >
+              <Bot className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </button>
+          </div>
             <button
               id="btn-sticky-camera"
               onClick={openCameraModal}

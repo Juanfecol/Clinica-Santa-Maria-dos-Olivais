@@ -90,3 +90,67 @@ body.camera-active #fixed-fab-hub {
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* Rotating light ring around chatbot button with clinic and page multicolor accents */
+.chatbot-glow-ring-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chatbot-glow-ring-container:hover {
+  transform: scale(1.1);
+}
+
+.chatbot-glow-ring-container:active {
+  transform: scale(0.95);
+}
+
+.chatbot-glow-ring-blur {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--color-clinic-blue),
+    var(--color-clinic-lime),
+    #25D366,
+    var(--color-clinic-purple),
+    #eab308,
+    #38bdf8,
+    var(--color-clinic-blue)
+  );
+  animation: chatbotRingSpin 3.5s linear infinite;
+  filter: blur(5px);
+  opacity: 0.9;
+  z-index: 0;
+}
+
+.chatbot-glow-ring-sharp {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--color-clinic-blue),
+    var(--color-clinic-lime),
+    #25D366,
+    var(--color-clinic-purple),
+    #eab308,
+    #38bdf8,
+    var(--color-clinic-blue)
+  );
+  animation: chatbotRingSpin 3.5s linear infinite;
+  z-index: 1;
+}
+
+@keyframes chatbotRingSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

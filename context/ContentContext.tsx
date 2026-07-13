@@ -85,16 +85,21 @@ const defaultData = {
         img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-227.jpeg",
         bio: "Focado na preservação dentária e tratamentos de canal.",
         imgPosition: "object-top"
-      }
-    ],
-    assistants: [
+      },
       {
-        name: "Inês Gama",
-        title: "Assistente de Medicina Dentária",
+        name: "Dra. Ladine",
+        title: "Clínica Geral",
         img: "",
-        bio: "Apoio clínico especializado em todas as áreas da medicina dentária."
+        bio: "Especialista em Desvitalização, Restauração, Prótese Removível, Periodontologia e Extrações. Disponível a partir de 17/08/2026 às quintas-feiras e sábados de manhã."
+      },
+      {
+        name: "Dr. Francisco",
+        title: "Clínica Geral",
+        img: "",
+        bio: "Especialista em Desvitalização, Restauração, Prótese Removível e Extrações."
       }
     ],
+    assistants: [],
     reception: [
       {
         name: "Carla Claro",
@@ -142,7 +147,7 @@ const ContentContext = createContext<any>(null);
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState(() => {
     try {
-      const saved = localStorage.getItem('site_content_v7');
+      const saved = localStorage.getItem('site_content_v8');
       if (saved) {
         const parsed = JSON.parse(saved);
         return parsed;
@@ -155,12 +160,12 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateContent = (newContent: any) => {
     setContent(newContent);
-    localStorage.setItem('site_content_v7', JSON.stringify(newContent));
+    localStorage.setItem('site_content_v8', JSON.stringify(newContent));
   };
 
   const resetContent = () => {
     setContent(defaultData);
-    localStorage.setItem('site_content_v7', JSON.stringify(defaultData));
+    localStorage.setItem('site_content_v8', JSON.stringify(defaultData));
   };
 
   return (

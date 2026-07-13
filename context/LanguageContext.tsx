@@ -210,7 +210,17 @@ const translationMap: Record<string, { es: string; en: string }> = {
     es: "Enfocado en la preservación dental y tratamientos de conducto.",
     en: "Focused on tooth preservation and root canal treatments."
   },
-  "Inês Gama": { es: "Inês Gama", en: "Inês Gama" },
+  "Dra. Ladine": { es: "Dra. Ladine", en: "Dr. Ladine" },
+  "Dr. Francisco": { es: "Dr. Francisco", en: "Dr. Francisco" },
+  "Clínica Geral": { es: "Odontología General", en: "General Dentistry" },
+  "Especialista em Desvitalização, Restauração, Prótese Removível, Periodontologia e Extrações. Disponível a partir de 17/08/2026 às quintas-feiras e sábados de manhã.": {
+    es: "Especialista en Desvitalización, Restauración, Prótesis Removible, Periodoncia y Extracciones. Disponible a partir del 17/08/2026 los jueves y sábados por la mañana.",
+    en: "Specialist in Root Canal Treatment, Restorations, Removable Prosthodontics, Periodontology, and Extractions. Available from 17/08/2026 on Thursdays and Saturday mornings."
+  },
+  "Especialista em Desvitalização, Restauração, Prótese Removível e Extrações.": {
+    es: "Especialista en Desvitalización, Restauración, Prótesis Removible y Extracciones.",
+    en: "Specialist in Root Canal Treatment, Restorations, Removable Prosthodontics, and Extractions."
+  },
   "Assistente de Medicina Dentária": { es: "Asistente de Medicina Dental", en: "Dental Medicine Assistant" },
   "Apoio clínico especializado em todas as áreas da medicina dentária.": {
     es: "Soporte clínico especializado en todas las áreas de la medicina dental.",

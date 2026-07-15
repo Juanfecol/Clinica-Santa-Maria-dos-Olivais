@@ -95,8 +95,9 @@ const defaultData = {
       {
         name: "Dr. Francisco",
         title: "Clínica Geral",
-        img: "",
-        bio: "Especialista em Desvitalização, Restauração, Prótese Removível e Extrações."
+        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/dra_francisco.jpeg",
+        bio: "Especialista em Desvitalização, Restauração, Prótese Removível e Extrações.",
+        imgPosition: "object-top"
       }
     ],
     assistants: [],
@@ -147,7 +148,7 @@ const ContentContext = createContext<any>(null);
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState(() => {
     try {
-      const saved = localStorage.getItem('site_content_v8');
+      const saved = localStorage.getItem('site_content_v9');
       if (saved) {
         const parsed = JSON.parse(saved);
         return parsed;
@@ -160,12 +161,12 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateContent = (newContent: any) => {
     setContent(newContent);
-    localStorage.setItem('site_content_v8', JSON.stringify(newContent));
+    localStorage.setItem('site_content_v9', JSON.stringify(newContent));
   };
 
   const resetContent = () => {
     setContent(defaultData);
-    localStorage.setItem('site_content_v8', JSON.stringify(defaultData));
+    localStorage.setItem('site_content_v9', JSON.stringify(defaultData));
   };
 
   return (

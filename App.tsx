@@ -1,4 +1,3 @@
-
 import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
@@ -25,6 +24,7 @@ const ThankYou = lazy(() => import('./pages/ThankYou'));
 const Blog = lazy(() => import('./pages/Blog'));
 const CaseStudies = lazy(() => import('./pages/CaseStudies'));
 const QuoteCalculator = lazy(() => import('./pages/QuoteCalculator'));
+const Landing = lazy(() => import('./pages/Landing'));
 import { ServiceTemplate } from './pages/ServiceTemplate';
 import { FAQ } from './pages/FAQ';
 
@@ -117,6 +117,7 @@ const App: React.FC = () => {
               <Route path="/casos-clinicos" element={<Suspense fallback={<PageLoader />}><CaseStudies /></Suspense>} />
               <Route path="/cotizador" element={<Suspense fallback={<PageLoader />}><QuoteCalculator /></Suspense>} />
               <Route path="/faq" element={<Suspense fallback={<PageLoader />}><FAQ /></Suspense>} />
+              <Route path="/landing" element={<Suspense fallback={<PageLoader />}><Landing /></Suspense>} />
               <Route path="/servicos/:slug" element={<ServiceTemplate />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

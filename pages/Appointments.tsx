@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { EvaluationInfo } from '../src/components/EvaluationInfo';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -49,6 +50,8 @@ const Appointments: React.FC = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-clinic-blue mb-4 leading-tight">{t("Agende a sua")} <span className="text-clinic-purple italic font-serif">{t("Consulta")}</span></h1>
             <p className="text-base sm:text-lg text-gray-600 font-light max-w-md">{t("Escolha o melhor horário para si diretamente no nosso calendário oficial de forma simples e rápida.")}</p>
           </div>
+
+          <EvaluationInfo />
 
           <div 
             id="calendly-inline-container" 

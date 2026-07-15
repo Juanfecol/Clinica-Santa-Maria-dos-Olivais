@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { EvaluationInfo } from '../src/components/EvaluationInfo';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -77,6 +78,12 @@ const Clinic: React.FC = () => {
              loading="lazy"
              decoding="async"
            />
+        </div>
+      </section>
+
+      <section className="px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <EvaluationInfo />
         </div>
       </section>
     </div>

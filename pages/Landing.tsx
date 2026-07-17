@@ -309,6 +309,14 @@ const Landing: React.FC = () => {
             >
               Ir para o Calendário
             </a>
+            <a 
+              href="https://clinica-santa-maria-dos-olivais.b-cdn.net/CUIDADOS%20POS%20OPERATORIOS.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-block bg-gray-100 text-gray-800 hover:bg-gray-200 px-8 py-3.5 rounded-full font-bold transition duration-200 text-sm"
+            >
+              📥 Cuidados Pós-Operatórios (PDF)
+            </a>
           </div>
         </div>
       </section>

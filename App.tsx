@@ -25,6 +25,7 @@ const Blog = lazy(() => import('./pages/Blog'));
 const CaseStudies = lazy(() => import('./pages/CaseStudies'));
 const QuoteCalculator = lazy(() => import('./pages/QuoteCalculator'));
 const Landing = lazy(() => import('./pages/Landing'));
+const PostOperativeCare = lazy(() => import('./pages/PostOperativeCare'));
 import { ServiceTemplate } from './pages/ServiceTemplate';
 import { FAQ } from './pages/FAQ';
 
@@ -117,6 +118,7 @@ const App: React.FC = () => {
               <Route path="/casos-clinicos" element={<Suspense fallback={<PageLoader />}><CaseStudies /></Suspense>} />
               <Route path="/cotizador" element={<Suspense fallback={<PageLoader />}><QuoteCalculator /></Suspense>} />
               <Route path="/faq" element={<Suspense fallback={<PageLoader />}><FAQ /></Suspense>} />
+              <Route path="/cuidados-pos-operatorios" element={<Suspense fallback={<PageLoader />}><PostOperativeCare /></Suspense>} />
               <Route path="/landing" element={<Suspense fallback={<PageLoader />}><Landing /></Suspense>} />
               <Route path="/servicos/:slug" element={<ServiceTemplate />} />
               <Route path="*" element={<Navigate to="/" replace />} />

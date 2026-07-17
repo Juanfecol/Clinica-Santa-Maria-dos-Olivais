@@ -248,6 +248,14 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
     // --- 4. GENERAL SECTIONS / ACTIONS / PAGES ---
     const pageItems = [
       {
+        id: 'page-pos-op',
+        title: t("Cuidados Pós-Operatórios"),
+        snippet: t("Orientações e recomendações essenciais para uma recuperação segura e confortável após o seu procedimento cirúrgico."),
+        url: '/cuidados-pos-operatorios',
+        icon: 'Stethoscope',
+        keywords: ['cuidados', 'pós-operatórios', 'recuperação', 'pós-operatório', 'cirurgia', 'guia', 'recomendações', 'dor', 'edema', 'aftas']
+      },
+      {
         id: 'page-home',
         title: t("Início / Home"),
         snippet: t("Página principal com o diagnóstico estético por foto gratuito, tratamento de implantes, ortodontia invisível Invisalign e o simulador de orçamento."),
@@ -745,6 +753,13 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
                     {t(service.title)}
                   </Link>
                 ))}
+                <Link 
+                  to="/cuidados-pos-operatorios"
+                  className="text-clinic-blue hover:text-clinic-purple py-1 px-1 font-medium"
+                  onClick={() => { setIsMenuOpen(false); setIsServicesOpen(false); }}
+                >
+                  {t("Cuidados Pós-Operatórios")}
+                </Link>
               </div>
             </li>
             <li style={{ transitionDelay: `${(navigation.length + 1) * 50}ms` }} className={`transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>

@@ -492,7 +492,7 @@ const Home: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 gap-4 mb-6">
-              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-lime transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
+              <Link to="/servicos/implantologia?item=1-implante" className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-lime transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
                 <div className="flex flex-col gap-2 w-full mb-3">
                   <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-lime transition-colors leading-tight break-normal hyphens-none">{t("Implante Unitário + Coroa")}</p>
                   <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">{t("Desde 745 €*")}</p>
@@ -500,7 +500,7 @@ const Home: React.FC = () => {
                 <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">{t("(Inclui fase cirúrgica e coroa metalo-cerâmica)")}</p>
               </Link>
  
-              <Link to="/marcacoes" state={{ service: "Implantologia" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-purple transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
+              <Link to="/servicos/implantologia?item=protocolo-fixo" className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-purple transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
                 <div className="flex flex-col gap-2 w-full mb-3">
                   <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-purple transition-colors leading-tight break-normal hyphens-none">{t("Protocolo Superior (Dentes Fixos)")}</p>
                   <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">{t("Desde 4.800 €*")}</p>
@@ -508,7 +508,7 @@ const Home: React.FC = () => {
                 <p className="text-[11px] text-clinic-purple font-medium italic leading-tight mt-1">{t("(Reabilitação total de arcada)")}</p>
               </Link>
  
-              <Link to="/marcacoes" state={{ service: "Estética Dentária" }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-blue transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
+              <Link to="/servicos/facetas?item=facetas-4-dentes-anteriores" className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-clinic-blue transition-all hover:scale-[1.02] hover:shadow-lg block group overflow-hidden">
                 <div className="flex flex-col gap-2 w-full mb-3">
                   <p className="text-xs text-gray-400 uppercase font-bold tracking-widest group-hover:text-clinic-blue transition-colors leading-tight break-normal hyphens-none">{t("Facetas Estéticas (Pack 4 dentes)")}</p>
                   <p className="text-2xl md:text-3xl font-bold text-clinic-blue leading-none">{t("Desde 1.800 €*")}</p>

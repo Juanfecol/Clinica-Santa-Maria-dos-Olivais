@@ -81,22 +81,29 @@ const defaultData = {
       },
       {
         name: "Dr. Tomás Machado",
-        title: "Dentisteria e Endodontia",
+        title: "Dentisteria, Endodontia e Cirurgia",
         img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-227.jpeg",
-        bio: "Focado na preservação dentária e tratamentos de canal.",
+        bio: "Especialista em Endodontia (canal), restaurações estéticas, extrações dentárias, higiene oral e próteses removíveis.",
+        imgPosition: "object-top"
+      },
+      {
+        name: "Dr. Júlio",
+        title: "Cirurgia Oral e Extracções de Sisos",
+        img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/dr_julio_clinica_smo.jpg",
+        bio: "Especialista em Cirurgia Oral Avançada e extração de dentes do siso.",
         imgPosition: "object-top"
       },
       {
         name: "Dra. Ladine",
-        title: "Clínica Geral",
+        title: "Clínica Geral e Reabilitação",
         img: "",
-        bio: "Especialista em Desvitalização, Restauração, Prótese Removível, Periodontologia e Extrações. Disponível a partir de 17/08/2026 às quintas-feiras e sábados de manhã."
+        bio: "Especialista em Higiene Oral, Restaurações, Próteses Removíveis, Branqueamento e Placas de Relaxamento/Bruxismo."
       },
       {
         name: "Dr. Francisco",
-        title: "Clínica Geral",
+        title: "Clínica Geral e Endodontia",
         img: "https://clinica-santa-maria-dos-olivais.b-cdn.net/dra_francisco.jpeg",
-        bio: "Especialista em Desvitalização, Restauração, Prótese Removível e Extrações.",
+        bio: "Especialista em Endodontia, Restaurações, Coroas sobre dente, Higiene Oral e Extrações.",
         imgPosition: "object-top"
       }
     ],

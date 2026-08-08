@@ -205,6 +205,27 @@ const translationMap: Record<string, { es: string; en: string }> = {
     es: "Especialista en la atención y salud buco-dental de los más pequeños.",
     en: "Specialist in dental care and oral health for the little ones."
   },
+  "Dr. Júlio": { es: "Dr. Júlio", en: "Dr. Júlio" },
+  "Cirurgia Oral e Extracções de Sisos": { es: "Cirugía Oral y Extracción de Cordales", en: "Oral Surgery & Wisdom Teeth Extractions" },
+  "Especialista em Cirurgia Oral Avançada e extração de dentes do siso.": {
+    es: "Especialista en Cirugía Oral Avanzada y extracción de muelas del juicio.",
+    en: "Specialist in Advanced Oral Surgery and wisdom teeth extractions."
+  },
+  "Dentisteria, Endodontia e Cirurgia": { es: "Odontología Conservadora, Endodoncia y Cirugía", en: "Conservative Dentistry, Endodontics & Surgery" },
+  "Especialista em Endodontia (canal), restaurações estéticas, extrações dentárias, higiene oral e próteses removíveis.": {
+    es: "Especialista en Endodoncia (conductos), restauraciones estéticas, extracciones dentales, higiene oral y prótesis removibles.",
+    en: "Specialist in Endodontics (root canals), aesthetic restorations, tooth extractions, oral hygiene, and removable dentures."
+  },
+  "Clínica Geral e Reabilitação": { es: "Odontología General y Rehabilitación", en: "General Dentistry & Rehabilitation" },
+  "Especialista em Higiene Oral, Restaurações, Próteses Removíveis, Branqueamento e Placas de Relaxamento/Bruxismo.": {
+    es: "Especialista en Higiene Bucal, Restauraciones, Prótesis Removibles, Blanqueamiento y Placas de Relajación/Bruxismo.",
+    en: "Specialist in Oral Hygiene, Restorations, Removable Dentures, Teeth Whitening, and Night Guards/Bruxism Splints."
+  },
+  "Clínica Geral e Endodontia": { es: "Odontología General y Endodoncia", en: "General Dentistry & Endodontics" },
+  "Especialista em Endodontia, Restaurações, Coroas sobre dente, Higiene Oral e Extrações.": {
+    es: "Especialista en Endodoncia, Restauraciones, Coronas sobre diente, Higiene Oral y Extracciones.",
+    en: "Specialist in Endodontics, Restorations, Dental Crowns, Oral Hygiene, and Extractions."
+  },
   "Dentisteria e Endodontia": { es: "Odontología General y Endodoncia", en: "General Dentistry & Endodontics" },
   "Focado na preservação dentária e tratamentos de canal.": {
     es: "Enfocado en la preservación dental y tratamientos de conducto.",

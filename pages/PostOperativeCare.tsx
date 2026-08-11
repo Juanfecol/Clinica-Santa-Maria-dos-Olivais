@@ -29,7 +29,7 @@ const PostOperativeCare: React.FC = () => {
         <div className="bg-clinic-blue/5 p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
             <div className='flex items-center gap-3'>
                 <Phone className='text-clinic-purple' size={24}/>
-                <p className='font-bold text-clinic-blue'>Contactos: 919861310 | 211350066</p>
+                <p className='font-bold text-clinic-blue'>Contactos: 912 907 024 | 211350066</p>
             </div>
             <div className='flex items-center gap-3'>
                 <Clock className='text-clinic-purple' size={24}/>

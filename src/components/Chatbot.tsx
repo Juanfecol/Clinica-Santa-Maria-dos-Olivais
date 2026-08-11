@@ -195,7 +195,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
       const currentPhone = leadData.telefone || '';
       const currentNome = leadData.nome || 'Cliente';
       const waMessage = `Olá! Quero tirar uma dúvida.%0A%0A*Nome:* ${currentNome}%0A*Telemóvel:* ${currentPhone}%0A*Mensagem:* ${userMsg}`;
-      const waLink = `https://wa.me/351919861310?text=${waMessage}`;
+      const waLink = `https://wa.me/351912907024?text=${waMessage}`;
 
       setTimeout(() => {
         setMessages(prev => [...prev, {
@@ -228,7 +228,7 @@ export default function Chatbot({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
       
       const waMessage = `Olá equipa! Quero agendar uma consulta.%0A%0A*Nome:* ${leadData.nome}%0A*Telemóvel:* ${leadData.telefone}%0A*Tratamento:* ${treatmentName}`;
       // Usando el WhatsApp oficial de la clínica
-      const waLink = `https://wa.me/351919861310?text=${waMessage}`; 
+      const waLink = `https://wa.me/351912907024?text=${waMessage}`; 
 
       setTimeout(() => setMessages(prev => [...prev, { 
         sender: 'bot', 

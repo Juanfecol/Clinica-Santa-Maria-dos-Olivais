@@ -1238,7 +1238,14 @@ const translationMap: Record<string, { es: string; en: string }> = {
   "Ler mais": { es: "Leer más", en: "Read more" },
   "Ver todas as mais de 140 avaliações no Google": { es: "Ver todas las más de 140 opiniones en Google", en: "View all 140+ reviews on Google" },
   "Ver todas as 141 avaliações no Google": { es: "Ver todas las 141 opiniones en Google", en: "View all 141 reviews on Google" },
-  "Avaliar a Clínica no Google": { es: "Calificar la Clínica en Google", en: "Review the Clinic on Google" }
+  "Ver todas as 141 avaliações": { es: "Ver todas las 141 opiniones", en: "View all 141 reviews" },
+  "Avaliar a Clínica no Google": { es: "Calificar la Clínica en Google", en: "Review the Clinic on Google" },
+  "Avaliar no Google": { es: "Calificar en Google", en: "Rate on Google" },
+  "Avalie a sua experiência no Google": { es: "Califique su experiencia en Google", en: "Rate your experience on Google" },
+  "A sua opinião é fundamental para continuarmos a evoluir. Partilhe a sua experiência e ajude novos pacientes a conhecerem a nossa clínica.": {
+    es: "Su opinión es fundamental para que sigamos evolucionando. Comparta su experiencia y ayude a nuevos pacientes a conocer nuestra clínica.",
+    en: "Your feedback is essential for our ongoing growth. Share your experience and help new patients discover our clinic."
+  }
 };
 
 // --- ELEGANT NORMALIZATION HELPER TO ENSURE 100% RELIABLE DICTIONARY SEARCH ---

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
-import GoogleReviews from '../src/components/GoogleReviews';
+import GoogleHeroWidget from '../src/components/GoogleHeroWidget';
 
 const Home: React.FC = () => {
   const { content } = useContent();
@@ -389,6 +389,11 @@ const Home: React.FC = () => {
           {heroTitle.replace('Clínica', '')}
         </h1>
         <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-800 max-w-4xl mx-auto font-light px-4 leading-relaxed">{heroSubtitle}</p>
+        
+        {/* Google Trust & Rating Hero Widget */}
+        <div className="mt-6 md:mt-8 flex justify-center">
+          <GoogleHeroWidget />
+        </div>
       </section>
 
       {/* Stories Section */}
@@ -655,11 +660,6 @@ const Home: React.FC = () => {
           ))}
         </div>
       </section>
-
-      {/* Google Reviews & Avaliações */}
-      <div className="relative z-30 border-t border-clinic-lime/20 py-8 md:py-16">
-        <GoogleReviews />
-      </div>
 
       {/* Seção Seguros e Reembolsos */}
       <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 border-t border-clinic-lime/20" aria-labelledby="insurance-heading">

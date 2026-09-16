@@ -1245,7 +1245,11 @@ const translationMap: Record<string, { es: string; en: string }> = {
   "A sua opinião é fundamental para continuarmos a evoluir. Partilhe a sua experiência e ajude novos pacientes a conhecerem a nossa clínica.": {
     es: "Su opinión es fundamental para que sigamos evolucionando. Comparta su experiencia y ayude a nuevos pacientes a conocer nuestra clínica.",
     en: "Your feedback is essential for our ongoing growth. Share your experience and help new patients discover our clinic."
-  }
+  },
+  "avaliações": { es: "opiniones", en: "reviews" },
+  "Google Verificado": { es: "Google Verificado", en: "Google Verified" },
+  "Ver opiniões": { es: "Ver opiniones", en: "Read reviews" },
+  "Avaliar": { es: "Calificar", en: "Rate" }
 };
 
 // --- ELEGANT NORMALIZATION HELPER TO ENSURE 100% RELIABLE DICTIONARY SEARCH ---

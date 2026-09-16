@@ -8,13 +8,13 @@ const defaultData = {
     email: "clinicasmod@gmail.com",
     phone: "211 350 066",
     customerService: "300 601 645",
-    mobile: "+351 912 907 024",
+    mobile: "+351 919 861 310",
     address: "Estrada de Moscavide N 32C, 1800-279, Lisboa",
     mapsLink: "https://www.google.com/maps/search/?api=1&query=Estrada+de+Moscavide+N+32C,+1800-279,+Lisboa",
     socials: {
       instagram: "https://www.instagram.com/clinicasantamariaolivais/",
       facebook: "https://www.facebook.com/clinicasmod/",
-      whatsapp: "https://wa.me/351912907024"
+      whatsapp: "https://wa.me/351919861310"
     }
   },
   navigation: [

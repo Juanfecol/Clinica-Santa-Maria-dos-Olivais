@@ -45,7 +45,7 @@ const ThankYou: React.FC = () => {
   };
 
   // Construct WhatsApp Message Dynamically from Content Context
-  const rawPhone = global.mobile ? global.mobile.replace(/\D/g, '') : "351912907024";
+  const rawPhone = global.mobile ? global.mobile.replace(/\D/g, '') : "351919861310";
   
   const waMessage = `Olá, o meu nome é ${displayData.nome}. Acabei de preencher o formulário no site sobre ${displayData.servico || 'uma consulta'} e gostaria de ser contactado.`;
   const finalWaLink = `https://wa.me/${rawPhone}?text=${encodeURIComponent(waMessage)}`;

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { EvaluationInfo } from '../src/components/EvaluationInfo';
+import GoogleReviews from '../src/components/GoogleReviews';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -79,6 +80,11 @@ const Clinic: React.FC = () => {
              decoding="async"
            />
         </div>
+      </section>
+
+      {/* Google Reviews */}
+      <section className="py-12 border-t border-clinic-lime/20">
+        <GoogleReviews />
       </section>
 
       <section className="px-4 py-8">

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
+import GoogleReviews from '../src/components/GoogleReviews';
 
 const Home: React.FC = () => {
   const { content } = useContent();
@@ -654,6 +655,11 @@ const Home: React.FC = () => {
           ))}
         </div>
       </section>
+
+      {/* Google Reviews & Avaliações */}
+      <div className="relative z-30 border-t border-clinic-lime/20 py-8 md:py-16">
+        <GoogleReviews />
+      </div>
 
       {/* Seção Seguros e Reembolsos */}
       <section className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 border-t border-clinic-lime/20" aria-labelledby="insurance-heading">

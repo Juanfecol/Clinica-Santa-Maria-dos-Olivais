@@ -1,6 +1,7 @@
 import React from 'react';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
+import GoogleReviews from '../src/components/GoogleReviews';
 
 const Contact: React.FC = () => {
   const { content } = useContent();
@@ -105,6 +106,11 @@ const Contact: React.FC = () => {
             {t("Abrir no Google Maps")}
           </a>
         </div>
+      </div>
+
+      {/* Google Reviews Section */}
+      <div className="mt-16 pt-12 border-t border-clinic-lime/20">
+        <GoogleReviews />
       </div>
     </div>
   );

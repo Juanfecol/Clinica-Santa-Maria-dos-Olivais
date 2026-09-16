@@ -1181,7 +1181,64 @@ const translationMap: Record<string, { es: string; en: string }> = {
   "Simular Outro Caso / Recomeçar": { es: "Simular Otro Caso / Reiniciar", en: "Simulate Another Case / Restart" },
   "Por favor, envie apenas ficheiros de imagem (JPG, PNG).": { es: "Por favor, envíe solo archivos de imagen (JPG, PNG).", en: "Please upload only image files (JPG, PNG)." },
   "Serviço não encontrado:": { es: "Servicio no encontrado:", en: "Service not found:" },
-  "Pagamento faseado sem juros diretamente com a clínica. Pague durante o tratamento e finalize no dia da cirurgia.": { es: "Pago fraccionado sin intereses directamente con la clínica. Pague durante el tratamiento y finalice el día de la cirugía.", en: "Interest-free installment payment directly with the clinic. Pay during treatment and finalize on the day of surgery." }
+  "Pagamento faseado sem juros diretamente com a clínica. Pague durante o tratamento e finalize no dia da cirurgia.": { es: "Pago fraccionado sin intereses directamente con la clínica. Pague durante el tratamiento y finalice el día de la cirugía.", en: "Interest-free installment payment directly with the clinic. Pay during treatment and finalize on the day of surgery." },
+  // Google Reviews Component
+  "Avaliações no Google": { es: "Opiniones en Google", en: "Google Reviews" },
+  "100% Verificado": { es: "100% Verificado", en: "100% Verified" },
+  "O que dizem os nossos pacientes": { es: "Lo que dicen nuestros pacientes", en: "What our patients say" },
+  "Transparência, dedicação e excelência médica comprovada por quem nos confia a saúde do seu sorriso diariamente.": {
+    es: "Transparencia, dedicación y excelencia médica comprobada por quienes nos confían la salud de su sonrisa a diario.",
+    en: "Transparency, dedication, and clinical excellence proven by those who trust us with their smile daily."
+  },
+  "Classificação Excelente": { es: "Calificación Excelente", en: "Excellent Rating" },
+  "Classificação Muito Boa": { es: "Calificación Muy Buena", en: "Very Good Rating" },
+  "+140 avaliações no Google": { es: "+140 opiniones en Google", en: "+140 Google reviews" },
+  "141 avaliações no Google": { es: "141 opiniones en Google", en: "141 Google reviews" },
+  "Ver no Google Maps": { es: "Ver en Google Maps", en: "View on Google Maps" },
+  "Deixar Avaliação": { es: "Dejar Opinión", en: "Leave Review" },
+  "Todas as Avaliações": { es: "Todas las Opiniones", en: "All Reviews" },
+  "Ortodontia & Invisalign": { es: "Ortodoncia & Invisalign", en: "Orthodontics & Invisalign" },
+  "Estética & Facetas": { es: "Estética & Carillas", en: "Aesthetics & Veneers" },
+  "Atendimento & Família": { es: "Atención & Familia", en: "Patient Care & Family" },
+  "Paciente verificado": { es: "Paciente verificado", en: "Verified patient" },
+  "Implante Unitário + Coroa Cerâmica": { es: "Implante Unitario + Corona Cerámica", en: "Single Implant + Ceramic Crown" },
+  "Alinhadores Invisíveis": { es: "Alineadores Invisibles", en: "Invisible Aligners" },
+  "Consulta Geral e Higiene Oral": { es: "Consulta General e Higiene Bucal", en: "General Consultation & Oral Hygiene" },
+  "Facetas Dentárias e Branqueamento": { es: "Carillas Dentales y Blanqueamiento", en: "Dental Veneers & Teeth Whitening" },
+  "Consulta de Odontopediatria": { es: "Consulta de Odontopediatría", en: "Pediatric Dental Consultation" },
+  "Protocolo Fixo Superior": { es: "Protocolo Fijo Superior", en: "Upper Fixed Full-Arch Protocol" },
+  "Reabilitação Total": { es: "Rehabilitación Total", en: "Full Mouth Rehabilitation" },
+  "Atendimento & Simpatia": { es: "Atención & Simpatía", en: "Friendly Care & Service" },
+  "Coloquei implantes com a Dra. Ana Mata e toda a equipa foi excecional do início ao fim. Sem qualquer dor durante o procedimento e uma recuperação muito tranquila. Explicação transparente de cada fase. Recomendo vivamente a clínica!": {
+    es: "Me coloqué implantes con la Dra. Ana Mata y todo el equipo fue excepcional de principio a fin. Sin ningún dolor durante el procedimiento y una recuperación muy tranquila. Explicación transparente en cada fase. ¡Recomiendo totalmente la clínica!",
+    en: "I had implants placed with Dr. Ana Mata and the entire team was exceptional from start to finish. Completely painless procedure and a very smooth recovery. Clear explanation at every stage. Highly recommend the clinic!"
+  },
+  "Fiz o meu tratamento de ortodontia com alinhadores com a Dra. Mariana Aberto. O resultado do sorriso ficou muito além das minhas expectativas! Consultório super moderno, tecnologia de ponta e equipa extremamente atenciosa.": {
+    es: "Hice mi tratamiento de ortodoncia con alineadores con la Dra. Mariana Aberto. ¡El resultado de la sonrisa superó con creces mis expectativas! Clínica súper moderna, tecnología puntera y equipo extremadamente atento.",
+    en: "I completed my orthodontic treatment with aligners with Dr. Mariana Aberto. The smile results far exceeded my expectations! Super modern clinic, cutting-edge technology, and extremely attentive staff."
+  },
+  "Excelente clínica nos Olivais. Desde a receção com a D. Carla Claro até ao atendimento clínico do Dr. Tomás e da Dra. Alexandra, sentimos uma segurança e simpatia raras. Preços claros e sem surpresas.": {
+    es: "Excelente clínica en Olivais. Desde la recepción con D. Carla Claro hasta la atención clínica del Dr. Tomás y la Dra. Alexandra, se siente una seguridad y amabilidad únicas. Precios claros y sin sorpresas.",
+    en: "Excellent clinic in Olivais. From reception with Carla Claro to the clinical care of Dr. Tomás and Dr. Alexandra, one feels rare safety and kindness. Clear and transparent pricing without surprises."
+  },
+  "Fiz facetas e branqueamento e o meu sorriso ficou perfeito e muito natural! Tinha muito receio de ficar artificial, mas a Dra. Ana Mata teve um cuidado milimétrico com a estética facial. Muito grata pelo trabalho.": {
+    es: "Me hice carillas y blanqueamiento y mi sonrisa quedó perfecta y muy natural. Tenía mucho miedo de que quedara artificial, pero la Dra. Ana Mata tuvo un cuidado milimétrico con la estética facial. Muy agradecida por el trabajo.",
+    en: "I had veneers and whitening done and my smile turned out perfect and very natural! I was worried it would look artificial, but Dr. Ana Mata was meticulous with facial aesthetics. Very grateful for the work."
+  },
+  "Levei o meu filho para a consulta com a Dra. Orizanda. A paciência, carinho e técnica para lidar com crianças são fantásticas. Ele já não tem medo de ir ao dentista. Toda a família passou a tratar-se aqui.": {
+    es: "Llevé a mi hijo a la consulta con la Dra. Orizanda. La paciencia, cariño y técnica para tratar con niños son fantásticas. Ya no tiene miedo de ir al dentista. Toda la familia ahora se atiende aquí.",
+    en: "I took my son for a visit with Dr. Orizanda. Her patience, warmth, and skill with children are fantastic. He is no longer afraid of the dentist. Now the whole family comes here for treatment."
+  },
+  "Fiz a reabilitação de arcada completa com a equipa. Voltei a sorrir com confiança e a mastigar sem qualquer problema. Agradeço a toda a equipa pela dedicação, acompanhamento pós-operatório e humanismo.": {
+    es: "Hice la rehabilitación de arcada completa con el equipo. Volví a sonreír con confianza y a masticar sin ningún problema. Agradezco a todo el equipo su dedicación, seguimiento postoperatorio y calidez humana.",
+    en: "I completed a full-arch rehabilitation with the team. I can smile with confidence and chew without issues again. Many thanks to the entire team for their dedication, post-operative care, and human warmth."
+  },
+  "pessoas acharam útil": { es: "personas encontraron útil", en: "people found this helpful" },
+  "Mostrar menos": { es: "Mostrar menos", en: "Show less" },
+  "Ler mais": { es: "Leer más", en: "Read more" },
+  "Ver todas as mais de 140 avaliações no Google": { es: "Ver todas las más de 140 opiniones en Google", en: "View all 140+ reviews on Google" },
+  "Ver todas as 141 avaliações no Google": { es: "Ver todas las 141 opiniones en Google", en: "View all 141 reviews on Google" },
+  "Avaliar a Clínica no Google": { es: "Calificar la Clínica en Google", en: "Review the Clinic on Google" }
 };
 
 // --- ELEGANT NORMALIZATION HELPER TO ENSURE 100% RELIABLE DICTIONARY SEARCH ---

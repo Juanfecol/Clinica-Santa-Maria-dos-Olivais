@@ -37,8 +37,8 @@ const Landing: React.FC = () => {
             <a href="tel:211350066" className="flex items-center gap-2 hover:text-clinic-lime transition duration-200 font-medium">
               <Phone size={14} className="text-clinic-lime" /> 211 350 066
             </a>
-            <a href="https://wa.me/351912907024" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-clinic-lime transition duration-200 font-bold bg-white/10 px-3 py-1.5 rounded-full border border-white/20">
-              <MessageCircle size={14} className="text-green-400 fill-green-400" /> WhatsApp: +351 912 907 024
+            <a href="https://wa.me/351919861310" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-clinic-lime transition duration-200 font-bold bg-white/10 px-3 py-1.5 rounded-full border border-white/20">
+              <MessageCircle size={14} className="text-green-400 fill-green-400" /> WhatsApp: +351 919 861 310
             </a>
           </div>
         </div>
@@ -71,7 +71,7 @@ const Landing: React.FC = () => {
                 Agendar Avaliação Online
               </a>
               <a 
-                href="https://wa.me/351912907024" 
+                href="https://wa.me/351919861310" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="w-full sm:w-auto text-center flex items-center justify-center gap-2 bg-green-500 text-white px-8 py-4 rounded-full text-md font-bold hover:bg-green-600 transition duration-300 shadow-lg shadow-green-500/10 transform hover:-translate-y-0.5"
@@ -82,7 +82,7 @@ const Landing: React.FC = () => {
 
             {/* Micro Trust badges */}
             <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 text-xs text-gray-500 font-medium">
-              <span className="flex items-center gap-1">⭐ 4.9/5 estrelas no Google</span>
+              <span className="flex items-center gap-1">⭐ 4.4/5 estrelas no Google (141)</span>
               <span className="text-gray-300">|</span>
               <span className="flex items-center gap-1">🔒 Tratamentos Seguros de Alta Durabilidade</span>
               <span className="text-gray-300">|</span>
@@ -277,7 +277,7 @@ const Landing: React.FC = () => {
           <div className="text-center bg-green-50 rounded-2xl p-6 border border-green-100 max-w-2xl mx-auto">
             <p className="text-sm text-green-800 font-semibold mb-3">Prefere marcar diretamente no chat?</p>
             <a 
-              href="https://wa.me/351912907024" 
+              href="https://wa.me/351919861310" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="inline-flex items-center justify-center gap-2 bg-green-500 text-white font-bold py-3.5 px-8 rounded-full hover:bg-green-600 transition duration-200 shadow-md shadow-green-500/15 text-sm"

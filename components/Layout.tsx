@@ -28,7 +28,7 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
   useEffect(() => {
     if (isFabHubOpen) return;
     const interval = setInterval(() => {
-      setCycleIndex(prev => (prev + 1) % 5);
+      setCycleIndex(prev => (prev + 1) % 4);
     }, 2800); // changes every 2.8 seconds
     return () => clearInterval(interval);
   }, [isFabHubOpen]);
@@ -930,27 +930,6 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
 
               {/* Action List */}
               <div className="flex flex-col gap-2">
-                {/* WhatsApp */}
-                <a
-                  id="btn-whatsapp-main"
-                  href={global.socials?.whatsapp || "#"}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => {
-                    trackWhatsAppClick();
-                    setIsFabHubOpen(false);
-                  }}
-                  className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-white/30 border border-transparent hover:border-white/30 transition-all group/action"
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shadow-lg group-hover/action:scale-105 transition-transform shrink-0">
-                    <i className="fab fa-whatsapp text-xl text-white"></i>
-                  </div>
-                  <div className="flex flex-col text-left">
-                    <span className="text-xs font-black text-clinic-blue">{t("WhatsApp")}</span>
-                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">{t("Resposta célere")}</span>
-                  </div>
-                </a>
-
                 {/* Calendly */}
                 <button
                   id="btn-calendly-main"
@@ -1010,40 +989,77 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
           )}
         </AnimatePresence>
 
-        {/* Always Sticky Premium Camera Floating Button */}
+        {/* Floating Action Buttons Column: WhatsApp (on top) -> Bot -> Camera */}
         <div className="relative mb-3.5 flex flex-col items-center gap-3">
-          <div className="chatbot-glow-ring-container w-14 h-14 md:w-16 md:h-16 z-10">
-            <div className="chatbot-glow-ring-blur"></div>
-            <div className="chatbot-glow-ring-sharp"></div>
-            <button
-              id="btn-sticky-chatbot"
-              onClick={() => setIsChatbotOpen(true)}
-              className="absolute inset-0 w-full h-full flex items-center justify-center rounded-full border border-white/50 bg-gradient-to-tr from-clinic-blue via-blue-600 to-clinic-purple text-white cursor-pointer z-10"
-              aria-label={t("Chatbot")}
-              title={t("Chatbot")}
-            >
-              <Bot className="w-5 h-5 md:w-6 md:h-6 text-white" />
-            </button>
+          {/* Independent WhatsApp Floating Button with WhatsApp Green Aro */}
+          <div className="relative group">
+            <div className="whatsapp-glow-ring-container w-14 h-14 md:w-16 md:h-16 z-10">
+              <div className="whatsapp-glow-ring-blur"></div>
+              <div className="whatsapp-glow-ring-sharp"></div>
+              <a
+                id="btn-sticky-whatsapp"
+                href="https://wa.me/351300601645"
+                target="_blank"
+                rel="noreferrer"
+                onClick={trackWhatsAppClick}
+                className="absolute inset-0 w-full h-full flex items-center justify-center rounded-full border border-white/50 bg-[#25D366] hover:bg-[#20ba5a] text-white cursor-pointer z-10 shadow-[0_10px_30px_rgba(37,211,102,0.45)] transition-all duration-300"
+                aria-label={t("WhatsApp: +351 300 601 645")}
+                title={t("WhatsApp: +351 300 601 645")}
+              >
+                <i className="fab fa-whatsapp text-xl md:text-2xl text-white"></i>
+              </a>
+            </div>
+
+            {/* Hover tooltip */}
+            <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-clinic-blue/95 backdrop-blur-sm text-white font-black text-[9px] md:text-[10px] px-3.5 py-2 rounded-full uppercase tracking-widest shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap border border-white/10 shrink-0">
+              {t("WhatsApp (+351 300 601 645)")}
+            </div>
           </div>
+
+          {/* Independent Bot Button */}
+          <div className="relative group">
+            <div className="chatbot-glow-ring-container w-14 h-14 md:w-16 md:h-16 z-10">
+              <div className="chatbot-glow-ring-blur"></div>
+              <div className="chatbot-glow-ring-sharp"></div>
+              <button
+                id="btn-sticky-chatbot"
+                onClick={() => setIsChatbotOpen(true)}
+                className="absolute inset-0 w-full h-full flex items-center justify-center rounded-full border border-white/50 bg-gradient-to-tr from-clinic-blue via-blue-600 to-clinic-purple text-white cursor-pointer z-10 shadow-[0_10px_30px_rgba(45,50,119,0.35)] transition-all duration-300"
+                aria-label={t("Chatbot")}
+                title={t("Chatbot")}
+              >
+                <Bot className="w-5 h-5 md:w-6 md:h-6 text-white" />
+              </button>
+            </div>
+
+            {/* Hover tooltip */}
+            <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-clinic-blue/95 backdrop-blur-sm text-white font-black text-[9px] md:text-[10px] px-3.5 py-2 rounded-full uppercase tracking-widest shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap border border-white/10 shrink-0">
+              {t("Assistente Virtual 🦷")}
+            </div>
+          </div>
+
+          {/* Independent Camera Diagnostic Button */}
+          <div className="relative group">
             <button
               id="btn-sticky-camera"
               onClick={openCameraModal}
-            className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_35px_rgba(107,70,193,0.55)] hover:shadow-[0_15px_40px_rgba(107,70,193,0.7)] transition-all duration-300 hover:scale-110 active:scale-95 border border-white/50 bg-gradient-to-tr from-clinic-purple via-violet-600 to-clinic-blue text-white cursor-pointer z-10"
-            aria-label={t("Diagnóstico por Foto 📸")}
-            title={t("Diagnóstico Gratuito por Foto 🦷")}
-          >
-            <Camera className="w-5 h-5 md:w-6 md:h-6 text-white" />
-            
-            {/* Soft pulsing notification bubble/badge */}
-            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-clinic-lime opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-5 w-5 bg-clinic-lime text-[10px] font-black justify-center items-center text-clinic-blue select-none shadow">✓</span>
-            </span>
-          </button>
+              className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_35px_rgba(107,70,193,0.55)] hover:shadow-[0_15px_40px_rgba(107,70,193,0.7)] transition-all duration-300 hover:scale-110 active:scale-95 border border-white/50 bg-gradient-to-tr from-clinic-purple via-violet-600 to-clinic-blue text-white cursor-pointer z-10"
+              aria-label={t("Diagnóstico por Foto 📸")}
+              title={t("Diagnóstico Gratuito por Foto 🦷")}
+            >
+              <Camera className="w-5 h-5 md:w-6 md:h-6 text-white" />
+              
+              {/* Soft pulsing notification bubble/badge */}
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-clinic-lime opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-5 w-5 bg-clinic-lime text-[10px] font-black justify-center items-center text-clinic-blue select-none shadow">✓</span>
+              </span>
+            </button>
 
-          {/* Hover tooltip */}
-          <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-clinic-blue/95 backdrop-blur-sm text-white font-black text-[9px] md:text-[10px] px-3.5 py-2 rounded-full uppercase tracking-widest shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap border border-white/10 shrink-0">
-            {t("Diagnóstico por Foto 🦷")}
+            {/* Hover tooltip */}
+            <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-clinic-blue/95 backdrop-blur-sm text-white font-black text-[9px] md:text-[10px] px-3.5 py-2 rounded-full uppercase tracking-widest shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap border border-white/10 shrink-0">
+              {t("Diagnóstico por Foto 🦷")}
+            </div>
           </div>
         </div>
 
@@ -1055,17 +1071,15 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
               {/* Soft continuous glowing blur */}
               <div className={`absolute inset-[-3px] rounded-full blur-md opacity-60 animate-pulse transition-colors duration-1000 z-0 ${
                 cycleIndex === 0 ? 'bg-clinic-purple/40 shadow-[0_0_20px_rgba(107,70,193,0.6)]' :
-                cycleIndex === 1 ? 'bg-[#25D366]/40 shadow-[0_0_20px_rgba(37,211,102,0.6)]' :
-                cycleIndex === 2 ? 'bg-[#2d3277]/40 shadow-[0_0_20px_rgba(45,50,119,0.6)]' :
-                cycleIndex === 3 ? 'bg-clinic-purple/40 shadow-[0_0_20px_rgba(107,70,193,0.6)]' :
+                cycleIndex === 1 ? 'bg-[#2d3277]/40 shadow-[0_0_20px_rgba(45,50,119,0.6)]' :
+                cycleIndex === 2 ? 'bg-clinic-purple/40 shadow-[0_0_20px_rgba(107,70,193,0.6)]' :
                 'bg-clinic-blue/40 shadow-[0_0_20px_rgba(45,50,119,0.6)]'
               }`} />
               {/* Expanding ping ripple */}
               <div className={`absolute inset-[-6px] rounded-full opacity-35 animate-ping transition-colors duration-1000 z-0 ${
                 cycleIndex === 0 ? 'bg-clinic-purple' :
-                cycleIndex === 1 ? 'bg-[#25D366]' :
-                cycleIndex === 2 ? 'bg-[#2d3277]' :
-                cycleIndex === 3 ? 'bg-clinic-purple' :
+                cycleIndex === 1 ? 'bg-[#2d3277]' :
+                cycleIndex === 2 ? 'bg-clinic-purple' :
                 'bg-clinic-blue'
               }`} />
             </>
@@ -1107,17 +1121,6 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
                   )}
                   {cycleIndex === 1 && (
                     <motion.div
-                      key="cycle-whatsapp"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="w-full h-full flex items-center justify-center bg-[#25D366]"
-                    >
-                      <i className="fab fa-whatsapp text-2xl md:text-3xl text-white"></i>
-                    </motion.div>
-                  )}
-                  {cycleIndex === 2 && (
-                    <motion.div
                       key="cycle-calendly"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -1127,7 +1130,7 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
                       <i className="fas fa-calendar-check text-xl md:text-2xl text-[#d4e157]"></i>
                     </motion.div>
                   )}
-                  {cycleIndex === 3 && (
+                  {cycleIndex === 2 && (
                     <motion.div
                       key="cycle-phone"
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -1138,7 +1141,7 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
                       <i className="fas fa-phone-alt text-xl md:text-2xl text-white"></i>
                     </motion.div>
                   )}
-                  {cycleIndex === 4 && (
+                  {cycleIndex === 3 && (
                     <motion.div
                       key="cycle-form"
                       initial={{ opacity: 0, scale: 0.8 }}

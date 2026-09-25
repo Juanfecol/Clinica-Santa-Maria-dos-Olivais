@@ -14,7 +14,7 @@ const defaultData = {
     socials: {
       instagram: "https://www.instagram.com/clinicasantamariaolivais/",
       facebook: "https://www.facebook.com/clinicasmod/",
-      whatsapp: "https://wa.me/351919861310"
+      whatsapp: "https://wa.me/351300601645"
     }
   },
   navigation: [

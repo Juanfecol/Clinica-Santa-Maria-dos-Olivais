@@ -300,11 +300,18 @@ const Admin: React.FC = () => {
                           <label className="block text-xs text-gray-600 mb-1">Título</label>
                           <input type="text" value={story.title} onChange={(e) => handleChange('stories', 'stories', e.target.value, index, 'title')} className="w-full px-3 py-2 bg-white border rounded text-sm" />
                         </div>
-                         <div>
+                          <div>
                           <label className="block text-xs text-gray-600 mb-1">Tipo (video/image)</label>
                           <select value={story.type} onChange={(e) => handleChange('stories', 'stories', e.target.value, index, 'type')} className="w-full px-3 py-2 bg-white border rounded text-sm">
                             <option value="video">Vídeo</option>
                             <option value="image">Imagem</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">Formato / Enquadramento</label>
+                          <select value={story.aspect || 'vertical'} onChange={(e) => handleChange('stories', 'stories', e.target.value, index, 'aspect')} className="w-full px-3 py-2 bg-white border rounded text-sm">
+                            <option value="vertical">Vertical (Reels 9:16)</option>
+                            <option value="horizontal">Horizontal (Landscape 16:9)</option>
                           </select>
                         </div>
                         <div className="md:col-span-2">

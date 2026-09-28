@@ -20,6 +20,8 @@ const Home: React.FC = () => {
     
     // Clean, high-quality maps strictly utilizing photos of doctors or the physical clinic interior/lobby (no machinery/drones)
     const fallbacks: Record<string, string> = {
+      'smo moscavide': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG',
+      'moscavide': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG',
       'alinhadores': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-132.jpeg', // Dra. Mariana Aberto (Ortodontia)
       'aparelho': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG', // Clinic Lobby area
       'consulta': 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5650.JPG', // Fully-focused Clinical Room/Cabinet
@@ -343,7 +345,15 @@ const Home: React.FC = () => {
     const scale = absDiff === 0 ? 1 : Math.max(0.65, 0.85 - (absDiff * 0.15));
     const translateZ = absDiff === 0 ? 150 : -200;
     const zIndex = 100 - Math.floor(absDiff * 20);
-    const translateX = diff * 70; // Espaçamento mais dinâmico
+
+    const centerIsHorizontal = stories[centerIndex]?.aspect === 'horizontal' || stories[centerIndex]?.src?.includes('Moscavide');
+
+    let translateXFactor = 70;
+    if (centerIsHorizontal && absDiff > 0) {
+      translateXFactor = 110;
+    }
+
+    const translateX = diff * translateXFactor;
 
     return {
       transform: `translate3d(${translateX}%, 0, ${translateZ}px) scale(${scale})`,
@@ -405,10 +415,18 @@ const Home: React.FC = () => {
         <div className="relative z-20 w-full h-full flex justify-center items-center perspective-[2000px]">
           {stories.map((story: any, index: number) => {
             const isCenter = centerIndex === index;
+            const isHorizontal = story.aspect === 'horizontal' || story.src?.includes('Moscavide');
+            // Solo cuando está en primer plano (isCenter) toma el formato horizontal (16:9).
+            // Al salir de primer plano se mete en un cajón del mismo tamaño y aspecto (9:16) que los demás para no romper el diseño.
+            const isHorizontalActive = isHorizontal && isCenter;
+            const cardShapeClasses = isHorizontalActive
+              ? `w-[260px] aspect-[16/9] sm:w-[360px] md:w-[480px] xl:w-[560px] rounded-2xl md:rounded-[2.5rem] border-[4px] border-white overflow-hidden cursor-pointer transition-all duration-500 ease-out isolate ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)] scale-105`
+              : `w-[140px] aspect-[9/16] sm:w-[180px] md:w-[240px] xl:w-[280px] rounded-[2.5rem] md:rounded-[4rem] border-[4px] border-white overflow-hidden cursor-pointer transition-all duration-500 ease-out isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)] scale-110' : 'shadow-xl'}`;
+
             return (
               <div 
                 key={story.id} 
-                className={`absolute w-[140px] aspect-[9/16] sm:w-[180px] md:w-[240px] xl:w-[280px] rounded-[2.5rem] md:rounded-[4rem] border-[4px] border-white overflow-hidden cursor-pointer transition-all duration-500 isolate ${isCenter ? 'ring-4 ring-clinic-lime/70 shadow-[0_45px_100px_-10px_rgba(0,0,0,0.75)] scale-110' : 'shadow-xl'}`}
+                className={`absolute ${cardShapeClasses}`}
                 style={{
                   ...getStoryStyle(index),
                   WebkitMaskImage: '-webkit-radial-gradient(white, black)',
@@ -429,7 +447,7 @@ const Home: React.FC = () => {
                         key={story.src} 
                         ref={(el) => (videoRefs.current[index] = el)} 
                         src={`${story.src}#t=0.1`}
-                        className={`absolute inset-0 w-full h-full object-cover scale-[1.05] transition-all duration-500 bg-black/40 ${isCenter ? 'opacity-100 pointer-events-auto' : 'opacity-80 pointer-events-none'}`}
+                        className={`absolute inset-0 w-full h-full object-cover ${isHorizontalActive ? '' : 'scale-[1.05]'} transition-all duration-500 bg-black/40 ${isCenter ? 'opacity-100 pointer-events-auto' : 'opacity-80 pointer-events-none'}`}
                         style={{ transform: 'translateZ(0)', minWidth: '100%', minHeight: '100%' }}
                         playsInline 
                         muted={index === centerIndex ? activeStoryMuted : true}
@@ -459,17 +477,38 @@ const Home: React.FC = () => {
                         />
                       </div>
                       
-                      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-black/95 to-transparent z-10 flex flex-col justify-center items-center">
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); toggleStoryMute(); }}
-                          className="mb-2 p-2 rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
-                        >
-                          {activeStoryMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                        </button>
-                        <p className="text-white text-[9px] md:text-xs font-bold uppercase tracking-widest text-center drop-shadow-md">
-                          {story.title}
-                        </p>
-                      </div>
+                      {isHorizontalActive ? (
+                        <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 pb-3 md:pb-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-center justify-between z-10">
+                          <div className="flex items-center gap-2 pl-1">
+                            <span className="w-2.5 h-2.5 rounded-full bg-clinic-lime animate-pulse shadow-[0_0_8px_#bbf246]"></span>
+                            <div>
+                              <p className="text-white text-[11px] md:text-sm font-bold uppercase tracking-wider drop-shadow-md">
+                                {story.title}
+                              </p>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); toggleStoryMute(); }}
+                            className="px-2.5 py-1.5 md:px-3 md:py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all backdrop-blur-md flex items-center gap-1.5 shadow"
+                            title={activeStoryMuted ? "Ativar som" : "Desativar som"}
+                          >
+                            {activeStoryMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                            <span className="text-[10px] md:text-xs font-semibold">{activeStoryMuted ? "Som" : "Mudo"}</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-black/95 to-transparent z-10 flex flex-col justify-center items-center">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); toggleStoryMute(); }}
+                            className="mb-2 p-2 rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
+                          >
+                            {activeStoryMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                          </button>
+                          <p className="text-white text-[9px] md:text-xs font-bold uppercase tracking-widest text-center drop-shadow-md">
+                            {story.title}
+                          </p>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

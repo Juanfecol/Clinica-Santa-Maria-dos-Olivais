@@ -30,6 +30,7 @@ const defaultData = {
     heroSubtitle: "Especialistas em Implantologia, Ortodontia (Invisalign) e Estética Dentária em Olivais, Lisboa. 10 anos de excelência médica.",
   },
   stories: [
+    { id: 0, type: 'video', title: 'SMO Moscavide', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/SMO%20-%20Moscavide.mp4', thumbnail: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG', aspect: 'horizontal' },
     { id: 1, type: 'video', title: 'Alinhadores', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_ALINHADORES.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-D089534F-903E-476C-BB13-26CAB404F1F3.jpeg' },
     { id: 2, type: 'video', title: 'Aparelho', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_APARALHO.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-100-scaled.jpg' },
     { id: 3, type: 'video', title: 'Consulta', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_CONSULTA.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg' },
@@ -155,9 +156,21 @@ const ContentContext = createContext<any>(null);
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState(() => {
     try {
-      const saved = localStorage.getItem('site_content_v9');
+      const saved = localStorage.getItem('site_content_v10');
       if (saved) {
         const parsed = JSON.parse(saved);
+        if (parsed.stories && !parsed.stories.some((s: any) => s.src?.includes('Moscavide'))) {
+          parsed.stories = [defaultData.stories[0], ...parsed.stories];
+        }
+        return parsed;
+      }
+      const savedV9 = localStorage.getItem('site_content_v9');
+      if (savedV9) {
+        const parsed = JSON.parse(savedV9);
+        if (parsed.stories && !parsed.stories.some((s: any) => s.src?.includes('Moscavide'))) {
+          parsed.stories = [defaultData.stories[0], ...parsed.stories];
+        }
+        localStorage.setItem('site_content_v10', JSON.stringify(parsed));
         return parsed;
       }
     } catch (e) {
@@ -168,12 +181,12 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateContent = (newContent: any) => {
     setContent(newContent);
-    localStorage.setItem('site_content_v9', JSON.stringify(newContent));
+    localStorage.setItem('site_content_v10', JSON.stringify(newContent));
   };
 
   const resetContent = () => {
     setContent(defaultData);
-    localStorage.setItem('site_content_v9', JSON.stringify(defaultData));
+    localStorage.setItem('site_content_v10', JSON.stringify(defaultData));
   };
 
   return (

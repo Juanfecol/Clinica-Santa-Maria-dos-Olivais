@@ -30,7 +30,7 @@ const defaultData = {
     heroSubtitle: "Especialistas em Implantologia, Ortodontia (Invisalign) e Estética Dentária em Olivais, Lisboa. 10 anos de excelência médica.",
   },
   stories: [
-    { id: 0, type: 'video', title: 'SMO Moscavide', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/SMO%20-%20Moscavide.mp4', thumbnail: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG', aspect: 'horizontal' },
+    { id: 0, type: 'video', title: 'SMO Moscavide', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_dentaria_smo_moscavide.mp4', thumbnail: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG', aspect: 'horizontal' },
     { id: 1, type: 'video', title: 'Alinhadores', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_ALINHADORES.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/06/original-D089534F-903E-476C-BB13-26CAB404F1F3.jpeg' },
     { id: 2, type: 'video', title: 'Aparelho', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_APARALHO.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/Clinica-Santa-Maria-Olivais-100-scaled.jpg' },
     { id: 3, type: 'video', title: 'Consulta', src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_CONSULTA.mp4', thumbnail: 'https://clinicasantamariadosolivais.pt/wp-content/uploads/2025/07/393562f5162f9e7b1dda9718a868fcd1.jpg' },
@@ -153,40 +153,75 @@ const defaultData = {
 
 const ContentContext = createContext<any>(null);
 
+const MOSCAVIDE_VIDEO_ITEM = { 
+  id: 0, 
+  type: 'video', 
+  title: 'SMO Moscavide', 
+  src: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_dentaria_smo_moscavide.mp4', 
+  thumbnail: 'https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG', 
+  aspect: 'horizontal' 
+};
+
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState(() => {
+    const STORAGE_KEY = 'site_content_v13';
+
+    const sanitizeStories = (stories: any[]) => {
+      if (!Array.isArray(stories)) return [MOSCAVIDE_VIDEO_ITEM, ...defaultData.stories.slice(1)];
+      const filtered = stories.filter((s: any) => 
+        !s.src?.toLowerCase().includes('moscavide') && 
+        !s.src?.includes('SMO') && 
+        s.title?.toLowerCase() !== 'smo moscavide' && 
+        s.title?.toLowerCase() !== 'moscavide'
+      );
+      return [MOSCAVIDE_VIDEO_ITEM, ...filtered];
+    };
+
     try {
-      const saved = localStorage.getItem('site_content_v10');
+      const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.stories && !parsed.stories.some((s: any) => s.src?.includes('Moscavide'))) {
-          parsed.stories = [defaultData.stories[0], ...parsed.stories];
-        }
+        parsed.stories = sanitizeStories(parsed.stories);
         return parsed;
       }
-      const savedV9 = localStorage.getItem('site_content_v9');
-      if (savedV9) {
-        const parsed = JSON.parse(savedV9);
-        if (parsed.stories && !parsed.stories.some((s: any) => s.src?.includes('Moscavide'))) {
-          parsed.stories = [defaultData.stories[0], ...parsed.stories];
+
+      // Check and migrate previous versions if any
+      const olderKeys = ['site_content_v12', 'site_content_v11', 'site_content_v10', 'site_content_v9'];
+      for (const oldKey of olderKeys) {
+        const oldSaved = localStorage.getItem(oldKey);
+        if (oldSaved) {
+          try {
+            const parsed = JSON.parse(oldSaved);
+            parsed.stories = sanitizeStories(parsed.stories);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+            return parsed;
+          } catch (_) {}
         }
-        localStorage.setItem('site_content_v10', JSON.stringify(parsed));
-        return parsed;
       }
     } catch (e) {
       console.error("Content load failed", e);
     }
-    return defaultData;
+    
+    // Default data with sanitized stories
+    const initialData = { ...defaultData, stories: sanitizeStories(defaultData.stories) };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
+    } catch (_) {}
+    return initialData;
   });
 
   const updateContent = (newContent: any) => {
     setContent(newContent);
-    localStorage.setItem('site_content_v10', JSON.stringify(newContent));
+    try {
+      localStorage.setItem('site_content_v13', JSON.stringify(newContent));
+    } catch (_) {}
   };
 
   const resetContent = () => {
     setContent(defaultData);
-    localStorage.setItem('site_content_v10', JSON.stringify(defaultData));
+    try {
+      localStorage.setItem('site_content_v13', JSON.stringify(defaultData));
+    } catch (_) {}
   };
 
   return (

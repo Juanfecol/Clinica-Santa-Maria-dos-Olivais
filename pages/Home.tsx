@@ -297,14 +297,14 @@ const Home: React.FC = () => {
 
     syncPlayback();
     
-    // Watchdog for stalls
+    // Watchdog for stalls (giving ample time for large high-definition video files to buffer without skipping)
     const stallTimeout = setTimeout(() => {
       const activeVideo = videoRefs.current[centerIndex];
-      if (activeVideo && isStoriesVisible && activeVideo.readyState < 2) {
-        console.warn(`Video ${centerIndex} stalled, skipping...`);
+      if (activeVideo && isStoriesVisible && activeVideo.readyState < 1 && activeVideo.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+        console.warn(`Video ${centerIndex} failed to load source, skipping...`);
         handleNextStory();
       }
-    }, 10000);
+    }, 25000);
 
     return () => clearTimeout(stallTimeout);
   }, [centerIndex, isStoriesVisible, hasInteracted, handleNextStory]);
@@ -346,7 +346,7 @@ const Home: React.FC = () => {
     const translateZ = absDiff === 0 ? 150 : -200;
     const zIndex = 100 - Math.floor(absDiff * 20);
 
-    const centerIsHorizontal = stories[centerIndex]?.aspect === 'horizontal' || stories[centerIndex]?.src?.includes('Moscavide');
+    const centerIsHorizontal = stories[centerIndex]?.aspect === 'horizontal' || stories[centerIndex]?.src?.toLowerCase().includes('moscavide');
 
     let translateXFactor = 70;
     if (centerIsHorizontal && absDiff > 0) {
@@ -415,7 +415,7 @@ const Home: React.FC = () => {
         <div className="relative z-20 w-full h-full flex justify-center items-center perspective-[2000px]">
           {stories.map((story: any, index: number) => {
             const isCenter = centerIndex === index;
-            const isHorizontal = story.aspect === 'horizontal' || story.src?.includes('Moscavide');
+            const isHorizontal = story.aspect === 'horizontal' || story.src?.toLowerCase().includes('moscavide');
             // Solo cuando está en primer plano (isCenter) toma el formato horizontal (16:9).
             // Al salir de primer plano se mete en un cajón del mismo tamaño y aspecto (9:16) que los demás para no romper el diseño.
             const isHorizontalActive = isHorizontal && isCenter;

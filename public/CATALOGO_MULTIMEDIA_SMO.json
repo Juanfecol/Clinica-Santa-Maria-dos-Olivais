@@ -1,0 +1,618 @@
+[
+  {
+    "category": "Identidad de Marca & Favicon",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png",
+    "pages": ["index.html", "components/Layout.tsx", "pages/Home.tsx", "pages/Campaigns.tsx", "components/Chatbot.tsx"],
+    "name": "Icono Nocturno SMO",
+    "type": "image/png",
+    "description": "Logotipo Oficial Nocturno (Isotipo PNG): Utilizado como favicon, icono de pestaña, logotipo de cabecera y pie de página, avatar del chatbot y tarjeta social OpenGraph."
+  },
+  {
+    "category": "Fondo y Textura de Marca",
+    "url": "https://clinicadentariasantamariadosolivais.pt/wp-content/uploads/2025/05/Sem-titulo-7.png",
+    "pages": ["components/Layout.tsx"],
+    "name": "Marca de Agua de Fondo",
+    "type": "image/png",
+    "description": "Marca de Agua Corporativa de Fondo con opacidad suave (2%) que recubre el fondo del layout de la aplicación."
+  },
+  {
+    "category": "Documentos Clínicos Descargables",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/CUIDADOS%20POS%20OPERATORIOS.pdf",
+    "pages": ["pages/PostOperativeCare.tsx", "pages/Landing.tsx"],
+    "name": "Guia de Cuidados Pós-Operatórios (PDF)",
+    "type": "application/pdf",
+    "description": "Documento médico oficial descargable e imprimible con recomendaciones para pacientes después de intervenciones quirúrgicas e implantes."
+  },
+  {
+    "category": "Vídeos Institucionales",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/clinicadentaria-santamariadosolivais.mp4",
+    "pages": ["pages/Home.tsx", "index.html"],
+    "name": "Vídeo Institucional SMO Lisboa",
+    "type": "video/mp4",
+    "description": "Vídeo institucional de alta definición de la clínica, sus instalaciones, equipo odontológico y tecnología."
+  },
+  {
+    "category": "Vídeos Institucionales",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/0309.mp4",
+    "pages": ["pages/Home.tsx", "index.html"],
+    "name": "Vídeo Campaña Sorriso Sem Escalas",
+    "type": "video/mp4",
+    "description": "Spot promocional enfocado en tratamientos odontológicos e implantes sin escalas ni intermediarios en Lisboa."
+  },
+  {
+    "category": "Vídeos Institucionales",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_dentaria_smo_moscavide.mp4",
+    "pages": ["context/ContentContext.tsx"],
+    "name": "Vídeo SMO Moscavide (16:9)",
+    "type": "video/mp4",
+    "description": "Vídeo panorámico en formato horizontal de la fachada e instalaciones de la clínica en Moscavide."
+  },
+  {
+    "category": "Equipo Médico",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/dra_ana_mata.png",
+    "pages": ["context/ContentContext.tsx", "pages/Team.tsx"],
+    "name": "Dra. Ana Mata",
+    "type": "image/png",
+    "description": "Foto de perfil de la Directora Clínica y especialista en Implantología y Rehabilitación Oral."
+  },
+  {
+    "category": "Equipo Médico",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-132.jpeg",
+    "pages": ["context/ContentContext.tsx", "pages/Home.tsx", "pages/Team.tsx"],
+    "name": "Dra. Mariana Aberto",
+    "type": "image/jpeg",
+    "description": "Foto de perfil de la especialista en Ortodoncia y Alineadores Invisibles."
+  },
+  {
+    "category": "Equipo Médico",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-67.jpeg",
+    "pages": ["context/ContentContext.tsx", "pages/Home.tsx", "pages/Team.tsx"],
+    "name": "Dra. Alexandra Lucas",
+    "type": "image/jpeg",
+    "description": "Foto de perfil de la especialista en Periodontología y salud de las encías."
+  },
+  {
+    "category": "Equipo Médico",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-51.jpeg",
+    "pages": ["context/ContentContext.tsx", "pages/Home.tsx", "pages/Team.tsx"],
+    "name": "Dra. Orizanda Claret",
+    "type": "image/jpeg",
+    "description": "Foto de perfil de la especialista en Odontopediatría (odontología para niños)."
+  },
+  {
+    "category": "Equipo Médico",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-227.jpeg",
+    "pages": ["context/ContentContext.tsx", "pages/Home.tsx", "pages/Team.tsx"],
+    "name": "Dr. Tomás Machado",
+    "type": "image/jpeg",
+    "description": "Foto de perfil del especialista en Dentistería Estética, Endodoncia y Cirugía Oral."
+  },
+  {
+    "category": "Equipo Médico",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/dr_julio_clinica_smo.jpg",
+    "pages": ["context/ContentContext.tsx", "pages/Team.tsx"],
+    "name": "Dr. Júlio",
+    "type": "image/jpeg",
+    "description": "Foto de perfil del especialista en Cirugía Oral y Extracción de Dientes del Juicio."
+  },
+  {
+    "category": "Equipo Médico",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/dra_francisco.jpeg",
+    "pages": ["context/ContentContext.tsx", "pages/Team.tsx"],
+    "name": "Dr. Francisco",
+    "type": "image/jpeg",
+    "description": "Foto de perfil del especialista en Clínica General, Endodoncia y Prótesis Dentales."
+  },
+  {
+    "category": "Equipo Médico",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/Clinica%20Santa%20Maria%20Olivais-94.jpeg",
+    "pages": ["context/ContentContext.tsx", "pages/Home.tsx", "pages/Team.tsx"],
+    "name": "Carla Claro",
+    "type": "image/jpeg",
+    "description": "Foto de perfil de la responsable de Recepción y Coordinación de Pacientes."
+  },
+  {
+    "category": "Instalaciones de la Clínica",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5640.JPG",
+    "pages": ["context/ContentContext.tsx", "pages/Home.tsx"],
+    "name": "Recepción y Sala de Espera",
+    "type": "image/jpeg",
+    "description": "Fotografía del mostrador principal y sala de estar de la clínica."
+  },
+  {
+    "category": "Instalaciones de la Clínica",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/IMG_5650.JPG",
+    "pages": ["context/ContentContext.tsx", "pages/Home.tsx"],
+    "name": "Gabinete Dental Principal",
+    "type": "image/jpeg",
+    "description": "Fotografía del equipamiento tecnológico, sillón e iluminación del gabinete dental."
+  },
+  {
+    "category": "Instalaciones de la Clínica",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/DJI_20250819154440_0104_D.JPG",
+    "pages": ["context/ContentContext.tsx"],
+    "name": "Fachada Dron 1",
+    "type": "image/jpeg",
+    "description": "Fotografía aérea con dron de la fachada exterior sobre Estrada de Moscavide."
+  },
+  {
+    "category": "Instalaciones de la Clínica",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/DJI_20250819154505_0105_D.JPG",
+    "pages": ["context/ContentContext.tsx"],
+    "name": "Panorámica Aérea Dron 2",
+    "type": "image/jpeg",
+    "description": "Perspectiva urbana aérea de la zona de Moscavide y Olivais en Lisboa."
+  },
+  {
+    "category": "Instalaciones de la Clínica",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/DJI_20250819155107_0110_D.JPG",
+    "pages": ["context/ContentContext.tsx"],
+    "name": "Vista Cenital Dron 3",
+    "type": "image/jpeg",
+    "description": "Fotografía cenital del acceso peatonal y comercial de la clínica."
+  },
+  {
+    "category": "Instalaciones de la Clínica",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/carrusel%203-02.jpg",
+    "pages": ["context/ContentContext.tsx"],
+    "name": "Detalle de Gabinetes",
+    "type": "image/jpeg",
+    "description": "Fotografía de detalle de los gabinetes clínicos y zonas de desinfección."
+  },
+  {
+    "category": "Instalaciones de la Clínica",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/Slide%201.jpg",
+    "pages": ["pages/Clinic.tsx"],
+    "name": "Cabecera Página Clínica",
+    "type": "image/jpeg",
+    "description": "Imagen de cabecera en el banner de la página informativa sobre la clínica."
+  },
+  {
+    "category": "Banners y Campañas Publicitarias",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/kids%20clinica%20dentaria%20santa%20maria%20dos%20olivais%20.jpg",
+    "pages": ["context/ContentContext.tsx", "pages/Campaigns.tsx"],
+    "name": "Campaña Odontopediatría",
+    "type": "image/jpeg",
+    "description": "Banner promocional para la campaña de odontología infantil y hábitos saludables."
+  },
+  {
+    "category": "Banners y Campañas Publicitarias",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/implantes_smo_junio_julio_2.jpeg",
+    "pages": ["context/ContentContext.tsx", "pages/Campaigns.tsx"],
+    "name": "Campaña Implantes Unitarios",
+    "type": "image/jpeg",
+    "description": "Banner promocional para campaña de implante dental con corona incluida."
+  },
+  {
+    "category": "Banners y Campañas Publicitarias",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/arcada_completa_smo_2.jpeg",
+    "pages": ["context/ContentContext.tsx", "pages/Campaigns.tsx"],
+    "name": "Campaña Arcada Completa",
+    "type": "image/jpeg",
+    "description": "Banner promocional para rehabilitación total de arcada completa sobre implantes."
+  },
+  {
+    "category": "Banners y Campañas Publicitarias",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/doctora_ana_mata_agendamiento_online.jpg",
+    "pages": ["pages/Appointments.tsx"],
+    "name": "Banner Citas Dra. Ana Mata",
+    "type": "image/jpeg",
+    "description": "Imagen de la Dra. Ana Mata en el encabezado del módulo de agendamiento de citas online."
+  },
+  {
+    "category": "Banners y Campañas Publicitarias",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/implantes_smo_video.mp4",
+    "pages": ["pages/Landing.tsx"],
+    "name": "Vídeo Landing Implantes",
+    "type": "video/mp4",
+    "description": "Vídeo promocional optimizado para alta conversión en la landing page de implantes."
+  },
+  {
+    "category": "Vídeos por Especialidad",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/IMPLANTEHOJE.mp4",
+    "pages": ["src/data/servicesData.ts"],
+    "name": "Vídeo Servicio Implantes",
+    "type": "video/mp4",
+    "description": "Vídeo explicativo sobre el proceso quirúrgico y restauración de implantes dentales."
+  },
+  {
+    "category": "Vídeos por Especialidad",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/SORRISO.mp4",
+    "pages": ["src/data/servicesData.ts"],
+    "name": "Vídeo Servicio Ortodoncia",
+    "type": "video/mp4",
+    "description": "Vídeo explicativo sobre el alineamiento de la sonrisa con ortodoncia fija y transparente."
+  },
+  {
+    "category": "Vídeos por Especialidad",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/FACETAS.mp4",
+    "pages": ["src/data/servicesData.ts"],
+    "name": "Vídeo Servicio Facetas Dentárias",
+    "type": "video/mp4",
+    "description": "Vídeo explicativo del procedimiento de carillas cerámicas y diseño estético de sonrisa."
+  },
+  {
+    "category": "Vídeos por Especialidad",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/GENERALISTA.mp4",
+    "pages": ["src/data/servicesData.ts"],
+    "name": "Vídeo Servicio Odontología General",
+    "type": "video/mp4",
+    "description": "Vídeo explicativo sobre higiene profunda, eliminación de placa y revisiones generales."
+  },
+  {
+    "category": "Vídeos por Especialidad",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_EDODONTIA.mp4",
+    "pages": ["src/data/servicesData.ts"],
+    "name": "Vídeo Servicio Endodoncia",
+    "type": "video/mp4",
+    "description": "Vídeo explicativo de desvitalización y tratamiento de conductos para salvar piezas dentales."
+  },
+  {
+    "category": "Vídeos por Especialidad",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/REEL_LIMPEZA.mp4",
+    "pages": ["src/data/servicesData.ts"],
+    "name": "Vídeo Servicio Blanqueamiento",
+    "type": "video/mp4",
+    "description": "Vídeo explicativo sobre las técnicas de aclaramiento dental seguro en consultorio."
+  },
+  {
+    "category": "Vídeos por Especialidad",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/PROTESISFIXAS.mp4",
+    "pages": ["src/data/servicesData.ts"],
+    "name": "Vídeo Servicio Prótesis Fijas",
+    "type": "video/mp4",
+    "description": "Vídeo explicativo sobre las diferencias entre prótesis fijas sobre implantes y prótesis removibles."
+  },
+  {
+    "category": "Vídeos por Especialidad",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/ODONTO02.mp4",
+    "pages": ["src/data/servicesData.ts"],
+    "name": "Vídeo Servicio Odontopediatría",
+    "type": "video/mp4",
+    "description": "Vídeo explicativo del enfoque lúdico y sin miedo para niños en consulta dental."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V1.mp4",
+    "pages": ["pages/CaseStudies.tsx", "components/ClinicalCases.tsx"],
+    "name": "Caso Clínico V1",
+    "type": "video/mp4",
+    "description": "Corrección de apiñamiento severo con alineadores transparentes."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V2.mp4",
+    "pages": ["pages/CaseStudies.tsx", "components/ClinicalCases.tsx"],
+    "name": "Caso Clínico V2",
+    "type": "video/mp4",
+    "description": "Colocación de implante unitario y corona en el sector estético anterior."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V4.mp4",
+    "pages": ["pages/CaseStudies.tsx", "components/ClinicalCases.tsx"],
+    "name": "Caso Clínico V4",
+    "type": "video/mp4",
+    "description": "Diseño de sonrisa estético y colocación de carillas cerámicas."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V5.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Caso Clínico V5",
+    "type": "video/mp4",
+    "description": "Rehabilitación total de maxilar superior con puente fijo sobre 6 implantes."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V6.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Caso Clínico V6",
+    "type": "video/mp4",
+    "description": "Tratamiento periodontal no quirúrgico y regeneración tisular."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V7.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Caso Clínico V7",
+    "type": "video/mp4",
+    "description": "Ortodoncia interceptiva para mordida cruzada en edad de crecimiento."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V8.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Caso Clínico V8",
+    "type": "video/mp4",
+    "description": "Reconstrucción y férula oclusal en caso severo de bruxismo."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V9.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Caso Clínico V9",
+    "type": "video/mp4",
+    "description": "Rehabilitación protética combinada con retenedores estéticos."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V10.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Caso Clínico V10",
+    "type": "video/mp4",
+    "description": "Blanqueamiento dental combinado clínico y domiciliario."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V11.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Caso Clínico V11",
+    "type": "video/mp4",
+    "description": "Extracción atraumática, preservación de alveolo e implante diferido."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/V12.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Caso Clínico V12",
+    "type": "video/mp4",
+    "description": "Cierre de diastemas y armonización estética de incisivos."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_santa_maria_1.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Testimonio Paciente 1",
+    "type": "video/mp4",
+    "description": "Testimonio de paciente tras completar su tratamiento en la clínica."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_santa_maria_2.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Testimonio Paciente 2",
+    "type": "video/mp4",
+    "description": "Testimonio en vídeo de paciente satisfecho con implantes dentales."
+  },
+  {
+    "category": "Casos Clínicos en Vídeo",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/clinica_santa_maria_3.mp4",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Testimonio Paciente 3",
+    "type": "video/mp4",
+    "description": "Testimonio en vídeo de paciente tras transformación con carillas."
+  },
+  {
+    "category": "Casos Clínicos en Fotos (Antes y Después)",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/P1.jpg",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Foto Antes y Después P1",
+    "type": "image/jpeg",
+    "description": "Fotografía antes y después: Cierre de espacios y diastemas."
+  },
+  {
+    "category": "Casos Clínicos en Fotos (Antes y Después)",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/P2.jpg",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Foto Antes y Después P2",
+    "type": "image/jpeg",
+    "description": "Fotografía antes y después: Alineación dental estética superior."
+  },
+  {
+    "category": "Casos Clínicos en Fotos (Antes y Después)",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/P3.jpg",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Foto Antes y Después P3",
+    "type": "image/jpeg",
+    "description": "Fotografía antes y después: Blanqueamiento dental clínico."
+  },
+  {
+    "category": "Casos Clínicos en Fotos (Antes y Después)",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/P4.jpg",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Foto Antes y Después P4",
+    "type": "image/jpeg",
+    "description": "Fotografía antes y después: Corona unitaria sobre implante incisivo."
+  },
+  {
+    "category": "Casos Clínicos en Fotos (Antes y Después)",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/P5.jpg",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Foto Antes y Después P5",
+    "type": "image/jpeg",
+    "description": "Fotografía antes y después: Carillas estéticas de porcelana."
+  },
+  {
+    "category": "Casos Clínicos en Fotos (Antes y Después)",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/P6.jpg",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Foto Antes y Después P6",
+    "type": "image/jpeg",
+    "description": "Fotografía antes y después: Corrección de apiñamiento anterior inferior."
+  },
+  {
+    "category": "Casos Clínicos en Fotos (Antes y Después)",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/P7.jpg",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Foto Antes y Después P7",
+    "type": "image/jpeg",
+    "description": "Fotografía antes y después: Corona de zirconio monolítico."
+  },
+  {
+    "category": "Casos Clínicos en Fotos (Antes y Después)",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/P8.jpg",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Foto Antes y Después P8",
+    "type": "image/jpeg",
+    "description": "Fotografía antes y después: Prótesis fija de arcada completa."
+  },
+  {
+    "category": "Casos Clínicos en Fotos (Antes y Después)",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/P9.jpg",
+    "pages": ["pages/CaseStudies.tsx"],
+    "name": "Foto Antes y Después P9",
+    "type": "image/jpeg",
+    "description": "Fotografía antes y después: Reconstrucción estética por traumatismo dental."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_criancas.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Educação Infantil",
+    "type": "video/mp4",
+    "description": "Guía práctica para padres sobre cepillado infantil y prevención de caries."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_cuidado_implantes_MANUTENCAOADAWARNESS.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Manutenção de Implantes",
+    "type": "video/mp4",
+    "description": "Uso de cepillos interproximales e irrigador bucal en implantes."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_dentebanado_ALEXINVITACION2.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Dente Banado (Dra. Alexandra)",
+    "type": "video/mp4",
+    "description": "Explicación médica de la Dra. Alexandra sobre la protección del esmalte dental."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_dor.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Alívio da Dor Aguda",
+    "type": "video/mp4",
+    "description": "Qué medidas tomar ante un dolor punzante antes de acudir a la clínica."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_dr_tomas_PREVENCAO.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Prevenção Diária (Dr. Tomás)",
+    "type": "video/mp4",
+    "description": "Consejos del Dr. Tomás para detectar a tiempo pequeñas fisuras y caries."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_facetas_dentarias.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Como funcionam as Facetas",
+    "type": "video/mp4",
+    "description": "Detalles del tallado mínimo y adhesión duradera de carillas."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_implantes_dra_IMPLANTESAD01.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Implantes por Dra. Ana Mata",
+    "type": "video/mp4",
+    "description": "La Dra. Ana Mata explica por qué colocar un implante a tiempo evita la pérdida ósea."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_implantes.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Anatomia do Implante",
+    "type": "video/mp4",
+    "description": "Explicación sencilla de las tres partes de un implante: raíz de titanio, pilar y corona."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_invita_revision_TOMASINVITACION.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Convite para Revisão",
+    "type": "video/mp4",
+    "description": "El Dr. Tomás recuerda la periodicidad recomendada para revisiones dentales."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_limpeza_dentaria_gbt.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Limpeza Guiada por Biofilme (GBT)",
+    "type": "video/mp4",
+    "description": "Demostración de destartarización de alta tecnología sin dolor con protocolo GBT."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_MANTENIMIENTOIMPLANTES.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Manutenção Profissional de Implantes",
+    "type": "video/mp4",
+    "description": "Controles radiológicos y ajuste periódico de tornillos en prótesis sobre implantes."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_marcar_facetas_MARIANAINVITACION01.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Consulta de Facetas (Dra. Mariana)",
+    "type": "video/mp4",
+    "description": "Cómo se planifica una prueba estética mock-up antes del tratamiento definitivo."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_MARIANAALINEADORES.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Rotina com Alineadores",
+    "type": "video/mp4",
+    "description": "Instrucciones de uso diario de 22 horas y limpieza de férulas invisibles."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_prevencion_ALEXINVITACION.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Prevenção Gengival (Dra. Alexandra)",
+    "type": "video/mp4",
+    "description": "Por qué las encías sangrantes nunca deben ser ignoradas."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_prevencion_GENERALISTA.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Saúde Bucal Integral",
+    "type": "video/mp4",
+    "description": "Pautas de alimentación, dentífricos fluorados y prevención en el hogar."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_PROBLEMASILENCIOSO.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Periodontite Silenciosa",
+    "type": "video/mp4",
+    "description": "Por qué las infecciones de encías avanzan sin dolor hasta fases críticas."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_PROBLEMASPERIODONTALES.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Sinais de Alerta Periodontal",
+    "type": "video/mp4",
+    "description": "Identificación de mal aliento crónico y retracción de encías."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_protesis_parte_PROTESISFIXAS.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Próteses Fixas vs. Removíveis",
+    "type": "video/mp4",
+    "description": "Comparativa de comodidad masticatoria y estética entre prótesis."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_solucion_facetas_MARIANAINVITACION02.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Transformação com Facetas",
+    "type": "video/mp4",
+    "description": "Casos clínicos de corrección de manchas de tetraciclinas y dientes cortos."
+  },
+  {
+    "category": "Vídeos Educativos del Blog",
+    "url": "https://clinica-santa-maria-dos-olivais.b-cdn.net/educa_GINGIVASCORTO.mp4",
+    "pages": ["pages/Blog.tsx"],
+    "name": "Vídeo Blog: Cuidado Rápido das Gengivas",
+    "type": "video/mp4",
+    "description": "Micro-reel de 30 segundos con 3 reglas de oro para encías sanas."
+  }
+]

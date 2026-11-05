@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { EvaluationInfo } from '../src/components/EvaluationInfo';
 import { CallMeForm } from '../src/components/CallMeForm';
 import { ClinicalCases } from '../src/components/ClinicalCases';
-import { Check, Phone, ShieldCheck, Award, Sparkles, MessageCircle } from 'lucide-react';
+import { Check, Phone, ShieldCheck, Award, Sparkles, MessageCircle, MessageSquare } from 'lucide-react';
+import { openLeadConnectorChat } from '../src/utils/chatWidget';
 
 const Landing: React.FC = () => {
   useEffect(() => {
@@ -11,21 +12,6 @@ const Landing: React.FC = () => {
     if (metaDescription) {
       metaDescription.setAttribute('content', 'Implantes dentários em Lisboa com a Clínica Santa Maria dos Olivais. Protocolo Fixo (Toda a arcada) por 4.800€. Soluções fixas, seguras e duradouras. Agende a sua consulta hoje!');
     }
-
-    // Initialize Calendly inline widget
-    const initCalendly = () => {
-      if ((window as any).Calendly) {
-        (window as any).Calendly.initInlineWidget({
-          url: 'https://calendly.com/clinicasmod/30min?primary_color=d4e157&text_color=2d3277&hide_landing_page_details=1&hide_gdpr_banner=1',
-          parentElement: document.getElementById('calendly-landing-container'),
-          prefill: {},
-          utm: {}
-        });
-      } else {
-        setTimeout(initCalendly, 500);
-      }
-    };
-    initCalendly();
   }, []);
 
   return (
@@ -265,26 +251,31 @@ const Landing: React.FC = () => {
 
           <EvaluationInfo />
 
-          <div className="bg-white p-2 rounded-[2.2rem] shadow-lg border border-gray-150 overflow-hidden mb-8">
-            <div 
-              id="calendly-landing-container" 
-              className="calendly-inline-widget w-full rounded-[2rem] overflow-hidden" 
-              style={{ width: '100%', minWidth: '100%', height: '620px' }}
-            ></div>
-          </div>
-
-          {/* Strong Secondary Conversion Button for Mobile / WhatsApp preferers */}
-          <div className="text-center bg-green-50 rounded-2xl p-6 border border-green-100 max-w-2xl mx-auto">
-            <p className="text-sm text-green-800 font-semibold mb-3">Prefere marcar diretamente no chat?</p>
-            <a 
-              href="https://wa.me/351300601645" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="inline-flex items-center justify-center gap-2 bg-green-500 text-white font-bold py-3.5 px-8 rounded-full hover:bg-green-600 transition duration-200 shadow-md shadow-green-500/15 text-sm"
-            >
-              <MessageCircle size={18} className="fill-white" /> Marcar via WhatsApp em 1 minuto
-            </a>
-            <p className="text-[11px] text-gray-400 mt-2">Resposta imediata durante o horário comercial.</p>
+          <div className="bg-white p-6 sm:p-10 rounded-[2.2rem] shadow-xl border border-gray-150 overflow-hidden mb-8 text-center">
+            <div className="max-w-md mx-auto space-y-4">
+              <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
+                <div className="absolute -inset-2 bg-gradient-to-tr from-clinic-lime/40 to-clinic-purple/40 rounded-2xl blur-sm opacity-70"></div>
+                <div className="relative w-full h-full rounded-2xl bg-white border border-clinic-purple/20 shadow-md flex items-center justify-center p-2.5">
+                  <img 
+                    src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" 
+                    alt="SMO Logo" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-clinic-blue">Agendamento Inteligente com IA</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Tire dúvidas sobre valores de implantes e marque a sua avaliação clínica de 20€ com a Dra. Ana Mata diretamente no chat em tempo real.
+              </p>
+              <button 
+                type="button"
+                onClick={() => openLeadConnectorChat()}
+                className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-clinic-blue to-clinic-purple hover:from-clinic-blue/95 hover:to-clinic-purple/95 text-white font-bold py-4 px-8 rounded-2xl shadow-lg shadow-clinic-purple/20 hover:scale-[1.01] active:scale-[0.99] transition duration-200 text-base cursor-pointer"
+              >
+                <Sparkles className="w-5 h-5 text-clinic-lime" />
+                <span>Abrir Chat de Agendamento Imediato</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>

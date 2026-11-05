@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { ContactForm } from './ContactForm';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChatbotLauncher } from '../src/components/Chatbot';
+import { openLeadConnectorChat } from '../src/utils/chatWidget';
 
 const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setIsChatbotOpen: (open: boolean) => void }> = ({ children, isChatbotOpen, setIsChatbotOpen }) => {
   const { language, setLanguage, t, translateObject } = useLanguage();
@@ -22,16 +22,6 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isCameraInfoModalOpen, setIsCameraInfoModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isFabHubOpen, setIsFabHubOpen] = useState(false);
-  const [cycleIndex, setCycleIndex] = useState(0);
-
-  useEffect(() => {
-    if (isFabHubOpen) return;
-    const interval = setInterval(() => {
-      setCycleIndex(prev => (prev + 1) % 4);
-    }, 2800); // changes every 2.8 seconds
-    return () => clearInterval(interval);
-  }, [isFabHubOpen]);
   const location = useLocation();
   const navigate = useNavigate();
   const { trackWhatsApp, trackPhone } = useGoogleAds();
@@ -274,10 +264,10 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
       {
         id: 'page-booking',
         title: t("Marcação de Consulta Online"),
-        snippet: t("Reserve a sua consulta de avaliação diretamente no nosso calendário online Calendly ou preencha o formulário."),
+        snippet: t("Reserve a sua consulta de avaliação diretamente no nosso chat inteligente ou agende online."),
         url: '/marcacoes',
         icon: 'Calendar',
-        keywords: ['marcar', 'marcação', 'consulta', 'calendário', 'agendar', 'calendly', 'cita', 'reservar']
+        keywords: ['marcar', 'marcação', 'consulta', 'chat', 'agendar', 'ia', 'cita', 'reservar']
       },
       {
         id: 'page-campaigns',
@@ -512,17 +502,14 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
     setBgLoaded(true);
   }, []);
 
-  const openCalendly = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if ((window as any).Calendly) {
-      (window as any).Calendly.showPopupWidget('https://calendly.com/clinicasmod/30min');
-      
-      if ((window as any).trackMeta) {
-        (window as any).trackMeta('Schedule', {
-          content_name: 'Calendly Appointment',
-          content_category: 'Booking'
-        }, true);
-      }
+  const handleScheduleAppointment = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    openLeadConnectorChat();
+    if ((window as any).trackMeta) {
+      (window as any).trackMeta('Schedule', {
+        content_name: 'LeadConnector AI Chat Booking',
+        content_category: 'Booking'
+      }, true);
     }
   };
 
@@ -531,15 +518,27 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
       <header className="fixed top-2 md:top-5 left-0 right-0 mx-auto w-[92%] md:w-[90%] max-w-[1400px] h-[65px] md:h-[90px] bg-white/20 backdrop-blur-md border border-white/30 rounded-[20px] md:rounded-[30px] flex justify-between items-center px-4 md:px-[40px] z-[100] shadow-lg transition-all hover:bg-white/30">
         <Link 
           to="/" 
-          className="z-[110] flex-shrink-0"
+          className="z-[110] flex-shrink-0 flex items-center gap-2.5 sm:gap-3.5 group"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          title="Clínica Santa Maria dos Olivais"
         >
-          <img 
-            src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" 
-            alt="Clínica Santa Maria dos Olivais" 
-            className="h-[40px] sm:h-[48px] md:h-[68px] w-auto object-contain transition-transform hover:scale-105" 
-            fetchPriority="high"
-          />
+          <div className="relative flex items-center justify-center">
+            <div className="absolute -inset-1.5 bg-gradient-to-tr from-clinic-lime/30 via-clinic-blue/20 to-clinic-purple/30 rounded-2xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <img 
+              src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" 
+              alt="Clínica Santa Maria dos Olivais" 
+              className="relative h-[38px] sm:h-[46px] md:h-[58px] w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-sm" 
+              fetchPriority="high"
+            />
+          </div>
+          <div className="flex flex-col text-left justify-center leading-tight">
+            <span className="font-serif font-black text-xs sm:text-base md:text-xl text-clinic-blue tracking-tight group-hover:text-clinic-purple transition-colors duration-300">
+              Clínica Santa Maria
+            </span>
+            <span className="text-[8px] sm:text-[9px] md:text-[11px] font-bold text-clinic-purple tracking-[0.22em] uppercase mt-0.5">
+              dos Olivais <span className="text-clinic-lime font-black">·</span> Lisboa
+            </span>
+          </div>
         </Link>
         
         <div className="flex items-center gap-2 md:gap-4 z-[110]">
@@ -812,7 +811,24 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
       <footer className="bg-clinic-blue text-[#f2f2f2] pt-[60px] pb-[40px] px-[20px] md:px-[60px]">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12 md:mb-20">
-             <div className="inline-block mb-8"><img src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" alt="Logo Footer" className="max-w-[100px] md:max-w-[180px] mx-auto transition-transform hover:scale-110" loading="lazy" decoding="async" /></div>
+             <div className="inline-flex flex-col items-center justify-center mb-8 group">
+               <div className="relative mb-3">
+                 <div className="absolute -inset-2 bg-gradient-to-r from-clinic-lime/20 via-white/10 to-clinic-purple/20 rounded-full blur-md opacity-40 group-hover:opacity-100 transition duration-500"></div>
+                 <img 
+                   src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" 
+                   alt="Clínica Santa Maria dos Olivais" 
+                   className="relative max-w-[90px] md:max-w-[130px] mx-auto transition-transform duration-300 group-hover:scale-105 drop-shadow-md" 
+                   loading="lazy" 
+                   decoding="async" 
+                 />
+               </div>
+               <span className="font-serif font-bold text-xl md:text-3xl text-white tracking-tight">
+                 Clínica Santa Maria dos Olivais
+               </span>
+               <span className="text-[10px] md:text-xs font-semibold text-clinic-lime tracking-[0.25em] uppercase mt-1">
+                 Medicina Dentária & Implantologia · Lisboa
+               </span>
+             </div>
              <h2 className="text-xl sm:text-2xl md:text-5xl font-semibold leading-tight px-4 font-sans">
                {language === 'pt' ? (
                  <>Criamos <span className="text-clinic-purple font-serif italic">sorrisos</span> perfeitos,<br className="hidden md:block" /> combinando excelência médica<br className="hidden md:block" /> com <span className="text-clinic-purple font-serif italic">conforto</span> absoluto.</>
@@ -903,261 +919,7 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
         </div>
       </footer>
       
-      {/* Backdrop for the FAB Hub */}
-      {isFabHubOpen && (
-        <div 
-          className="fixed inset-0 z-[95] bg-black/5 backdrop-blur-[2px] transition-all duration-300"
-          onClick={() => setIsFabHubOpen(false)}
-        />
-      )}
 
-      {/* Unified Multi-Action Floating Button Hub */}
-      <div id="fixed-fab-hub" className={`fixed bottom-4 md:bottom-6 right-4 md:right-6 z-[100] ${isMenuOpen ? 'hidden' : ''} flex flex-col items-end`}>
-        <AnimatePresence>
-          {isFabHubOpen && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              className="mb-4 p-4 md:p-5 rounded-[2.2rem] bg-white/20 backdrop-blur-md border border-white/30 shadow-[0_20px_50px_rgba(0,0,0,0.15)] w-[265px] sm:w-[290px] flex flex-col gap-3 origin-bottom-right"
-            >
-              {/* Header */}
-              <div className="text-center pb-2.5 border-b border-white/20">
-                <span className="text-[9px] font-black tracking-wider uppercase text-clinic-blue/80 block">{t("Atendimento Rápido")}</span>
-                <span className="text-[11px] font-extrabold text-clinic-purple tracking-tight">{t("Fale Connosco 🦷")}</span>
-              </div>
-
-              {/* Action List */}
-              <div className="flex flex-col gap-2">
-                {/* Calendly */}
-                <button
-                  id="btn-calendly-main"
-                  onClick={(e) => {
-                    openCalendly(e);
-                    setIsFabHubOpen(false);
-                  }}
-                  className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-white/30 border border-transparent hover:border-white/30 transition-all text-left w-full group/action cursor-pointer"
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#2d3277] flex items-center justify-center shadow-lg group-hover/action:scale-105 transition-transform shrink-0">
-                    <i className="fas fa-calendar-check text-base text-[#d4e157]"></i>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs font-black text-clinic-blue">{t("Agendar Consulta")}</span>
-                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">{t("Reserva imediata")}</span>
-                  </div>
-                </button>
-
-                {/* Direct Call */}
-                <a
-                  id="btn-call-direct"
-                  href={`tel:${cleanCustomerService}`}
-                  onClick={() => {
-                    trackPhoneClick(customerService);
-                    setIsFabHubOpen(false);
-                  }}
-                  className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-white/30 border border-transparent hover:border-white/30 transition-all group/action"
-                >
-                  <div className="w-10 h-10 rounded-full bg-clinic-purple flex items-center justify-center shadow-lg group-hover/action:scale-105 transition-transform shrink-0">
-                    <i className="fas fa-phone-alt text-base text-white"></i>
-                  </div>
-                  <div className="flex flex-col text-left">
-                    <span className="text-xs font-black text-clinic-blue">{t("Chamada Direta")}</span>
-                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">{t("Linha Grátis 24h")}</span>
-                  </div>
-                </a>
-
-                {/* Contact Form Inquiry */}
-                <button
-                  id="btn-contact-form-trigger"
-                  onClick={() => {
-                    setIsContactModalOpen(true);
-                    setIsFabHubOpen(false);
-                  }}
-                  className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-white/30 border border-transparent hover:border-white/30 transition-all text-left w-full group/action cursor-pointer"
-                >
-                  <div className="w-10 h-10 rounded-full bg-clinic-blue flex items-center justify-center shadow-lg group-hover/action:scale-105 transition-transform shrink-0">
-                    <i className="fas fa-comment-dots text-base text-clinic-lime"></i>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs font-black text-clinic-blue">{t("Contactem-me")}</span>
-                    <span className="text-[9px] text-clinic-blue/60 font-bold uppercase tracking-wide">{t("Ligamos de volta")}</span>
-                  </div>
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Floating Action Buttons Column: WhatsApp (on top) -> Bot -> Camera */}
-        <div className="relative mb-3.5 flex flex-col items-center gap-3">
-          {/* Independent WhatsApp Floating Button with WhatsApp Green Aro */}
-          <div className="relative group">
-            <div className="whatsapp-glow-ring-container w-14 h-14 md:w-16 md:h-16 z-10">
-              <div className="whatsapp-glow-ring-blur"></div>
-              <div className="whatsapp-glow-ring-sharp"></div>
-              <a
-                id="btn-sticky-whatsapp"
-                href="https://wa.me/351300601645"
-                target="_blank"
-                rel="noreferrer"
-                onClick={trackWhatsAppClick}
-                className="absolute inset-0 w-full h-full flex items-center justify-center rounded-full border border-white/50 bg-[#25D366] hover:bg-[#20ba5a] text-white cursor-pointer z-10 shadow-[0_10px_30px_rgba(37,211,102,0.45)] transition-all duration-300"
-                aria-label={t("WhatsApp: +351 300 601 645")}
-                title={t("WhatsApp: +351 300 601 645")}
-              >
-                <i className="fab fa-whatsapp text-xl md:text-2xl text-white"></i>
-              </a>
-            </div>
-
-            {/* Hover tooltip */}
-            <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-clinic-blue/95 backdrop-blur-sm text-white font-black text-[9px] md:text-[10px] px-3.5 py-2 rounded-full uppercase tracking-widest shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap border border-white/10 shrink-0">
-              {t("WhatsApp (+351 300 601 645)")}
-            </div>
-          </div>
-
-          {/* Independent Bot Button */}
-          <div className="relative group">
-            <div className="chatbot-glow-ring-container w-14 h-14 md:w-16 md:h-16 z-10">
-              <div className="chatbot-glow-ring-blur"></div>
-              <div className="chatbot-glow-ring-sharp"></div>
-              <button
-                id="btn-sticky-chatbot"
-                onClick={() => setIsChatbotOpen(true)}
-                className="absolute inset-0 w-full h-full flex items-center justify-center rounded-full border border-white/50 bg-gradient-to-tr from-clinic-blue via-blue-600 to-clinic-purple text-white cursor-pointer z-10 shadow-[0_10px_30px_rgba(45,50,119,0.35)] transition-all duration-300"
-                aria-label={t("Chatbot")}
-                title={t("Chatbot")}
-              >
-                <Bot className="w-5 h-5 md:w-6 md:h-6 text-white" />
-              </button>
-            </div>
-
-            {/* Hover tooltip */}
-            <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-clinic-blue/95 backdrop-blur-sm text-white font-black text-[9px] md:text-[10px] px-3.5 py-2 rounded-full uppercase tracking-widest shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap border border-white/10 shrink-0">
-              {t("Assistente Virtual 🦷")}
-            </div>
-          </div>
-
-          {/* Independent Camera Diagnostic Button */}
-          <div className="relative group">
-            <button
-              id="btn-sticky-camera"
-              onClick={openCameraModal}
-              className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_35px_rgba(107,70,193,0.55)] hover:shadow-[0_15px_40px_rgba(107,70,193,0.7)] transition-all duration-300 hover:scale-110 active:scale-95 border border-white/50 bg-gradient-to-tr from-clinic-purple via-violet-600 to-clinic-blue text-white cursor-pointer z-10"
-              aria-label={t("Diagnóstico por Foto 📸")}
-              title={t("Diagnóstico Gratuito por Foto 🦷")}
-            >
-              <Camera className="w-5 h-5 md:w-6 md:h-6 text-white" />
-              
-              {/* Soft pulsing notification bubble/badge */}
-              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-clinic-lime opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-5 w-5 bg-clinic-lime text-[10px] font-black justify-center items-center text-clinic-blue select-none shadow">✓</span>
-              </span>
-            </button>
-
-            {/* Hover tooltip */}
-            <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-clinic-blue/95 backdrop-blur-sm text-white font-black text-[9px] md:text-[10px] px-3.5 py-2 rounded-full uppercase tracking-widest shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap border border-white/10 shrink-0">
-              {t("Diagnóstico por Foto 🦷")}
-            </div>
-          </div>
-        </div>
-
-        {/* The Trigger Button - Cycles through when closed, morphs to X when open */}
-        <div className="relative">
-          {/* Brand-Colored Pulsing Glow/Aura backdrop */}
-          {!isFabHubOpen && (
-            <>
-              {/* Soft continuous glowing blur */}
-              <div className={`absolute inset-[-3px] rounded-full blur-md opacity-60 animate-pulse transition-colors duration-1000 z-0 ${
-                cycleIndex === 0 ? 'bg-clinic-purple/40 shadow-[0_0_20px_rgba(107,70,193,0.6)]' :
-                cycleIndex === 1 ? 'bg-[#2d3277]/40 shadow-[0_0_20px_rgba(45,50,119,0.6)]' :
-                cycleIndex === 2 ? 'bg-clinic-purple/40 shadow-[0_0_20px_rgba(107,70,193,0.6)]' :
-                'bg-clinic-blue/40 shadow-[0_0_20px_rgba(45,50,119,0.6)]'
-              }`} />
-              {/* Expanding ping ripple */}
-              <div className={`absolute inset-[-6px] rounded-full opacity-35 animate-ping transition-colors duration-1000 z-0 ${
-                cycleIndex === 0 ? 'bg-clinic-purple' :
-                cycleIndex === 1 ? 'bg-[#2d3277]' :
-                cycleIndex === 2 ? 'bg-clinic-purple' :
-                'bg-clinic-blue'
-              }`} />
-            </>
-          )}
-
-          <button
-            onClick={() => setIsFabHubOpen(!isFabHubOpen)}
-            className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-full shadow-[0_10px_30px_rgba(45,50,119,0.3)] transition-all duration-300 hover:scale-105 active:scale-95 group overflow-hidden border border-white/40 bg-white/20 backdrop-blur-md cursor-pointer z-10"
-            aria-label={isFabHubOpen ? "Fechar contactos" : "Ver contactos rápidos"}
-          >
-            <AnimatePresence mode="wait">
-              {isFabHubOpen ? (
-                <motion.div
-                  key="close-icon"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="w-full h-full flex items-center justify-center bg-clinic-blue text-white"
-                >
-                  <X className="w-6 h-6 md:w-8 md:h-8" />
-                </motion.div>
-              ) : (
-                <div className="w-full h-full">
-                  {cycleIndex === 0 && (
-                    <motion.div
-                      key="cycle-logo"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="w-full h-full flex items-center justify-center p-3 bg-white"
-                    >
-                      <img 
-                        src="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" 
-                        alt="Logo" 
-                        className="w-full h-full object-contain"
-                      />
-                    </motion.div>
-                  )}
-                  {cycleIndex === 1 && (
-                    <motion.div
-                      key="cycle-calendly"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="w-full h-full flex items-center justify-center bg-[#2d3277]"
-                    >
-                      <i className="fas fa-calendar-check text-xl md:text-2xl text-[#d4e157]"></i>
-                    </motion.div>
-                  )}
-                  {cycleIndex === 2 && (
-                    <motion.div
-                      key="cycle-phone"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="w-full h-full flex items-center justify-center bg-clinic-purple"
-                    >
-                      <i className="fas fa-phone-alt text-xl md:text-2xl text-white"></i>
-                    </motion.div>
-                  )}
-                  {cycleIndex === 3 && (
-                    <motion.div
-                      key="cycle-form"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="w-full h-full flex items-center justify-center bg-clinic-blue"
-                    >
-                      <i className="fas fa-comment-dots text-xl md:text-2xl text-clinic-lime"></i>
-                    </motion.div>
-                  )}
-                </div>
-              )}
-            </AnimatePresence>
-          </button>
-        </div>
-      </div>
 
       {/* Contact Modal */}
       {isContactModalOpen && (

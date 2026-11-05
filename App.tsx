@@ -5,7 +5,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { ContentProvider } from './context/ContentContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { CookieConsent } from './components/CookieConsent';
-import Chatbot, { ChatbotLauncher } from './src/components/Chatbot';
+import { openLeadConnectorChat } from './src/utils/chatWidget';
 
 // Direct imports for primary pages to ensure immediate loading
 import Home from './pages/Home';
@@ -94,6 +94,14 @@ const PixelRouteTracker: React.FC = () => {
 
 const App: React.FC = () => {
   const [isChatbotOpen, setIsChatbotOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isChatbotOpen) {
+      openLeadConnectorChat();
+      setIsChatbotOpen(false);
+    }
+  }, [isChatbotOpen]);
+
   return (
     <LanguageProvider>
       <ContentProvider>
@@ -124,7 +132,6 @@ const App: React.FC = () => {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>
-          <Chatbot isOpen={isChatbotOpen} setIsOpen={setIsChatbotOpen} />
         </BrowserRouter>
       </ContentProvider>
     </LanguageProvider>

@@ -11,7 +11,7 @@ export const arvoreDecisao: any = {
 
   // --- RAMA: SEGUROS E PAGAMENTOS ---
   SEGUROS_PAGAMENTOS: {
-    text: "Relativamente a seguros e acordos:\nNós funcionamos exclusivamente em regime privado, priorizando a elevada qualidade dos materiais e o tempo dedicado a cada consulta. 💎\n\nEmitimos sempre a fatura detalhada com todos os códigos médicos necessários para que possa solicitar o reembolso junto da sua seguradora ou subsistema (ADSE, Médis, Multicare, etc.), através do Regime Livre. 📄\n\nFacilidades de Pagamento 💳\nVanessa, você pode pagar cada tratamento que for fazendo. Em relação a implantes, o pagamento é no dia da cirurgia. Atenciosamente, Clínica Santa Maria dos Olivais.",
+    text: "Relativamente a seguros e acordos:\nNós funcionamos exclusivamente em regime privado, priorizando a elevada qualidade dos materiais e o tempo dedicado a cada consulta. 💎\n\nEmitimos sempre a fatura detalhada com todos os códigos médicos necessários para que possa solicitar o reembolso junto da sua seguradora ou subsistema (ADSE, Médis, Multicare, etc.), através do Regime Livre. 📄\n\nFacilidades de Pagamento 💳\nPode pagar cada tratamento à medida que for realizando. Em relação a implantes, dispomos de pronto pagamento ou modalidade faseada (50% na cirurgia e 50% na coroa). Atenciosamente, Clínica Santa Maria dos Olivais.",
     options: [
       { label: "Agendar uma Avaliação Agora", next: "FINALIZAR_AGENDAMENTO", treatment: "Consulta Geral" },
       { label: "Voltar ao Menu Principal", next: "MENU_PRINCIPAL" }
@@ -39,7 +39,7 @@ export const arvoreDecisao: any = {
     ]
   },
   IMPLANTES_UNITARIOS: {
-    text: "Pack (inclui coroa):\n• Implante Unitário: 745,00€\n• 2 Implantes: 1.400,00€\n• 4 Implantes: 2.300,00€\n• Enxerto ósseo: 200,00€ a 500,00€\n\nVamos agendar a sua avaliação?",
+    text: "Pack (inclui coroa metalo-cerâmica):\n• 1 Implante: 745,00€\n• 2 Implantes: 1.400,00€\n• 3 Implantes: 1.800,00€\n• 4 Implantes: 2.300,00€\n• Enxerto ósseo: A partir de 200,00€\n\nVamos agendar a sua avaliação?",
     options: [
       { label: "Sim, Agendar Agora", next: "FINALIZAR_AGENDAMENTO", treatment: "Implantes Unitários" },
       { label: "Voltar", next: "IMPLANTES_MENU" }
@@ -136,7 +136,7 @@ export const arvoreDecisao: any = {
 
   // --- RAMA: INFORMAÇÕES DA CLÍNICA ---
   INFO_CLINICA: {
-    text: "Clínica Santa Maria dos Olivais.\nMorada: Estrada de Moscavide N 32C, 1800-279, Lisboa.\nPagamentos: Vanessa, você pode pagar cada tratamento que for fazendo. Em relação a implantes, o pagamento é no dia da cirurgia. Atenciosamente, Clínica Santa Maria dos Olivais.",
+    text: "Clínica Santa Maria dos Olivais.\nMorada: Estrada de Moscavide N 32C, 1800-279, Lisboa.\nContactos: +351 912 907 024 | 211 350 066.\nHorário: Seg–Sex 10h00–19h00, Sáb 10h00–13h00.",
     options: [
       { label: "Ver Seguros e Pagamentos", next: "SEGUROS_PAGAMENTOS" },
       { label: "Agendar uma Avaliação Agora", next: "FINALIZAR_AGENDAMENTO", treatment: "Consulta Geral" },

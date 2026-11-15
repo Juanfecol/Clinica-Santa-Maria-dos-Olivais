@@ -3,6 +3,7 @@ import { Send, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { services } from '../constants/servicesData';
+import { fireCleanGoogleAdsConversion, getAttributionPayload } from '../src/utils/attribution';
 
 interface ContactFormProps {
   especialidadeInicial?: string;
@@ -41,31 +42,35 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     const data = Object.fromEntries(formData.entries());
 
     try {
+      const attribution = getAttributionPayload();
       const response = await fetch('/api/send', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: data.nome,
-          email: 'contacto@clinica.pt', // Placeholder
+          email: '',
           phone: data.telefone,
-          message: `Especialidade: ${data.especialidade}`
+          tratamento: String(data.especialidade || ''),
+          preferencia_contacto: 'WhatsApp / Telemóvel',
+          source: 'Formulário Website SMO',
+          message: `Especialidade: ${data.especialidade}`,
+          ...attribution
         })
       });
 
       if (response.ok) {
-        // Rastreamento de Conversão
+        // Rastreamento de Conversão (Cumprimento Saúde UE: zero termos clínicos enviados ao Google Ads)
         if ((window as any).trackEvent) {
           (window as any).trackEvent('generate_lead', {
-            event_category: 'conversion',
-            especialidade: data.especialidade
+            event_category: 'conversion'
           });
         }
         // Meta Pixel Conversion
         if ((window as any).trackMeta) {
           (window as any).trackMeta('Lead', {
             content_name: data.especialidade || 'Contacto Geral',
-            content_category: 'Formulário Rodapé / Laterial',
-            value: 5.0,
+            content_category: 'Formulário Rodapé / Lateral',
+            value: 20.0,
             currency: 'EUR',
             _userData: {
               fn: data.nome,
@@ -73,12 +78,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             }
           });
         }
-        // Google Ads Conversion Tracking
-        if ((window as any).gtag) {
-          (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/form_submit' });
-        }
+        // Google Ads Conversion Tracking (Label Real Oficial + Enhanced Conversions Hashed)
+        fireCleanGoogleAdsConversion({
+          name: String(data.nome || ''),
+          phone: String(data.telefone || '')
+        });
         setStatus('success');
-        navigate('/obrigado', { state: { nome: data.nome, servico: data.especialidade } });
+        navigate('/obrigado', { state: { nome: data.nome, telemovel: data.telefone, servico: data.especialidade } });
       } else {
         setStatus('error');
       }

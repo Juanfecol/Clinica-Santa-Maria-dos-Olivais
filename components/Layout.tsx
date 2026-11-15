@@ -452,7 +452,7 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
     return () => { document.body.style.overflow = 'unset'; };
   }, [isMenuOpen]);
 
-  const customerService = global.customerService || "300 601 645";
+  const customerService = global.customerService || "+351 912 907 024";
   const cleanPhone = contactPhone.replace(/\s+/g, '');
   const cleanCustomerService = customerService.replace(/\s+/g, '');
 
@@ -477,19 +477,19 @@ const Layout: React.FC<{ children: React.ReactNode, isChatbotOpen: boolean, setI
     });
   };
 
-  const trackPhoneClick = (number: string) => {
+  const trackPhoneClick = (_number?: string) => {
     trackPhone(); // Google Ads Conversion
     if ((window as any).trackMeta) {
       (window as any).trackMeta('Contact', { content_name: 'Phone Call' }, true);
     }
-    trackGtagEvent('phone_click', { 'event_category': 'contact', 'event_label': 'Phone', 'number': number });
+    trackGtagEvent('phone_click', { 'event_category': 'contact', 'event_label': 'Phone' });
   };
 
-  const trackEmailClick = (email: string) => {
+  const trackEmailClick = (_email?: string) => {
     if ((window as any).trackMeta) {
       (window as any).trackMeta('Contact', { content_name: 'Email' }, true);
     }
-    trackGtagEvent('email_click', { 'event_category': 'contact', 'event_label': 'Email', 'email': email });
+    trackGtagEvent('email_click', { 'event_category': 'contact', 'event_label': 'Email' });
   };
 
   const trackLocationClick = () => {

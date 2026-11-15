@@ -60,12 +60,15 @@ export const CookieConsent: React.FC = () => {
     }
 
     (window as any).trackEvent = function(eventName: string, eventParams: object = {}) {
+        const cleanGadsParams = (window as any).sanitizeGoogleAdsParams
+          ? (window as any).sanitizeGoogleAdsParams(eventParams)
+          : {};
         if ((window as any).gtag) {
-          (window as any).gtag('event', eventName, { ...eventParams, 'send_to': ['AW-434250599', 'AW-1135006626'] });
+          (window as any).gtag('event', eventName, { ...cleanGadsParams, 'send_to': 'AW-434250599' });
         }
         // Manychat event tracking
         if ((window as any).MC) {
-          (window as any).MC.track(eventName, eventParams);
+          (window as any).MC.track(eventName, cleanGadsParams);
         }
     };
     

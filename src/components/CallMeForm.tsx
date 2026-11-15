@@ -1,21 +1,48 @@
 import React, { useState } from 'react';
 import { useGoogleAds } from '../../hooks/useGoogleAds';
+import { getAttributionPayload } from '../utils/attribution';
+
+const TREATMENT_LABELS: Record<string, string> = {
+  'implante-unitario': 'Implantes Dentários',
+  'protocolo-arcada': 'Protocolo Arcada Completa',
+  'facetas': 'Facetas Dentárias',
+  'outro-caso': 'Consulta de Avaliação Geral',
+};
 
 export const CallMeForm: React.FC = () => {
   const [formData, setFormData] = useState({ name: '', phone: '', treatment: 'implante-unitario' });
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const { trackForm } = useGoogleAds();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
-    trackForm();
-    // Simulate form submission
-    console.log('Form submitted:', formData);
-    setTimeout(() => {
+    const treatmentLabel = TREATMENT_LABELS[formData.treatment] || formData.treatment;
+    try {
+      const response = await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          email: '',
+          tratamento: treatmentLabel,
+          preferencia_contacto: 'Chamada Telefónica',
+          source: 'Landing Google Ads - Ligamos-lhe',
+          message: `Pedido Ligamos-lhe Grátis — Tratamento: ${treatmentLabel}`,
+          ...getAttributionPayload(),
+        }),
+      });
+      if (response.ok) {
+        trackForm({ name: formData.name, phone: formData.phone });
         setStatus('success');
         setFormData({ name: '', phone: '', treatment: 'implante-unitario' });
-    }, 1000);
+      } else {
+        setStatus('error');
+      }
+    } catch (_) {
+      setStatus('error');
+    }
   };
 
   if (status === 'success') {

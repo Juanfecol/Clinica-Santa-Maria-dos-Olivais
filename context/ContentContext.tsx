@@ -7,14 +7,14 @@ const defaultData = {
   global: {
     email: "clinicasmod@gmail.com",
     phone: "211 350 066",
-    customerService: "300 601 645",
-    mobile: "+351 919 861 310",
+    customerService: "+351 912 907 024",
+    mobile: "+351 912 907 024",
     address: "Estrada de Moscavide N 32C, 1800-279, Lisboa",
-    mapsLink: "https://www.google.com/maps/search/?api=1&query=Estrada+de+Moscavide+N+32C,+1800-279,+Lisboa",
+    mapsLink: "https://maps.google.com/?cid=6711586521976072040",
     socials: {
       instagram: "https://www.instagram.com/clinicasantamariaolivais/",
       facebook: "https://www.facebook.com/clinicasmod/",
-      whatsapp: "https://wa.me/351300601645"
+      whatsapp: "https://wa.me/351912907024"
     }
   },
   navigation: [
@@ -164,7 +164,22 @@ const MOSCAVIDE_VIDEO_ITEM = {
 
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState(() => {
-    const STORAGE_KEY = 'site_content_v13';
+    const STORAGE_KEY = 'site_content_v14';
+
+    const sanitizeGlobal = (g: any) => ({
+      ...defaultData.global,
+      ...(g || {}),
+      phone: "211 350 066",
+      customerService: "+351 912 907 024",
+      mobile: "+351 912 907 024",
+      address: "Estrada de Moscavide N 32C, 1800-279, Lisboa",
+      mapsLink: "https://maps.google.com/?cid=6711586521976072040",
+      socials: {
+        ...defaultData.global.socials,
+        ...(g?.socials || {}),
+        whatsapp: "https://wa.me/351912907024"
+      }
+    });
 
     const sanitizeStories = (stories: any[]) => {
       if (!Array.isArray(stories)) return [MOSCAVIDE_VIDEO_ITEM, ...defaultData.stories.slice(1)];
@@ -181,17 +196,19 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
+        parsed.global = sanitizeGlobal(parsed.global);
         parsed.stories = sanitizeStories(parsed.stories);
         return parsed;
       }
 
       // Check and migrate previous versions if any
-      const olderKeys = ['site_content_v12', 'site_content_v11', 'site_content_v10', 'site_content_v9'];
+      const olderKeys = ['site_content_v13', 'site_content_v12', 'site_content_v11', 'site_content_v10', 'site_content_v9'];
       for (const oldKey of olderKeys) {
         const oldSaved = localStorage.getItem(oldKey);
         if (oldSaved) {
           try {
             const parsed = JSON.parse(oldSaved);
+            parsed.global = sanitizeGlobal(parsed.global);
             parsed.stories = sanitizeStories(parsed.stories);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
             return parsed;
@@ -203,7 +220,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     
     // Default data with sanitized stories
-    const initialData = { ...defaultData, stories: sanitizeStories(defaultData.stories) };
+    const initialData = { ...defaultData, global: sanitizeGlobal(defaultData.global), stories: sanitizeStories(defaultData.stories) };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
     } catch (_) {}
@@ -213,14 +230,14 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateContent = (newContent: any) => {
     setContent(newContent);
     try {
-      localStorage.setItem('site_content_v13', JSON.stringify(newContent));
+      localStorage.setItem('site_content_v14', JSON.stringify(newContent));
     } catch (_) {}
   };
 
   const resetContent = () => {
     setContent(defaultData);
     try {
-      localStorage.setItem('site_content_v13', JSON.stringify(defaultData));
+      localStorage.setItem('site_content_v14', JSON.stringify(defaultData));
     } catch (_) {}
   };
 

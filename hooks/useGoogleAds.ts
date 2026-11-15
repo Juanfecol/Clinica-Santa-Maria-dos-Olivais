@@ -1,27 +1,30 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import { captureAttributionOnLoad, fireCleanGoogleAdsConversion } from '../src/utils/attribution';
 
 export const useGoogleAds = () => {
-  const trackConversion = useCallback((conversionLabel: string) => {
+  useEffect(() => {
+    captureAttributionOnLoad();
+  }, []);
+
+  const trackConversion = useCallback((conversionLabel: string, value: number = 1.0) => {
     if ((window as any).gtag) {
       (window as any).gtag('event', 'conversion', {
-        'send_to': `AW-434250599/${conversionLabel}`,
-        'value': 1.0,
-        'currency': 'EUR'
+        send_to: `AW-434250599/${conversionLabel}`,
+        value,
+        currency: 'EUR',
       });
-      console.log(`Evento enviado: ${conversionLabel}`);
-    } else {
-      console.warn("Google Tag (gtag.js) no está detectado.");
     }
   }, []);
 
   // Conversión de WhatsApp
-  const trackWhatsApp = () => trackConversion('grC7CL3rxeobEOfGiM8B');
+  const trackWhatsApp = () => trackConversion('grC7CL3rxeobEOfGiM8B', 5.0);
 
   // Conversión de Llamada
-  const trackPhone = () => trackConversion('gGyeCMDrxeobEOfGiM8B');
+  const trackPhone = () => trackConversion('gGyeCMDrxeobEOfGiM8B', 5.0);
 
-  // Conversión de Formulario
-  const trackForm = () => trackConversion('koh5CPOs1uobEOfGiM8B');
+  // Conversión de Formulario (20 EUR, EU Healthcare Privacy Compliant + Enhanced Conversions)
+  const trackForm = (userData?: { email?: string; phone?: string; name?: string }) =>
+    fireCleanGoogleAdsConversion(userData);
 
   return { trackWhatsApp, trackPhone, trackForm };
 };

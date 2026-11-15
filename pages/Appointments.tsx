@@ -103,11 +103,11 @@ const Appointments: React.FC = () => {
             </button>
 
             <a
-              href="tel:300601645"
+              href="tel:+351211350066"
               className="w-full sm:w-auto py-4 px-6 rounded-2xl bg-white hover:bg-slate-50 text-clinic-blue font-bold text-sm border border-slate-200 shadow-sm transition-all flex items-center justify-center gap-2"
             >
               <Phone className="w-4 h-4 text-clinic-purple" />
-              <span>300 601 645</span>
+              <span>211 350 066</span>
             </a>
           </div>
         </div>

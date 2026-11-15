@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { fireCleanGoogleAdsConversion, getAttributionPayload } from '../src/utils/attribution';
 import { 
   Calculator, 
   ChevronRight, 
@@ -113,9 +114,9 @@ const specialtiesData: Specialty[] = [
       { id: 'imp-3', name: 'Reabilitação 2 Implantes', priceMin: 1400, priceMax: 1400, description: 'Substituição múltipla de dentes.' },
       { id: 'imp-4', name: 'Reabilitação 3 Implantes', priceMin: 1800, priceMax: 1800, description: 'Substituição de múltiplos dentes.' },
       { id: 'imp-5', name: 'Reabilitação 4 Implantes', priceMin: 2300, priceMax: 2300, description: 'Base para ponte fixa extensa.' },
-      { id: 'imp-6', name: 'Protocolo Superior (Arcada Completa)', priceMin: 4800, priceMax: 5000, description: 'Toda a arcada fixa sobre implantes.' },
+      { id: 'imp-6', name: 'Protocolo Superior (Arcada Completa)', priceMin: 4800, priceMax: 4800, description: 'Toda a arcada fixa sobre implantes (4 a 6 implantes + prótese fixa definitiva).' },
       { id: 'imp-7', name: 'Coroa sobre Implante (Cerâmica/Zircónia)', priceMin: 650, priceMax: 650, description: 'Parte visível do dente sobre o implante (exceto cirurgia).' },
-      { id: 'imp-8', name: 'Enxerto Ósseo', priceMin: 200, priceMax: 500, description: 'Recuperação de volume ósseo perdido.' },
+      { id: 'imp-8', name: 'Enxerto Ósseo', priceMin: 200, priceMax: 200, description: 'A partir de 200,00€ (varia consoante necessidade clínica).' },
       { id: 'imp-9', name: 'Limpeza Prótese Fixa Implante', priceMin: 100, priceMax: 100, description: 'Manutenção periódica de prótese fixa.' },
       { id: 'imp-10', name: 'Prótese Provisória (Removível / Fixa)', priceMin: 350, priceMax: 1200, description: 'Dentes temporários durante a cicatrização.' },
       { id: 'imp-11', name: 'Recolocação / Aperto Coroa', priceMin: 10, priceMax: 10, description: 'Pequenos ajustes em coroas sobre implantes.' }
@@ -482,7 +483,7 @@ const QuoteCalculator: React.FC = () => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const mode = searchParams.get('mode') || (location.state as any)?.mode;
+    const mode = searchParams.get('mode') || (searchParams.get('diagnostico') === 'foto' ? 'photo' : null) || (location.state as any)?.mode;
     if (mode === 'photo') {
       setFlowMode('photo_only');
       setPhotoOptionConsent('yes');
@@ -539,10 +540,14 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: leadName,
-          email: leadEmail || 'contacto@clinica.pt',
+          email: (leadEmail || '').trim(),
           phone: leadPhone,
+          tratamento: treatmentsList.join(', ') || selectedInterests.join(', ') || selectedSpecialty?.name || 'Simulador de Sorriso',
+          preferencia_contacto: 'WhatsApp / Telemóvel',
+          source: capturedPhoto ? 'Diagnóstico por Foto Website' : 'Simulador de Investimento Website',
           message: msgText,
-          photo: capturedPhoto || undefined
+          photo: capturedPhoto || undefined,
+          ...getAttributionPayload()
         })
       });
 
@@ -553,17 +558,22 @@ Mensagem do Paciente: ${leadNotes || 'Sem observações.'}`;
           'success'
         );
         if ((window as any).trackEvent) {
-          (window as any).trackEvent('quote_submitted_with_photo', { min, max, has_photo: !!capturedPhoto });
+          (window as any).trackEvent('quote_submitted_with_photo', { event_category: 'conversion', has_photo: !!capturedPhoto });
         }
+        fireCleanGoogleAdsConversion({
+          name: leadName,
+          email: (leadEmail || '').trim(),
+          phone: leadPhone
+        });
         if ((window as any).trackMeta) {
           (window as any).trackMeta('Lead', {
             content_name: 'Simulador Orçamento com Foto',
             content_category: 'Simulator',
-            value: Number(min),
+            value: Number(min) || 20.0,
             currency: 'EUR',
             _userData: {
               fn: leadName,
-              em: leadEmail,
+              em: (leadEmail || '').trim(),
               ph: leadPhone
             }
           });

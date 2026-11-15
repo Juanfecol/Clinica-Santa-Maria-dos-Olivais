@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 import { useLanguage } from '../context/LanguageContext';
+import { fireCleanGoogleAdsConversion } from '../src/utils/attribution';
 
 // CONTROL POINT: LEAD SUBMISSION AND THANK YOU PAGE
 const ThankYou: React.FC = () => {
@@ -13,7 +14,7 @@ const ThankYou: React.FC = () => {
   useEffect(() => {
     if ((window as any).trackEvent) {
       (window as any).trackEvent('view_thank_you', {
-        service: state?.servico
+        event_category: 'conversion'
       });
     }
     // Meta Pixel Conversion
@@ -21,7 +22,7 @@ const ThankYou: React.FC = () => {
       (window as any).trackMeta('Lead', {
         content_name: state?.servico || 'Consulta Geral',
         content_category: 'Agendamento Finalizado',
-        value: 10.0,
+        value: 20.0,
         currency: 'EUR',
         _userData: {
           fn: state?.nome,
@@ -30,22 +31,24 @@ const ThankYou: React.FC = () => {
         }
       });
     }
-    // Google Ads Conversion Tracking
-    if ((window as any).gtag) {
-      (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/thank_you_page' });
-    }
+    // Google Ads Conversion Tracking (Label Real Oficial + Zero Termos Clínicos)
+    fireCleanGoogleAdsConversion({
+      name: state?.nome,
+      email: state?.email,
+      phone: state?.telemovel
+    });
   }, [state]);
 
   // FIX: Datos de respaldo por si se accede directamente (para evitar pantalla en blanco)
   const displayData = state || {
     nome: "Estimado Paciente",
-    email: "contacto@exemplo.com",
+    email: "",
     telemovel: "---",
     servico: "Consulta Geral"
   };
 
   // Construct WhatsApp Message Dynamically from Content Context
-  const rawPhone = global.mobile ? global.mobile.replace(/\D/g, '') : "351919861310";
+  const rawPhone = global.mobile ? global.mobile.replace(/\D/g, '') : "351912907024";
   
   const waMessage = `Olá, o meu nome é ${displayData.nome}. Acabei de preencher o formulário no site sobre ${displayData.servico || 'uma consulta'} e gostaria de ser contactado.`;
   const finalWaLink = `https://wa.me/${rawPhone}?text=${encodeURIComponent(waMessage)}`;

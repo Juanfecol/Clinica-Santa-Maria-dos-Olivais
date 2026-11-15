@@ -12,7 +12,7 @@ const servicesData: Record<string, any> = {
     prices: [
       { name: 'Implante Unitário + Coroa Metalo-cerâmica', value: '745€' },
       { name: 'Protocolo Superior (4 a 6 implantes + prótese fixa final)', value: '4.800€' },
-      { name: 'Enxerto Ósseo', value: 'A partir de 200€ (ou 500€ conforme complexidade)' }
+      { name: 'Enxerto Ósseo', value: 'A partir de 200,00€ (mediante avaliação clínica)' }
     ]
   },
   'facetas': {
@@ -60,7 +60,7 @@ export const ServiceDetail: React.FC = () => {
   useEffect(() => {
     if ((window as any).trackEvent) {
       (window as any).trackEvent('view_service', {
-        service: slug
+        event_category: 'engagement'
       });
     }
   }, [slug]);

@@ -62,13 +62,10 @@ export const ServiceTemplate: React.FC = () => {
     const fullUrl = `${window.location.origin}${newUrl}`;
     navigator.clipboard.writeText(fullUrl).catch(() => {});
 
-    // Hook tracking if available
+    // Hook tracking if available (EU Health Privacy: zero clinical terms sent to Google Ads)
     if ((window as any).trackEvent) {
-      (window as any).trackEvent('select_treatment_item_campaign', {
-        service: slug,
-        item: itemName,
-        value: itemValue,
-        slug: itemSlug
+      (window as any).trackEvent('select_price_item', {
+        event_category: 'engagement'
       });
     }
   };
@@ -128,9 +125,10 @@ export const ServiceTemplate: React.FC = () => {
   }, [slug, service]);
   
   useEffect(() => {
+    // EU Health Privacy: zero clinical/treatment identifiers sent to Google Ads / GTM
     if ((window as any).trackEvent) {
       (window as any).trackEvent('view_service', {
-        service: slug
+        event_category: 'engagement'
       });
     }
     // Meta Pixel Tracking
@@ -140,11 +138,10 @@ export const ServiceTemplate: React.FC = () => {
         content_category: 'Serviço Odontológico'
       }, true);
     }
-    // Google Tag Manager Data Layer
+    // Google Tag Manager Data Layer (clean, without medical category)
     if ((window as any).dataLayer) {
       (window as any).dataLayer.push({
-        event: 'view_service_page',
-        service_category: slug
+        event: 'view_service_page'
       });
     }
   }, [slug]);
@@ -186,7 +183,7 @@ export const ServiceTemplate: React.FC = () => {
                     poster={`${service.videoSrc}#t=0.1`}
                     onClick={() => {
                       if ((window as any).trackEvent) {
-                        (window as any).trackEvent('click_service_video', { service: slug });
+                        (window as any).trackEvent('click_service_video', { event_category: 'engagement' });
                       }
                     }}
                   />

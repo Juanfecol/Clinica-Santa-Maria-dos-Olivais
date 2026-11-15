@@ -23,15 +23,16 @@ O teu papel:
   5. Higiene Oral, Destartarização e Prevenção.
   6. Endodontia (desvitalização com microscópio clínico), Cirurgia e Periodontologia.
 - Informações práticas:
+  - Morada: Estrada de Moscavide N 32C, 1800-279, Lisboa
   - Telefone da clínica: 211 350 066
-  - WhatsApp oficial: 919861310 (link direto: https://wa.me/351919861310)
-  - Horário: Segunda a Sexta das 09h00 às 19h30, Sábado das 09h00 às 13h00.
-  - A primeira consulta de avaliação inclui diagnóstico e plano de tratamento personalizado.
+  - WhatsApp oficial: +351 912 907 024 (link direto: https://wa.me/351912907024)
+  - Horário: Segunda a Sexta das 10h00 às 19h00, Sábado das 10h00 às 13h00.
+  - A primeira consulta de avaliação (20,00€) inclui diagnóstico, equipamento clínico e Raio-X Periapical.
 - Instruções de conduta:
-  - Responde com gentileza na mesma língua em que o paciente escrever (Português por defeito, Espanhol ou Inglês se falar nessa língua).
+  - Responde com gentileza na mesma língua em que o paciente escrever (Português de Portugal por defeito).
   - Mantém as explicações simples e fáceis de compreender por leigos, sem jargão médico excessivo.
   - Lembra que uma consulta presencial de avaliação é essencial para diagnósticos definitivos.
-  - Sempre que oportuno, encoraja o paciente a marcar a sua consulta ou falar diretamente com a equipa pelo WhatsApp 919861310.`;
+  - Sempre que oportuno, encoraja o paciente a marcar a sua consulta ou falar diretamente com a equipa pelo WhatsApp +351 912 907 024.`;
 
 async function startServer() {
   const app = express();
@@ -48,8 +49,8 @@ async function startServer() {
       
       console.log('Received photo in request:', photo ? `${photo.substring(0, 50)}...` : 'No photo');
       
-      if (!name || !email || !message) {
-        return res.status(400).json({ error: 'Missing required fields: name, email, or message' });
+      if (!name || (!email && !phone) || !message) {
+        return res.status(400).json({ error: 'Missing required fields: name, phone/email, or message' });
       }
 
       let htmlBody = `<h3>Nova mensagem do website (Simulador/Contacto):</h3>
@@ -276,18 +277,18 @@ async function startServer() {
         const lastUserMsg = [...messages].reverse().find((m: any) => m.role === 'user' || m.sender === 'user')?.text || '';
         const lower = String(lastUserMsg).toLowerCase();
         
-        let fallbackReply = "Obrigado pela sua pergunta! Na Clínica Dentária Santa Maria dos Olivais estamos sempre disponíveis para cuidar do seu sorriso. Pode agendar uma avaliação inicial com a nossa equipa médica através do nosso WhatsApp oficial (919861310) ou telefone (211 350 066).";
+        let fallbackReply = "Obrigado pela sua pergunta! Na Clínica Dentária Santa Maria dos Olivais estamos sempre disponíveis para cuidar do seu sorriso. Pode agendar uma avaliação inicial com a nossa equipa médica através do nosso WhatsApp oficial (+351 912 907 024) ou telefone (211 350 066).";
 
         if (lower.includes('invisalign') || lower.includes('aparelho') || lower.includes('ortodont') || lower.includes('alinhador')) {
-          fallbackReply = "O tratamento com Invisalign na Clínica Santa Maria dos Olivais é planeado digitalmente em 3D e dura em média entre 6 e 18 meses, dependendo da complexidade do caso. Os alinhadores são quase invisíveis, confortáveis e removíveis para as refeições. Recomendamos marcar uma consulta de diagnóstico com scan 3D para simular o resultado final do seu sorriso. Pode agendar no WhatsApp (919861310)!";
+          fallbackReply = "O tratamento com Invisalign na Clínica Santa Maria dos Olivais é planeado digitalmente em 3D e dura em média entre 6 e 18 meses, dependendo da complexidade do caso. Os alinhadores são quase invisíveis, confortáveis e removíveis para as refeições. Recomendamos marcar uma consulta de estudo ortodôntico para planear o seu sorriso. Pode agendar no WhatsApp (+351 912 907 024)!";
         } else if (lower.includes('implante') || lower.includes('dói') || lower.includes('dor') || lower.includes('anestesia')) {
-          fallbackReply = "A colocação de implantes dentários na nossa clínica é realizada com anestesia local potente e técnicas minimamente invasivas, sendo um procedimento indolor. No pós-operatório fornecemos analgesia e protocolo anti-inflamatório específico para uma recuperação rápida. Temos packs de implantes unitários com coroa cerâmica e reabilitações completas All-on-4. Ficamos à sua espera para uma avaliação!";
+          fallbackReply = "A colocação de implantes dentários na nossa clínica é realizada com anestesia local e técnicas minimamente invasivas. Temos packs de implantes unitários com coroa metalo-cerâmica (745€) e reabilitações completas (Protocolo 4.800€). Ficamos à sua espera para uma avaliação!";
         } else if (lower.includes('preço') || lower.includes('valor') || lower.includes('custo') || lower.includes('pagamento') || lower.includes('seguro') || lower.includes('acordo')) {
-          fallbackReply = "Na Clínica Santa Maria dos Olivais trabalhamos em regime privado com emissão de fatura detalhada com todos os atos médicos para reembolso junto de seguradoras (ADSE, Médis, Multicare, AdvanceCare por Regime Livre). Além disso, disponibilizamos facilidades de pagamento faseado à medida que os procedimentos são efetuados. Agende uma consulta para obter o seu plano e orçamento personalizado.";
+          fallbackReply = "Na Clínica Santa Maria dos Olivais emitimos sempre fatura oficial detalhada para pedido de reembolso junto da sua seguradora (ADSE, Médis, Multicare, AdvanceCare por Regime Livre). Dispomos também de pagamento conforme tratamentos realizados e opção 50%/50% em implantes. Agende a sua consulta de avaliação (20,00€) pelo WhatsApp (+351 912 907 024).";
         } else if (lower.includes('faceta') || lower.includes('estética') || lower.includes('branqueamento') || lower.includes('lente')) {
-          fallbackReply = "As facetas de cerâmica e o branqueamento dentário médico são as nossas soluções de eleição para transformar o sorriso com naturalidade e brilho. As facetas permitem corrigir a tonalidade, pequenas fraturas, espaçamentos (diastemas) e imperfeições estéticas com máxima durabilidade. Fale connosco pelo WhatsApp (919861310) para marcar uma consulta estética.";
+          fallbackReply = "As facetas dentárias e o branqueamento médico são as nossas soluções de eleição para transformar o sorriso com naturalidade. Fale connosco pelo WhatsApp (+351 912 907 024) para marcar uma consulta com a Dra. Ana Mata.";
         } else if (lower.includes('marca') || lower.includes('agendar') || lower.includes('horário') || lower.includes('contacto') || lower.includes('onde')) {
-          fallbackReply = "Estamos localizados na Rua Cidade de Bissau, Olivais, Lisboa. O nosso horário é de Segunda a Sexta das 09h00 às 19h30 e Sábados das 09h00 às 13h00. Pode marcar a sua consulta ligando para 211 350 066 ou enviando mensagem para o nosso WhatsApp oficial 919861310!";
+          fallbackReply = "Estamos localizados na Estrada de Moscavide N 32C, 1800-279, Lisboa. O nosso horário é de Segunda a Sexta das 10h00 às 19h00 e Sábados das 10h00 às 13h00. Pode marcar a sua consulta ligando para 211 350 066 ou enviando mensagem para o nosso WhatsApp oficial +351 912 907 024!";
         }
 
         return res.status(200).json({ reply: fallbackReply, model: `${selectedModel} (fallback)` });

@@ -199,9 +199,54 @@
     <link rel="apple-touch-icon" href="https://clinica-santa-maria-dos-olivais.b-cdn.net/Icono-Nocturno.png" />
     
     <script>
+      // Early Attribution Capture (gclid, wbraid, gbraid, UTMs, landing_page)
+      (function() {
+        try {
+          var key = 'smo_lead_attribution_v1';
+          var stored = {};
+          var raw = localStorage.getItem(key) || sessionStorage.getItem(key);
+          if (raw) stored = JSON.parse(raw);
+          var p = new URLSearchParams(window.location.search);
+          var fields = ['gclid', 'wbraid', 'gbraid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term'];
+          var changed = false;
+          for (var i = 0; i < fields.length; i++) {
+            var v = p.get(fields[i]);
+            if (v && v.trim()) {
+              stored[fields[i]] = v.trim();
+              changed = true;
+            }
+          }
+          if (!stored.landing_page || changed) {
+            stored.landing_page = window.location.href;
+            changed = true;
+          }
+          if (changed) {
+            var s = JSON.stringify(stored);
+            localStorage.setItem(key, s);
+            sessionStorage.setItem(key, s);
+          }
+        } catch (e) {}
+      })();
+
+      // Strict EU Healthcare Privacy Scrubber for Google Ads (NEVER send clinical/treatment/symptom params)
+      window.sanitizeGoogleAdsParams = function(params) {
+        if (!params || typeof params !== 'object') return {};
+        var blockedKeys = /^(especialidade|service|service_category|item|treatment|tratamento|servico|slug|symptom|condition|diagnosis)$/i;
+        var medicalTerms = /implante|implantologia|ortodontia|invisalign|aparelho|faceta|branqueamento|siso|extra[cç][aã]o|desvitaliza[cç][aã]o|endodontia|periodontia|gengiva|pr[oó]tese|c[aá]rie|dor|abcesso|odontopediatria|coroa|enxerto|bruxismo/i;
+        var clean = {};
+        for (var k in params) {
+          if (!Object.prototype.hasOwnProperty.call(params, k)) continue;
+          if (blockedKeys.test(k)) continue;
+          var val = params[k];
+          if (typeof val === 'string' && medicalTerms.test(val)) continue;
+          clean[k] = val;
+        }
+        return clean;
+      };
+
       window.trackEvent = function(name, params) {
         if (typeof gtag === 'function') {
-          gtag('event', name, params);
+          gtag('event', name, window.sanitizeGoogleAdsParams(params));
         }
       };
 
